@@ -33,16 +33,56 @@
   .go:hover{filter:brightness(1.15);transform:translateY(-1px)}
   @media (max-width:640px){.grid{grid-template-columns:1fr}}
 </style>
+<link rel="stylesheet" href="/ui/studio.css">
+
+<style>
+.studio-document .wrap{padding:32px 24px 64px;max-width:1080px}
+.studio-document .topbar{gap:16px;align-items:center;margin-bottom:16px}
+.studio-document h1{font-size:28px;line-height:1.4;min-width:0;overflow-wrap:anywhere}
+.studio-document .topbar h1{flex:1}
+.studio-document .mtag{margin-left:0;flex:none}
+.studio-document .tagline{margin:0 0 24px;line-height:1.9}
+.studio-document :is(.back,.go,.cta a,.opt,.game .play){display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:10px 16px;line-height:1.5}
+.studio-document .opt{display:block;text-align:left;margin:8px 0;background:var(--surface);color:var(--text);border-color:var(--line)}
+.studio-document .opt:hover{transform:none;background:#2b3828}
+.studio-document .opt.right{color:#ccebc1;background:#283c26}
+.studio-document .opt.wrong{color:#ffd3ca;background:#442b26}
+.studio-document .exp{margin:8px 0 16px;padding:16px;background:#222d20;color:var(--muted)}
+.studio-document :is(section,.scenebox){margin-bottom:32px}
+.studio-document :is(.fault,.safety,.course .cbody,.howto,.part,.game,.cta){padding:24px}
+.studio-document .course .chead{padding:16px 24px;gap:16px;align-items:flex-start;flex-wrap:wrap}
+.studio-document :is(.grid,.games){gap:24px;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr))}
+.studio-document .meta{gap:12px;margin-top:24px}
+.studio-document .meta .go{margin-left:0;width:100%;margin-top:4px}
+.studio-document .cta{gap:24px;margin-top:0}
+.studio-document :focus-visible{outline:2px solid var(--lime);outline-offset:4px}
+.studio-document .media-note{font-size:12px;line-height:1.8;color:var(--muted);margin:-16px 0 32px}
+@media(max-width:600px){
+ .studio-document .wrap{padding:24px 16px 48px}
+ .studio-document .topbar{gap:12px;align-items:flex-start}
+ .studio-document h1{font-size:24px}
+ .studio-document .mtag{width:100%;border:0;padding:0;background:none}
+ .studio-document :is(.fault,.safety,.course .cbody,.howto,.part,.game,.cta){padding:16px}
+ .studio-document .course .chead{padding:16px}
+ .studio-document :is(.grid,.games){gap:16px}
+ .studio-document .scenebox .stage{height:300px}
+ .studio-document .phead{align-items:flex-start;flex-wrap:wrap;gap:12px}
+ .studio-document .phead h3{min-width:0;flex:1}
+ .studio-document .done{margin-left:26px}
+ .studio-document .cta a{width:100%}
+}
+</style>
+<script src="/ui/navigation.js" defer></script>
 </head>
-<body>
+<body class="studio-document">
+<!-- Shared navigation is mounted by /ui/navigation.js. -->
 <div class="wrap">
   <div class="topbar">
-    <a class="back" href="./index.html">← 返回车型对比</a>
     <h1 id="vName">实操看图练习</h1>
     <span class="mtag" id="mTag"></span>
   </div>
   <p class="tagline" id="vTag"></p>
-  <div class="howto"><b>练习方式：</b>点击部件进入「3D 部件详解 + 随堂考核」页面——先<b>旋转/缩放 3D 模型</b>看清结构（看图），再回答该部件的随堂考核题（<b>全对记为通过</b>，进度同步到网站学习看板）；每页还有配套的两个维修实训游戏可直接演练。建议按顺序逐部件通关。</div>
+  <div class="howto"><b>练习方式：</b>点击部件进入「3D 部件详解 + 随堂考核」页面——先<b>旋转/缩放 3D 教学示意</b>看清结构（看图），再回答该部件的随堂考核题（<b>全对记为通过</b>，进度同步到网站学习看板）；每页还有配套的两个维修实训游戏可直接演练。建议按顺序逐部件通关。</div>
   <div class="prog"><span id="progText">完成进度</span><div class="bar"><i id="progBar" style="width:0%"></i></div></div>
   <div class="grid" id="grid"></div>
 </div>
@@ -78,22 +118,24 @@
     const MC=(window.MODEL_COURSES||{})[m]||[];
     const grid=document.getElementById('grid');
     let done=0;
-    CFG.parts.forEach((part,i)=>{
+    const entries=CFG.parts.map((part,i)=>({part,i})).filter(({part,i})=>!part.visualOnly&&MC[i]);
+    entries.forEach(({part,i})=>{
       const course=MC[i]||{};
       const qn=quizCount(course);
       const pass=(function(){try{return localStorage.getItem('et_vpart:'+m+':'+i)==='1'}catch(e){return false}})();
       if(pass)done++;
       const d=document.createElement('div');d.className='part';
-      d.innerHTML='<div class="phead"><span class="dot" style="background:'+(part.color||accent)+';color:'+(part.color||accent)+'"></span><h3>'+(i+1)+'. '+part.name+'</h3>'+(pass?'<span class="done">✅ 已通过</span>':'')+'</div>'
+      d.innerHTML='<div class="phead"><span class="dot" style="background:'+(part.color||accent)+';color:'+(part.color||accent)+'"></span><h3>'+(i+1)+'. '+part.name+'</h3>'+(pass?'<span class="done"> 已通过</span>':'')+'</div>'
         +'<div class="desc">'+(part.diff||part.desc||'')+'</div>'
         +'<div class="meta"><span class="qn">'+(qn?('随堂考核 '+qn+' 题 · 全对通过'):'3D 详解 + 部件课')+'</span><span class="qn">2 个实训游戏</span><a class="go" href="./part.html?m='+m+'&p='+i+'">开始看图练习 →</a></div>';
       grid.appendChild(d);
     });
-    const total=CFG.parts.length;
+    const total=entries.length;
     document.getElementById('progText').textContent='完成进度 '+done+'/'+total+(total&&done===total?' · 全部通过，可以进考证备考刷游戏实操试题了！':'');
     document.getElementById('progBar').style.width=(total?Math.round(done/total*100):0)+'%';
   }
 })();
 </script>
+<script src="/ui/studio.js"></script>
 </body>
 </html>

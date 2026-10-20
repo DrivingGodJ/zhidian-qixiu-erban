@@ -1,0 +1,157 @@
+.lesson-visuals {
+  width: 100%;
+  max-width: 1040px;
+  min-width: 0;
+  margin: 28px auto 36px;
+  color: #f3f5ef;
+  text-align: left;
+  container-type: inline-size;
+}
+.lesson-visuals .lesson-visual-title { margin: 0 0 10px; font-size: 21px; font-weight: 650; line-height: 1.45; }
+.lesson-visuals .lesson-visual-focus { margin: 0 0 18px; color: #c1cebb; font-size: 14px; line-height: 1.8; }
+.lesson-visual-grid { display: grid; grid-template-columns: repeat(2, minmax(262px, 1fr)); gap: 16px; min-width: 0; }
+.lesson-visual-grid[data-count="1"] { grid-template-columns: minmax(262px, 1fr); }
+.lesson-visual-card {
+  display: grid;
+  grid-template-rows: auto 350px auto;
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid #3a4936;
+  border-radius: 10px;
+  background: #141b15;
+}
+.lesson-visuals[data-kind="whole"] .lesson-visual-card { grid-template-rows: auto 410px auto; }
+.lesson-visual-card-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  min-width: 0;
+  min-height: 96px;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid #354131;
+  background: #1b241a;
+}
+.lesson-visual-card-header h3 { margin: 0; color: #f1f5e9; font-size: 16px; font-weight: 600; line-height: 1.6; }
+.lesson-visual-object { display: grid; min-width: 0; gap: 5px; }
+.lesson-visual-object-label, .lesson-visual-selector > span { color: #a8b7a1; font-size: 11px; line-height: 1.5; }
+.lesson-visual-selector { display: grid; gap: 5px; min-width: 0; }
+.lesson-visual-selector select {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  padding: 9px 32px 9px 12px;
+  border: 1px solid #788d65;
+  border-radius: 6px;
+  background: #222f1d;
+  color: #e2f2d2;
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.5;
+  cursor: pointer;
+}
+.lesson-visual-selector select:hover { border-color: #c8f36a; }
+.lesson-visual-selector select:focus-visible, .lesson-visual-frame:focus-visible { outline: 3px solid #c8f36a; outline-offset: -4px; }
+.lesson-visuals .lesson-visual-frame { position: static; display: block; width: 100%; min-width: 260px; height: 100%; min-height: 0; border: 0; background: #111512; pointer-events: none; }
+.lesson-visual-card[data-interactive="true"] .lesson-visual-frame { pointer-events: auto; }
+.lesson-visual-card[data-interactive="false"] { touch-action: pan-y; }
+.lesson-visual-caption { min-width: 0; padding: 12px 16px; border-top: 1px solid #303d2d; }
+.lesson-visuals .lesson-visual-interact { display: block; width: max-content; min-height: 44px; margin: 0; padding: 9px 14px; border: 1px solid #718a59; border-radius: 6px; background: #25321f; color: #d9edc4; font: inherit; font-size: 13px; font-weight: 600; line-height: 1.6; white-space: nowrap; cursor: pointer; }
+.lesson-visuals .lesson-visual-interact:hover { border-color: #c8f36a; background: #304327; }
+.lesson-visuals .lesson-visual-interact[aria-pressed="true"] { border-color: #c8f36a; background: #c8f36a; color: #1c280f; }
+.lesson-visuals .lesson-visual-interact:focus-visible { outline: 3px solid #c8f36a; outline-offset: 3px; }
+.lesson-visuals .lesson-visual-model-note { margin: 0; color: #c4cebe; font-size: 12px; line-height: 1.8; }
+.lesson-visuals .lesson-visual-status { min-height: 1.6em; margin: 6px 0 0; color: #a1b096; font-size: 11px; line-height: 1.6; }
+.lesson-visuals .lesson-visual-disclaimer { margin: 12px 0 0; color: #9eac96; font-size: 11px; line-height: 1.8; }
+.lesson-visuals .lesson-profile-layout { margin: 13px 0 8px; padding-left: 18px; color: #bed0b2; font-size: 12px; line-height: 1.9; }
+.lesson-visuals .lesson-profile-layout li + li { margin-top: 5px; }
+.lesson-visuals .lesson-profile-scope { margin: 10px 0 0; color: #a3b396; font-size: 11px; line-height: 1.9; }
+.lesson-profile-sources { margin-top: 10px; border-top: 1px solid #33432e; }
+.lesson-profile-sources > summary { min-height: 44px; padding: 12px 0; color: #b8d398; cursor: pointer; font-size: 11px; line-height: 1.8; }
+.lesson-profile-sources ul { margin: 0 0 7px; padding-left: 16px; color: #a3b396; font-size: 11px; line-height: 1.9; }
+.lesson-profile-sources li + li { margin-top: 9px; }
+.lesson-profile-sources a { color: #c0db9d; overflow-wrap: anywhere; }
+.lesson-profile-sources li > span { display: block; margin-top: 3px; color: #94aa85; font-size: 10px; }
+.models-page .model-profile-context { margin-top: 18px; padding: 20px 22px; border: 1px solid var(--line); border-radius: 9px; background: var(--card); }
+.models-page .model-profile-context h3 { margin: 0 0 9px; font-size: 17px; }
+.models-page .model-profile-context p { margin: 0 0 12px; color: var(--muted); font-size: 12px; line-height: 1.9; }
+.models-page .model-profile-layout { margin: 0; padding-left: 18px; color: #bdcdb3; font-size: 12px; line-height: 1.9; }
+.models-page .model-profile-layout li + li { margin-top: 5px; }
+.models-page .model-profile-context .model-profile-scope { margin: 12px 0 0; font-size: 11px; }
+.models-page .model-profile-sources { margin-top: 14px; border-top: 1px solid var(--line); font-size: 12px; line-height: 1.9; }
+.models-page .model-profile-sources summary { min-height: 44px; padding-block: 11px; color: #b8d398; cursor: pointer; }
+.models-page .model-profile-sources ul { padding-left: 18px; margin: 0; }
+.models-page .model-profile-sources li + li { margin-top: 8px; }
+.models-page .model-profile-sources a { color: #c0db9d; }
+.models-page .model-profile-sources li > span { display: block; color: var(--muted); font-size: 11px; }
+
+@container (max-width: 559px) {
+  .lesson-visual-grid { grid-template-columns: minmax(262px, 1fr); }
+}
+@container (max-width: 340px) {
+  .lesson-visual-card-header { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+}
+@media (max-width: 600px) {
+  .lesson-visuals { margin-block: 24px 28px; }
+  .lesson-visuals .lesson-visual-title { font-size: 19px; }
+  .lesson-visuals .lesson-visual-focus { font-size: 13px; }
+  .lesson-visual-grid { grid-template-columns: minmax(262px, 1fr); gap: 14px; }
+  .lesson-visual-card { grid-template-rows: auto 300px auto; }
+  .lesson-visuals[data-kind="whole"] .lesson-visual-card { grid-template-rows: auto 360px auto; }
+  .lesson-visual-card-header { min-height: 90px; padding: 11px 13px; }
+  .lesson-visual-caption { padding: 11px 13px; }
+  .models-page .model-profile-context { padding: 17px; }
+}
+
+.brand-comparisons .brand-comparison-toolbar { margin-bottom: 18px; }
+.brand-system-selector { display: grid; grid-template-columns: auto minmax(180px, 280px); align-items: center; gap: 14px; width: fit-content; max-width: 100%; font-size: 12px; color: #a8b7a1; }
+.brand-system-selector select { min-width: 0; min-height: 44px; padding: 9px 36px 9px 12px; border: 1px solid #718565; border-radius: 6px; background: #202c1d; color: #e0ebd8; font: inherit; font-size: 14px; }
+.brand-comparisons .brand-model-card { grid-template-rows: 104px 350px minmax(194px, auto); }
+.brand-comparisons .lesson-visual-card-header { min-height: 0; grid-template-columns: minmax(0, 1fr) auto; }
+.brand-comparisons .lesson-visual-selector select { text-overflow: ellipsis; white-space: nowrap; font-size: 13px; }
+.brand-comparisons .brand-scope { min-height: 3.6em; margin: 0 0 11px; color: #b9c8b0; font-size: 12px; line-height: 1.8; }
+.brand-comparisons .brand-model-facts { margin: 0 0 10px; padding-left: 1.4em; color: #c7d4bf; font-size: 12px; line-height: 1.9; }
+.brand-comparisons .brand-model-facts li + li { margin-top: 6px; }
+.brand-comparisons .brand-course-note { margin: 0 0 20px; padding: 12px 15px; border-left: 2px solid #7f9c5f; background: #1e291b; color: #b8cba9; font-size: 12px; line-height: 1.9; }
+.brand-comparison-matrix { max-width: 100%; margin-top: 20px; overflow-x: auto; border: 1px solid #354431; border-radius: 8px; }
+.brand-comparison-matrix table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 12px; line-height: 1.9; }
+.brand-comparison-matrix caption { padding: 12px 15px; background: #202c1d; text-align: left; font-size: 13px; font-weight: 600; color: #dbe9ce; }
+.brand-comparison-matrix th, .brand-comparison-matrix td { padding: 12px 14px; border-top: 1px solid #354431; text-align: left; vertical-align: top; overflow-wrap: anywhere; }
+.brand-comparison-matrix th { color: #cbdcbb; font-weight: 500; }
+.brand-comparison-matrix th:first-child { width: 19%; }
+.brand-comparison-matrix td { color: #b9c9af; }
+.brand-comparisons .brand-profile-heading { margin: 28px 0 12px; font-size: 17px; }
+.brand-profile-list { border-top: 1px solid #354431; }
+.brand-profile, .brand-sources { border-bottom: 1px solid #354431; }
+.brand-profile > summary, .brand-sources > summary { min-height: 44px; padding: 14px 4px; color: #c7daba; cursor: pointer; font-size: 13px; }
+.brand-profile-body { padding: 4px 4px 15px; }
+.brand-profile dl { margin: 0; }
+.brand-profile dl > div { display: grid; grid-template-columns: 46px minmax(0, 1fr); gap: 14px; padding: 9px 0; font-size: 12px; line-height: 1.9; }
+.brand-profile dt { color: #a5c38c; }
+.brand-profile dd { margin: 0; color: #bdcdb3; }
+.brand-comparisons .brand-profile-note { margin: 13px 0 0; padding-left: 12px; border-left: 2px solid #687e50; color: #96ac86; font-size: 11px; line-height: 1.8; }
+.brand-sources { margin-top: 18px; }
+.brand-sources ul { margin: 0 0 16px; padding-left: 20px; font-size: 12px; }
+.brand-sources li { margin: 7px 0; }
+.brand-sources a { color: #b9d79c; text-decoration-thickness: 1px; overflow-wrap: anywhere; }
+.brand-system-selector select:focus-visible, .brand-profile > summary:focus-visible, .brand-sources > summary:focus-visible { outline: 3px solid #c8f36a; outline-offset: 3px; }
+@container (max-width: 740px) {
+  .brand-comparisons .brand-model-card { grid-template-rows: 144px 330px minmax(194px, auto); }
+  .brand-comparisons .lesson-visual-card-header { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  .brand-comparisons .lesson-visual-interact { width: 100%; }
+}
+@media (max-width: 600px) {
+  .brand-system-selector { grid-template-columns: minmax(0, 1fr); gap: 7px; width: 100%; }
+  .brand-system-selector select { width: 100%; }
+  .brand-comparisons .brand-model-card { grid-template-rows: 144px 300px auto; }
+  .brand-comparisons .lesson-visual-selector select { font-size: 13px; }
+  .brand-comparison-matrix { border: 0; overflow: visible; }
+  .brand-comparison-matrix table, .brand-comparison-matrix tbody, .brand-comparison-matrix tr, .brand-comparison-matrix th, .brand-comparison-matrix td { display: block; width: 100%; }
+  .brand-comparison-matrix caption { display: block; border: 1px solid #354431; border-radius: 7px 7px 0 0; }
+  .brand-comparison-matrix thead { display: none; }
+  .brand-comparison-matrix th:first-child { width: 100%; background: #1e291c; }
+  .brand-comparison-matrix td { padding-top: 9px; padding-bottom: 9px; border: 1px solid #354431; border-top: 0; }
+  .brand-comparison-matrix td::before { content: attr(data-label); display: block; color: #9fb889; font-size: 10px; margin-bottom: 3px; }
+  .brand-profile dl > div { grid-template-columns: 38px minmax(0, 1fr); gap: 10px; }
+}

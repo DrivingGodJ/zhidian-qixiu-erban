@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#111512">
+  <title>课程学习 · 智电汽修</title>
+  <link rel="stylesheet" href="/ui/learn.css?v=progress-2">
+  <link rel="stylesheet" href="/ui/lesson-visuals.css?v=progress-2">
+</head>
+<body>
+  <header class="lesson-header">
+    <a id="backCourse" href="/#course">
+      <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m11.5 5-5 5 5 5M7 10h9"/></svg>
+      返回课程
+    </a>
+    <div class="lesson-heading"><h1 id="courseTitle">课程学习</h1><div class="course-progress-summary"><span id="learningProgressLabel">学习 0%</span><progress id="learningProgress" max="100" value="0" aria-label="本课学习进度"></progress></div></div>
+    <span id="courseMeta">正在准备</span>
+  </header>
+
+  <main id="lessonContent" tabindex="-1" aria-label="课程内容">
+    <ol id="lessonSteps" aria-label="学习环节">
+      <li aria-current="step"><span class="step-number">1</span><span>学原理</span></li>
+      <li><span class="step-number">2</span><span>做练习</span></li>
+      <li><span class="step-number">3</span><span>维修实训</span></li>
+      <li><span class="step-number">4</span><span>学习结果</span></li>
+    </ol>
+    <div class="training-loading" role="status">
+      <p>正在准备课程内容…</p>
+    </div>
+  </main>
+
+  <footer id="lessonFooter">
+    <span id="stepHint" aria-live="polite">准备好后，即可开始学习。</span>
+    <button id="prevStep" type="button" disabled>上一环节</button>
+    <button id="nextStep" type="button" disabled>继续学习</button>
+  </footer>
+  <script src="/ui/course-progress.js?v=progress-2"></script>
+  <script type="module" src="/ui/learn.js?v=progress-2"></script>
+</body>
+</html>

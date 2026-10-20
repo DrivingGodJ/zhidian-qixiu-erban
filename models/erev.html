@@ -1,71 +1,12 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>增程式 EREV · 整车3D模型 | 智电汽修二班</title>
-<style>
-  *{margin:0;padding:0;box-sizing:border-box}
-  html,body{height:100%;overflow:hidden;background:#070d1a;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;color:#e8f1ff}
-  #stage{position:fixed;inset:0}
-  #chipBar{position:fixed;left:0;right:0;bottom:0;z-index:9;padding:10px 14px 12px;background:linear-gradient(0deg,rgba(7,13,26,.94) 55%,transparent)}
-  .chiprow{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px;scrollbar-width:thin}
-  .chiprow::-webkit-scrollbar{height:5px}
-  .chiprow::-webkit-scrollbar-thumb{background:#2b4a7f;border-radius:3px}
-  .pchip{flex:0 0 auto;display:flex;align-items:center;gap:7px;font-size:12.5px;color:#cfe3ff;border:1px solid #2b4a7f;border-radius:18px;padding:7px 14px;background:rgba(13,24,44,.88);cursor:pointer;transition:all .18s;font-family:inherit;white-space:nowrap}
-  .pchip:hover{transform:translateY(-2px);border-color:#3d7fe0;box-shadow:0 5px 14px rgba(18,102,241,.35)}
-  .pchip:active{transform:scale(.94)}
-  .pchip .d{width:8px;height:8px;border-radius:50%;flex:0 0 auto}
-  .topbar{position:fixed;top:0;left:0;right:0;z-index:10;display:flex;align-items:center;gap:10px;padding:12px 16px;background:linear-gradient(180deg,rgba(7,13,26,.92),rgba(7,13,26,.55) 70%,transparent);flex-wrap:wrap}
-  .topbar h1{font-size:18px;font-weight:800;letter-spacing:1px}
-  .tag{font-size:11px;color:#9fc2ef;border:1px solid #2b4a7f;border-radius:20px;padding:2px 10px;background:rgba(18,40,80,.5)}
-  .summary{font-size:12px;color:#8fb3e8;flex-basis:100%;max-width:720px;line-height:1.6}
-  .btns{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
-  .btns button{font-size:13px;padding:7px 14px;border-radius:10px;border:1px solid #2b4a7f;background:rgba(18,40,80,.6);color:#cfe3ff;cursor:pointer;transition:.15s}
-  .btns button:hover{background:rgba(30,64,120,.8);transform:translateY(-1px)}
-  .btns button.on{background:linear-gradient(135deg,#1266f1,#0b3d91);border-color:#3d7fe0;color:#fff;font-weight:700}
-  .back{font-size:13px;color:#9fc2ef;text-decoration:none;border:1px solid #2b4a7f;border-radius:10px;padding:7px 12px;background:rgba(18,40,80,.5)}
-  #partCard{position:fixed;left:50%;bottom:74px;transform:translate(-50%,140%);width:min(640px,92vw);z-index:12;background:rgba(9,17,34,.96);border:1px solid #2b4a7f;border-radius:14px;padding:16px 18px;transition:transform .28s cubic-bezier(.22,.9,.32,1.05);box-shadow:0 12px 40px rgba(0,0,0,.6)}
-  #partCard.show{transform:translate(-50%,0)}
-  #partCard h3{font-size:16px;color:#7db4ff;margin-bottom:6px;padding-right:26px}
-  #pcDesc{font-size:13px;color:#c4d6f2;line-height:1.7}
-  #pcDiff{margin-top:8px;font-size:12.5px;color:#ffd166;line-height:1.7;border-top:1px dashed #2b4a7f;padding-top:8px}
-  #pcDiff:empty{display:none}
-  #pcCourse{margin-top:10px;width:100%;padding:9px 0;border:1px solid #3d6db3;border-radius:9px;background:linear-gradient(135deg,#123a75,#0d2a56);color:#cfe4ff;font-size:14px;letter-spacing:2px;cursor:pointer;transition:all .18s ease}
-  #pcCourse:hover{background:linear-gradient(135deg,#1a4f9e,#123a75);box-shadow:0 0 14px rgba(80,140,255,.35);transform:translateY(-1px)}
-  #pcClose{position:absolute;top:10px;right:12px;background:none;border:none;color:#8fb3e8;font-size:20px;cursor:pointer;line-height:1}
-  .hint{position:fixed;bottom:66px;right:16px;z-index:8;font-size:11.5px;color:#5f7ba8;background:rgba(9,17,34,.7);padding:5px 10px;border-radius:8px}
-</style>
-</head>
-<body>
-<div id="stage"></div>
-<div id="chipBar"></div>
-
-<div class="topbar">
-  <a class="back" href="./index.html">← 车型总览</a>
-  <h1 id="typeTitle"></h1>
-  <span class="tag" id="typeTag"></span>
-  <div class="btns">
-    <button id="vWhole">整车视角</button>
-    <button id="vUnder">底盘视角</button>
-    <button id="tRot" class="on">旋转：开</button>
-  </div>
-  <div class="summary" id="typeSummary"></div>
-</div>
-
-<div id="partCard">
-  <button id="pcClose">×</button>
-  <h3 id="pcName"></h3>
-  <p id="pcDesc"></p>
-  <p id="pcDiff"></p>
-  <button id="pcCourse">进入部件课 ▶</button>
-</div>
-<div class="hint">拖拽旋转 · 滚轮/双指缩放 · 点击零件看详解</div>
-
-<script src="cfg-erev.js"></script>
-<script type="importmap">
-{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}
-</script>
-<script type="module" src="model.js"></script>
-</body>
-</html>
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#111512">
+<title>增程式 EREV · 3D 拆解台 | 智电汽修</title><link rel="stylesheet" href="studio-stage.css"></head><body>
+<header class="topbar"><a class="back" href="/models/index.html">← 车型总览</a><div><h1 id="typeTitle"></h1><span class="tag" id="typeTag"></span></div><div class="btns"><button id="vWhole">整车视角</button><button id="vUnder">底盘视角</button><button id="tRot" class="on">旋转：开</button><a class="back" href="/">学习中心 ↗</a></div></header>
+<aside class="component-rail" aria-label="零部件结构树"><p class="rail-heading">COMPONENT EXPLORER</p><div class="chiprow"></div></aside>
+<main id="stage"><div class="stage-caption"><div class="stage-eyebrow">EV LEARNING STUDIO / 01</div><h2 id="stageTitle"></h2><p>无品牌通用SUV车体 · 完整配件教学示意</p></div><div class="stage-status">INTERACTIVE 3D</div>
+<div class="loader" id="modelLoading" role="status">正在加载精细模型…</div>
+<div id="partCard"><button id="pcClose" aria-label="关闭部件信息">×</button><h3 id="pcName"></h3><p id="pcDesc"></p><p id="pcDiff"></p><button id="pcCourse">学习此部件 →</button></div>
+<div class="stage-toolbar" role="toolbar" aria-label="模型显示"><button id="tShell" aria-pressed="false">实体车身</button><button id="tExplode" aria-pressed="false">分解结构</button><button id="tReset">重置视角 ↺</button></div><div class="hint">拖动旋转 · 滚轮缩放 · 从左侧或模型选取部件</div></main>
+<div class="stage-disclaimer">通用无品牌车体；集中展示本动力形式的完整教学配件，非量产车型维修数据。<a href="assets/ATTRIBUTION.md" target="_blank">模型来源与 CC BY 4.0 署名</a></div>
+<script src="cfg-erev.js"></script><script type="importmap">{"imports":{"three":"/videos/three.module.js","three/addons/":"/vendor/three/addons/"}}</script><script type="module" src="model.js"></script><script src="/ui/navigation.js" defer></script>
+</body></html>

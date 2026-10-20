@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#111512">
+<title>纯电动 BEV · 3D 拆解台 | 智电汽修</title><link rel="stylesheet" href="studio-stage.css"></head><body>
+<header class="topbar"><a class="back" href="/models/index.html">← 车型总览</a><div><h1 id="typeTitle"></h1><span class="tag" id="typeTag"></span></div><div class="btns"><button id="vWhole">整车视角</button><button id="vUnder">底盘视角</button><button id="tRot" class="on">旋转：开</button><a class="back" href="/">学习中心 ↗</a></div></header>
+<aside class="component-rail" aria-label="零部件结构树"><p class="rail-heading">COMPONENT EXPLORER</p><div class="chiprow"></div></aside>
+<main id="stage"><div class="stage-caption"><div class="stage-eyebrow">EV LEARNING STUDIO / 01</div><h2 id="stageTitle"></h2><p>无品牌通用轿车车体 · 完整配件教学示意</p></div><div class="stage-status">INTERACTIVE 3D</div>
+<div class="loader" id="modelLoading" role="status">正在加载精细模型…</div>
+<div id="partCard"><button id="pcClose" aria-label="关闭部件信息">×</button><h3 id="pcName"></h3><p id="pcDesc"></p><p id="pcDiff"></p><button id="pcCourse">学习此部件 →</button></div>
+<div class="stage-toolbar" role="toolbar" aria-label="模型显示"><button id="tShell" aria-pressed="false">实体车身</button><button id="tExplode" aria-pressed="false">分解结构</button><button id="tReset">重置视角 ↺</button></div><div class="hint">拖动旋转 · 滚轮缩放 · 从左侧或模型选取部件</div></main>
+<div class="stage-disclaimer">通用无品牌车体；集中展示本动力形式的完整教学配件，非量产车型维修数据。<a href="assets/ATTRIBUTION.md" target="_blank">模型来源与 CC BY 4.0 署名</a></div>
+<script src="cfg-bev.js"></script><script type="importmap">{"imports":{"three":"/videos/three.module.js","three/addons/":"/vendor/three/addons/"}}</script><script type="module" src="model.js"></script><script src="/ui/navigation.js" defer></script>
+</body></html>

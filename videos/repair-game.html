@@ -4,47 +4,53 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>智电维修工坊 · 3D维修实训游戏</title>
+<script src="/ui/course-progress.js?v=progress-2"></script>
+<script>if(new URLSearchParams(location.search).get("embed")==="1")document.documentElement.classList.add("game-embed");</script>
 <style>
-:root{--blue:#0b3d91;--blue2:#1266f1;--orange:#ff8a14;--bg:#070d1a;--panel:rgba(13,24,44,.94);--line:#274264;--txt:#e8f2ff;--sub:#9fc2ef}
+:root{--blue:#647d35;--blue2:#c6ef74;--orange:#ff8a14;--bg:#101511;--panel:rgba(27,34,28,.94);--line:#364237;--txt:#e7ece2;--sub:#a4b09f}
 *{margin:0;padding:0;box-sizing:border-box;user-select:none;-webkit-user-select:none}
-body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;background:radial-gradient(1200px 700px at 50% 0%,#0d2140 0%,var(--bg) 70%);color:var(--txt);height:100vh;display:flex;flex-direction:column;overflow:hidden}
+body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;background:radial-gradient(1200px 700px at 50% 0%,#1d271e 0%,var(--bg) 70%);color:var(--txt);height:100vh;display:flex;flex-direction:column;overflow:hidden}
 button{font:inherit;cursor:pointer}
-.topbar{display:flex;align-items:center;gap:14px;padding:10px 18px;background:rgba(9,16,32,.9);border-bottom:1px solid var(--line);flex-wrap:wrap}
-.topbar .logo{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--blue2),var(--blue));display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(18,102,241,.5)}
+.topbar{display:flex;align-items:center;gap:14px;padding:10px 18px;background:rgba(18,24,19,.96);border-bottom:1px solid var(--line);flex-wrap:wrap}
+.topbar .logo{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--blue2),var(--blue));display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(198,239,116,.12)}
 .topbar .logo svg{width:22px;height:22px}
 .topbar h1{font-size:17px;letter-spacing:1px}
 .topbar h1 small{font-size:11px;color:var(--sub);font-weight:400;margin-left:8px;letter-spacing:2px}
 .chip{font-size:12px;padding:4px 12px;border-radius:20px;border:1px solid var(--line);background:var(--panel);color:var(--sub)}
 .chip.bad{color:#ff6b5e;border-color:#5a2b26}
 #backBtn{padding:5px 14px;border-radius:18px;border:1px solid var(--line);background:var(--panel);color:var(--sub);font-size:12.5px;transition:.15s}
-#backBtn:hover{color:#fff;border-color:#3d7fe0}
+#backBtn:hover{color:#fff;border-color:#bedb83}
 .steps{display:flex;gap:5px;margin-left:auto;align-items:center}
-.dot{width:11px;height:11px;border-radius:50%;background:#1a3050;border:1px solid #2c4a77;transition:.3s}
+.dot{width:11px;height:11px;border-radius:50%;background:#273329;border:1px solid #455340;transition:.3s}
 .dot.on{background:var(--orange);box-shadow:0 0 10px rgba(255,138,20,.8);border-color:var(--orange)}
 .dot.cur{transform:scale(1.35);border-color:#fff}
 .stat{font-size:12.5px;color:var(--sub);font-variant-numeric:tabular-nums}
 .stat b{color:#fff}
 .main{flex:1;display:flex;min-height:0}
-.stage{flex:1;position:relative;min-width:0}
+.stage{flex:1;position:relative;min-width:0;overflow:hidden}
 .stage canvas{display:block}
 .objective{position:absolute;left:50%;top:12px;transform:translateX(-50%);font-size:14px;font-weight:600;color:#ffe9cf;background:rgba(40,24,6,.88);border:1px solid #7a4a12;padding:8px 22px;border-radius:22px;box-shadow:0 4px 14px rgba(0,0,0,.4);white-space:nowrap;max-width:92%;overflow:hidden;text-overflow:ellipsis}
 .objective b{color:var(--orange)}
-.hud{width:290px;border-left:1px solid var(--line);background:rgba(9,16,32,.75);padding:14px;display:flex;flex-direction:column;gap:12px;overflow-y:auto}
+.hud{width:290px;border-left:1px solid var(--line);background:rgba(18,24,19,.92);padding:14px;display:flex;flex-direction:column;gap:12px;overflow-y:auto}
 .hud h3{font-size:14px;color:#fff;border-left:3px solid var(--orange);padding-left:8px}
 .order{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px;font-size:12.5px;line-height:1.8;color:var(--sub)}
 .order b{color:#ffb35e}
 .order .done-step{color:#35d07f}
-.meter{background:#0a1424;border:1px solid var(--line);border-radius:12px;padding:12px;display:none}
+.meter{background:#151d16;border:1px solid var(--line);border-radius:12px;padding:12px;display:none}
 .meter.show{display:block;animation:pop .3s}
 .meter .val{font-size:26px;font-weight:800;color:#ff6b5e;font-variant-numeric:tabular-nums}
 .meter .val.ok{color:#35d07f}
 .meter .lbl{font-size:12px;color:var(--sub);margin-top:4px}
-.hintbox{font-size:12.5px;line-height:1.7;color:#cfe6ff;background:rgba(21,34,58,.8);border:1px solid var(--line);border-radius:12px;padding:10px 12px;min-height:58px}
+.hintbox{font-size:12.5px;line-height:1.7;color:#c4cdbd;background:rgba(33,43,32,.85);border:1px solid var(--line);border-radius:12px;padding:10px 12px;min-height:58px}
 .hintbox b{color:var(--orange)}
 @keyframes pop{from{transform:scale(.92);opacity:0}to{transform:scale(1);opacity:1}}
-.tray{display:flex;gap:10px;padding:12px 14px;background:rgba(9,16,32,.92);border-top:1px solid var(--line);overflow-x:auto;align-items:stretch}
+.tray{display:flex;gap:14px;padding:10px 14px;background:rgba(18,24,19,.98);border-top:1px solid var(--line);overflow:hidden;align-items:stretch;flex-shrink:0}
+.tray-actions{display:contents}
+.tool-strip{display:flex;gap:10px;flex:1;min-width:0;overflow-x:auto;padding:4px 0;scroll-snap-type:x proximity;scroll-padding:2px}
+.tool-strip .tool{scroll-snap-align:start}
+.tray-title{order:0}.tool-strip{order:1}#helpBtn{order:2}
 .tool{flex:none;width:104px;background:var(--panel);border:2px solid var(--line);border-radius:14px;padding:8px 6px 7px;text-align:center;cursor:grab;transition:transform .15s,box-shadow .15s,border-color .15s;position:relative}
-.tool:hover{transform:translateY(-4px);box-shadow:0 8px 20px rgba(61,127,224,.4);border-color:#3d7fe0}
+.tool:hover{transform:translateY(-4px);box-shadow:0 8px 20px rgba(159,190,116,.15);border-color:#bedb83}
 .tool.sel{border-color:var(--orange);box-shadow:0 0 16px rgba(255,138,20,.55);transform:translateY(-4px)}
 .tool img{width:76px;height:56px;display:block;margin:0 auto;pointer-events:none}
 .tool .nm{font-size:12px;color:var(--txt);margin-top:4px;font-weight:600}
@@ -53,18 +59,18 @@ button{font:inherit;cursor:pointer}
 #helpBtn{flex:none;align-self:center;margin-left:auto;padding:12px 18px;border-radius:14px;border:2px solid #7a4a12;background:linear-gradient(135deg,#a35a10,#7a3d08);color:#ffe9cf;font-weight:700;font-size:14px;white-space:nowrap;transition:transform .15s,filter .15s}
 #helpBtn:hover{transform:translateY(-3px);filter:brightness(1.2)}
 #helpBtn:disabled{opacity:.5;pointer-events:none}
-.overlay{position:fixed;inset:0;z-index:50;background:rgba(4,8,18,.82);display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);overflow-y:auto}
+.overlay{position:fixed;inset:0;z-index:50;background:rgba(8,12,9,.88);display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);overflow-y:auto}
 .overlay.hide{display:none}
-.panel{background:linear-gradient(160deg,#0e1c36,#0a1424);border:1px solid #2c4a77;border-radius:18px;padding:30px 34px;max-width:520px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.6);animation:pop .35s}
+.panel{background:linear-gradient(160deg,#202b20,#151d16);border:1px solid #455340;border-radius:18px;padding:30px 34px;max-width:520px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.6);animation:pop .35s}
 .panel h2{font-size:22px;color:#fff;margin-bottom:14px}
 .panel h2 .em{color:var(--orange)}
 .panel p{font-size:14px;line-height:2;color:var(--sub)}
 .panel p b{color:#ffd9a8}
-.bigbtn{margin-top:20px;width:100%;padding:14px;border-radius:12px;border:1px solid #3d7fe0;background:linear-gradient(135deg,var(--blue2),var(--blue));color:#fff;font-size:16px;font-weight:700;letter-spacing:2px;transition:transform .15s,filter .15s}
+.bigbtn{margin-top:20px;width:100%;padding:14px;border-radius:12px;border:1px solid #bedb83;background:linear-gradient(135deg,var(--blue2),var(--blue));color:#fff;font-size:16px;font-weight:700;letter-spacing:2px;transition:transform .15s,filter .15s}
 .bigbtn:hover{transform:translateY(-2px);filter:brightness(1.15)}
 .bigbtn.ghost{background:var(--panel);border-color:var(--line);color:var(--sub);margin-top:10px}
 .stars{font-size:44px;text-align:center;letter-spacing:10px;margin:8px 0}
-.stars .s{color:#3a4f74}.stars .s.on{color:#ffc531;text-shadow:0 0 22px rgba(255,197,49,.8)}
+.stars .s{color:#495542}.stars .s.on{color:#ffc531;text-shadow:0 0 22px rgba(255,197,49,.8)}
 .result-row{display:flex;justify-content:space-around;font-size:13px;color:var(--sub);margin:12px 0;text-align:center}
 .result-row b{display:block;font-size:20px;color:#fff}
 .toast{position:fixed;left:50%;bottom:118px;transform:translateX(-50%) translateY(20px);background:rgba(50,16,10,.95);border:1px solid #a03d2c;color:#ffd3c9;padding:10px 22px;border-radius:12px;font-size:13.5px;opacity:0;transition:.3s;z-index:60;pointer-events:none;max-width:80%}
@@ -75,7 +81,7 @@ button{font:inherit;cursor:pointer}
 .hub-sub{font-size:13px;color:var(--sub);margin-bottom:16px;line-height:1.8}
 .lv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
 .lv-card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 12px;cursor:pointer;transition:.18s;position:relative;overflow:hidden}
-.lv-card:hover{transform:translateY(-4px);border-color:#3d7fe0;box-shadow:0 10px 24px rgba(18,102,241,.35)}
+.lv-card:hover{transform:translateY(-4px);border-color:#bedb83;box-shadow:0 10px 24px rgba(159,190,116,.12)}
 .lv-card .bar{height:4px;border-radius:2px;margin-bottom:10px}
 .lv-card h4{font-size:14.5px;color:#fff;margin-bottom:6px}
 .lv-card p{font-size:11.5px;color:var(--sub);line-height:1.6;min-height:36px}
@@ -86,14 +92,126 @@ button{font:inherit;cursor:pointer}
   .topbar h1 small{display:none}
   #helpBtn{padding:10px 12px;font-size:12px}
 }
+/* Keep long case lists reachable and the work order readable on compact screens. */
+#hub{align-items:flex-start}
+#hub .hub-panel{margin:20px 0}
+@media(max-width:760px){
+  body{height:100dvh}
+  .topbar{gap:8px;padding:9px 12px}
+  .topbar h1{font-size:15px}
+  .steps{width:100%;margin-left:0;justify-content:flex-end}
+  .main{flex-direction:column}
+  .stage{min-height:240px}
+  .hud{display:flex;width:100%;max-height:164px;flex-shrink:0;border-left:0;border-top:1px solid var(--line);padding:10px 12px;gap:8px}
+  .hud h3{font-size:12px}
+  .order,.hintbox{font-size:12px;padding:8px 10px}
+  .objective{font-size:12px;padding:7px 12px;white-space:normal;text-align:center;width:calc(100% - 28px);max-width:none}
+  .tray{display:block;padding:8px 10px}
+  .tray-actions{display:flex;align-items:center;gap:12px;margin-bottom:5px}
+  .tray-title{display:block;font-size:10px;line-height:1.5}
+  .tray-title b{font-size:12px}
+  .tool-strip{gap:8px;width:100%;overflow-x:auto;padding:4px 0}
+  #helpBtn{position:static;margin-left:auto;padding:8px 14px;min-height:36px;border-radius:9px;box-shadow:none;z-index:auto}
+  #helpBtn:hover{transform:none}
+  .panel{padding:22px 20px}
+  .overlay{padding:14px}
+  #hub .hub-panel{margin:0}
+  .lv-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+}
+
+/* Action targets remain distinct from the model canvas and from global navigation. */
+.game-page :is(button,.tool,.lv-card):focus-visible{outline:2px solid var(--lime,#c8f36a);outline-offset:4px}
+.game-page #stage:focus-visible{outline:2px solid var(--lime,#c8f36a);outline-offset:-4px}
+.game-page :is(button,#backBtn){min-height:44px}
+.game-page .topbar{gap:16px;padding:12px 16px}
+.game-page .panel{padding:32px}
+.game-page .panel .bigbtn{min-height:48px;margin-top:24px}
+.game-page .panel .bigbtn.ghost{margin-top:16px}
+.game-page .lv-grid{gap:16px}
+.game-page .tray-actions #helpBtn{min-height:44px}
+.game-page .toast{bottom:calc(var(--game-tray-height,160px) + 16px)}
+@media(max-width:760px){
+ .game-page .topbar{gap:8px;padding:8px 12px}
+ .game-page .panel{padding:24px 16px}
+ .game-page .lv-grid{gap:12px}
+ .game-page .topbar h1{font-size:14px}
+ .game-page .topbar #backBtn{padding:8px 12px}
+}
+@media(max-height:700px) and (max-width:760px){.game-page .stage{min-height:160px}.game-page .hud{max-height:132px}}
+/* Every work area owns its height; a short viewport must never push the HUD into tools. */
+.game-page .main{position:relative;overflow:hidden}
+#learningGate .bigbtn{display:flex;align-items:center;justify-content:center;text-align:center;text-decoration:none;letter-spacing:0;color:#16200f}
+.lv-state{display:block;margin-top:10px;color:var(--sub);font-size:11px}
+.lv-state.unlocked{color:#b4dc86}
+.training-locked #backBtn{display:none!important}
+.hosted-game #learningLink{display:none!important}
+.game-page .stage{min-height:0}
+.game-page .hud .toast{position:static;display:none;left:auto;bottom:auto;transform:none;max-width:none;margin:0;padding:10px 12px;font-size:12px;opacity:1;transition:none;flex-shrink:0}
+.game-page .hud .toast.show{display:block;transform:none}
+.game-page .tool-strip{padding:8px 4px;scroll-padding:4px}
+.game-page .tool:hover,.game-page .tool.sel{transform:none}
+.game-embed,.game-embed body{height:100%;min-height:0;overflow:hidden}
+.game-embed body.game-page{height:100dvh;display:grid;grid-template-rows:auto minmax(0,1fr) auto;padding:0!important}
+.game-embed .global-navigation,.game-embed .topbar :is(.logo,h1,#backBtn),.game-embed #intro .bigbtn,.game-embed #result .bigbtn{display:none!important}
+.game-embed .topbar{min-height:44px;padding:6px 12px;gap:12px;flex-wrap:nowrap}
+.game-embed .topbar .steps{margin-left:auto;width:auto}
+.game-embed .topbar .chip,.game-embed .topbar .stat{font-size:11px;white-space:nowrap}
+.game-embed .topbar .dot{width:8px;height:8px}
+.game-embed .main{display:grid;grid-template-columns:minmax(0,1fr) 290px}
+.game-embed .overlay{position:absolute;inset:0;padding:16px;align-items:flex-start;overscroll-behavior:contain}
+.game-embed .overlay .panel{margin:auto;max-height:100%;overflow-y:auto;animation:none;padding:24px}
+.game-embed .overlay .panel h2{font-size:20px;margin-bottom:16px}
+.game-embed .overlay .panel p{font-size:13px;line-height:1.8}
+.game-embed .tray{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:center;padding:8px 12px}
+.game-embed .tray-actions{display:flex;flex-direction:column;gap:8px;margin:0;min-width:96px}
+.game-embed .tray-title{font-size:10px;padding:0;align-self:flex-start}
+.game-embed .tray-title b{font-size:12px}
+.game-embed #helpBtn{margin:0;padding:8px 12px;font-size:12px;min-height:44px;align-self:stretch}
+.game-embed .tool-strip{order:initial;min-width:0;width:100%}
+.game-embed .tool{width:88px;padding:6px 4px}
+.game-embed .tool img{width:64px;height:44px}
+.game-embed .tool .nm{font-size:11px}
+@media(max-width:760px){
+ .game-page .main{display:grid;grid-template-rows:minmax(0,1fr) minmax(0,164px)}
+ .game-page .hud{height:100%;min-height:0;max-height:none}
+ .game-embed .main{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) minmax(0,116px)}
+ .game-embed .topbar .steps{display:none}
+ .game-embed .topbar .chip{margin-right:auto}
+ .game-embed .hud{display:grid;grid-template-columns:minmax(0,1fr) 110px;grid-auto-rows:max-content;align-content:start;gap:8px;padding:8px 12px}
+ .game-embed .hud h3{display:none}
+ .game-embed .hud .hintbox{grid-column:1/-1;grid-row:1;font-size:12px;min-height:0}
+ .game-embed .hud:has(.meter.show) .hintbox{grid-column:1}
+ .game-embed .hud .meter{grid-column:2;grid-row:1;padding:8px}
+ .game-embed .hud .meter .val{font-size:20px}
+ .game-embed .hud .meter .lbl{font-size:10px}
+ .game-embed .hud .order{grid-column:1/-1;grid-row:2}
+ .game-embed .hud .toast{grid-column:1/-1;grid-row:1}
+ .game-embed .hud:has(.toast.show) :is(.hintbox,.meter){grid-row:2}
+ .game-embed .hud:has(.toast.show) .order{grid-row:3}
+ .game-embed .tray{display:grid;grid-template-columns:minmax(0,1fr);gap:0;padding:6px 10px}
+ .game-embed .tray-actions{display:flex;flex-direction:row;align-items:center;gap:12px;margin:0 0 4px;min-width:0}
+ .game-embed .tray-title{align-self:center}
+ .game-embed #helpBtn{margin-left:auto;align-self:center}
+ .game-embed .tool-strip{padding:5px 4px}
+ .game-embed .tool{width:84px}
+ .game-embed .overlay{padding:12px}
+ .game-embed .overlay .panel{padding:16px}
+}
+@media(max-height:550px) and (max-width:760px){
+ .game-page .main{grid-template-rows:minmax(0,1fr) minmax(0,96px)}
+ .game-embed .main{grid-template-rows:minmax(0,1fr) minmax(0,96px)}
+ .game-embed .tool img{height:36px;width:52px}
+ .game-embed .tool{padding:4px}
+}
 </style>
+<link rel="stylesheet" href="/ui/studio.css">
 </head>
-<body>
+<body class="game-page">
 
 <div class="topbar">
   <div class="logo"><svg viewBox="0 0 24 24" fill="none"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z" fill="#ffd166"/></svg></div>
   <h1>智电维修工坊<small id="lvLabel">3D 维修实训</small></h1>
-  <button id="backBtn" onclick="showHub()" style="display:none">返回关卡列表</button>
+  <button id="backBtn" onclick="showHub()" style="display:none">关卡目录</button>
   <span class="chip bad" id="statusChip">故障待修</span>
   <div class="steps" id="stepDots"></div>
   <span class="stat">失误 <b id="mist">0</b></span>
@@ -118,13 +236,14 @@ button{font:inherit;cursor:pointer}
 </div>
 
 <div class="tray" id="tray">
-  <div class="tray-title"><b>道具栏</b>乱序摆放 · 拖拽或点选</div>
+  <div class="tray-actions" id="trayActions"><div class="tray-title"><b>道具栏</b>乱序摆放 · 拖拽或点选</div></div>
+  <div class="tool-strip" id="toolStrip" aria-label="维修工具"></div>
 </div>
 
 <div class="overlay" id="hub">
   <div class="panel hub-panel">
     <h2>选择维修关卡 <span class="em">整车 15 大部件</span></h2>
-    <p class="hub-sub">每个关卡对应整车 3D 模型中的一个真实部件：一件待修零件、一组乱序工具、一条标准维修工艺。选错工具记失误，修好按失误数评星。</p>
+    <p class="hub-sub">每个关卡是一组3D教学示意：模拟故障、工具选择与维修工序。选错工具记失误，完成演练后按表现评星。</p>
     <div class="lv-grid" id="lvGrid"></div>
   </div>
 </div>
@@ -149,39 +268,86 @@ button{font:inherit;cursor:pointer}
     </div>
     <p id="resultText" style="text-align:center"></p>
     <button class="bigbtn" id="retryBtn">再修一次</button>
-    <button class="bigbtn ghost" onclick="showHub()">返回关卡列表</button>
+    <button class="bigbtn ghost" onclick="showHub()">选择其他关卡</button>
   </div>
 </div>
 
-<div class="toast" id="toast"></div>
+<div class="overlay hide" id="learningGate" role="alertdialog" aria-labelledby="learningGateTitle" aria-describedby="learningGateBody">
+  <div class="panel">
+    <h2 id="learningGateTitle">先完成对应部件学习</h2>
+    <p id="learningGateBody"></p>
+    <a class="bigbtn" id="learningLink" href="/#course">前往对应部件学习</a>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script type="importmap">{"imports":{"three":"./three.module.js"}}</script>
 <script type="module">
 import * as THREE from 'three';
+import { qualityGeometry, refineAssembly, studioEnvironment, fastener, finishPalette, cable, disposeAssembly } from '../models/model-quality.js';
+
+const EMBED=document.documentElement.classList.contains('game-embed');
+const gameQuery=new URLSearchParams(location.search);
+const requestedLevel=gameQuery.get('level');
+const hasCourseContext=gameQuery.has('vehicle')||gameQuery.has('part');
+const courseContext=hasCourseContext?{vehicle:gameQuery.get('vehicle'),part:gameQuery.get('part')}:undefined;
+const messageSource='zhidian-repair-game';
+function gameAccountIdentity(){try{return JSON.stringify(JSON.parse(localStorage.getItem('et_session'))||null)}catch{return 'null'}}
+const boundGameAccount=gameAccountIdentity();
+let gameAccountChanged=false;
+if(EMBED){
+  if(parent!==window)document.body.classList.add('hosted-game');
+  for(const id of ['hub','intro','result','learningGate'])document.querySelector('.main').appendChild(document.getElementById(id));
+  const reportError=message=>{if(parent!==window)parent.postMessage({source:messageSource,version:1,type:'studio:game-error',level:requestedLevel,message},location.origin)};
+  addEventListener('error',event=>reportError(event.message||'实训加载失败'));
+  addEventListener('unhandledrejection',event=>reportError(String(event.reason?.message||event.reason||'实训运行失败')));
+}
+document.querySelector('.hud').prepend(document.getElementById('toast'));
 
 /* ================= 基础场景 ================= */
 const stage=document.getElementById('stage');
+stage.tabIndex=0;stage.setAttribute('role','button');stage.setAttribute('aria-label','维修示意场景：选中工具后按回车使用');
 const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
 renderer.setPixelRatio(Math.min(devicePixelRatio,2));
 stage.appendChild(renderer.domElement);
 const scene=new THREE.Scene();
+scene.environment=studioEnvironment(renderer);
+renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.08;
+const toolFinishes=finishPalette();
 const camera=new THREE.PerspectiveCamera(42,1,0.1,100);
 camera.position.set(3.4,2.1,4.6);
 camera.lookAt(0,0.35,0);
-scene.add(new THREE.HemisphereLight(0xbcd7ff,0x1a2436,1.0));
+let modelFraming=null;
+function fitModelCamera(){
+  if(!modelFraming)return;
+  const {target,radius}=modelFraming;
+  const vertical=THREE.MathUtils.degToRad(camera.fov)/2;
+  const horizontal=Math.atan(Math.tan(vertical)*camera.aspect);
+  const distance=radius/Math.sin(Math.min(vertical,horizontal)) * 1.14;
+  camera.position.copy(target).addScaledVector(new THREE.Vector3(3.4,1.9,4.6).normalize(),distance);
+  camera.lookAt(target);
+}
+function frameModel(model){
+  const bounds=new THREE.Box3().setFromObject(model),size=bounds.getSize(new THREE.Vector3());
+  const radial=Math.hypot(Math.max(Math.abs(bounds.min.x),Math.abs(bounds.max.x)),Math.max(Math.abs(bounds.min.z),Math.abs(bounds.max.z)));
+  modelFraming={target:new THREE.Vector3(0,(bounds.min.y+bounds.max.y)/2,0),radius:Math.hypot(radial,size.y/2)};
+  fitModelCamera();
+}
+scene.add(new THREE.HemisphereLight(0xe2e8dc,0x18221d,1.25));
 const keyL=new THREE.DirectionalLight(0xffffff,1.6);keyL.position.set(4,6,5);scene.add(keyL);
-const rim=new THREE.DirectionalLight(0x3d8bff,1.1);rim.position.set(-5,3,-4);scene.add(rim);
-function resize(){const w=stage.clientWidth,h=stage.clientHeight;renderer.setSize(w,h);camera.aspect=w/h;camera.updateProjectionMatrix()}
-addEventListener('resize',resize);resize();
-const grid=new THREE.GridHelper(14,28,0x1d3a66,0x12233f);scene.add(grid);
-const bench=new THREE.Mesh(new THREE.CylinderGeometry(2.5,2.6,0.12,48),new THREE.MeshStandardMaterial({color:0x12264a,metalness:.6,roughness:.5}));
+const rim=new THREE.DirectionalLight(0xc8dfad,.85);rim.position.set(-5,3,-4);scene.add(rim);
+function resize(){const w=stage.clientWidth,h=stage.clientHeight;renderer.setSize(w,h);camera.aspect=w/h;camera.updateProjectionMatrix();fitModelCamera()}
+addEventListener('resize',resize);new ResizeObserver(resize).observe(stage);resize();
+const grid=new THREE.GridHelper(14,28,0x344137,0x202c25);scene.add(grid);
+const bench=new THREE.Mesh(new THREE.CylinderGeometry(2.5,2.6,0.12,48),new THREE.MeshStandardMaterial({color:0x252e28,metalness:.62,roughness:.48}));
 bench.position.y=-0.06;scene.add(bench);
 
 /* ================= 材质 ================= */
 const M={
   metal:new THREE.MeshStandardMaterial({color:0x9fb2c8,metalness:.85,roughness:.35}),
   dark:new THREE.MeshStandardMaterial({color:0x39465a,metalness:.7,roughness:.5}),
-  copper:new THREE.MeshStandardMaterial({color:0xd97a3a,metalness:.9,roughness:.3,emissive:0x2a0e00,emissiveIntensity:.35}),
+  copper:new THREE.MeshStandardMaterial({color:0xd97a3a,metalness:.9,roughness:.3,emissive:0x2a0e00,emissiveIntensity:.08}),
   copperBurnt:new THREE.MeshStandardMaterial({color:0x3a2a22,metalness:.5,roughness:.85}),
   copperWarm:new THREE.MeshStandardMaterial({color:0x8a5a3a,metalness:.8,roughness:.5}),
   orange:new THREE.MeshStandardMaterial({color:0xff7a1a,metalness:.4,roughness:.4}),
@@ -197,94 +363,247 @@ const M={
 
 /* ================= 道具 3D 建模 ================= */
 function buildTool(id){
-  const g=new THREE.Group();
-  const add=(geo,mat,x=0,y=0,z=0,rx=0,ry=0,rz=0)=>{const m=new THREE.Mesh(geo,mat);m.position.set(x,y,z);m.rotation.set(rx,ry,rz);g.add(m);return m};
+  const g=new THREE.Group(),body=new THREE.Group();g.add(body);
+  const polymer=(color,roughness=.5)=>new THREE.MeshStandardMaterial({color,metalness:.02,roughness});
+  const f={alloy:toolFinishes.aluminum.clone(),steel:toolFinishes.steel.clone(),brass:new THREE.MeshStandardMaterial({color:0xc6a15c,metalness:.8,roughness:.3}),red:polymer(0xc94c35),orange:polymer(0xe99038),rubber:polymer(0x323d43,.82),grip:polymer(0x506169,.76),white:polymer(0xdde0d5,.44),yellow:polymer(0xdab343,.68),green:polymer(0x4c876c),blue:polymer(0x376b83),ink:polymer(0x182328,.7),amber:new THREE.MeshStandardMaterial({color:0x985924,metalness:.05,roughness:.37}),bottle:new THREE.MeshPhysicalMaterial({color:0xd4dfd4,metalness:0,roughness:.36,transparent:true,opacity:.88,side:THREE.DoubleSide})};
+  const add=(geo,mat,x=0,y=0,z=0,rx=0,ry=0,rz=0)=>toolMesh(body,geo,mat,x,y,z,rx,ry,rz);
+  const grip=(r,h,x,y,z,mat=f.red,rz=0)=>toolGrip(body,r,h,mat,x,y,z,rz);
   switch(id){
-    case 'poweroff': /* 验电笔 */
-      add(new THREE.CylinderGeometry(0.05,0.05,0.55,16),M.red,0,0.1,0);
-      add(new THREE.CylinderGeometry(0.03,0.012,0.18,12),M.metal,0,-0.26,0);
-      add(new THREE.CylinderGeometry(0.052,0.052,0.1,16),M.dark,0,0.4,0);
-      add(new THREE.BoxGeometry(0.02,0.12,0.06),M.metal,0.055,0.15,0);
+    case 'poweroff':{
+      toolLathe(body,[[0,-.16],[.026,-.16],[.04,-.13],[.046,-.05],[.048,.12],[.044,.3],[.036,.35],[0,.35]],f.red);
+      toolLathe(body,[[0,-.13],[.058,-.13],[.07,-.115],[.07,-.10],[.052,-.085],[0,-.085]],f.orange);
+      add(new THREE.CylinderGeometry(.02,.026,.09,32),f.rubber,0,-.19,0);
+      add(new THREE.CylinderGeometry(.007,.007,.11,24),f.steel,0,-.285,0);
+      add(new THREE.ConeGeometry(.007,.025,24),f.steel,0,-.352,0,Math.PI);
+      grip(.047,.085,0,.382,0,f.rubber);
+      for(let i=0;i<6;i++)toolRing(body,.045,.0028,f.grip,0,-.03+i*.042,0,Math.PI/2);
+      add(new THREE.BoxGeometry(.031,.13,.009),f.ink,0,.19,.045);
+      toolFace(body,'V\n~',.023,.09,0,.19,.051,'lcd');
+      add(new THREE.SphereGeometry(.011,20,12),new THREE.MeshStandardMaterial({color:0x8fd0a1,emissive:0x305c3a,emissiveIntensity:.5}),0,.285,.041);
+      toolPlate(body,[[0,-.085],[.012,-.085],[.016,.075],[.007,.085],[-.003,.06]],.008,.002,f.alloy,.048,.19,0,0,Math.PI/2);
       break;
-    case 'gloves': { /* 绝缘手套（一双） */
-      [-0.22,0.22].forEach(dx=>{
-        add(new THREE.BoxGeometry(0.24,0.3,0.1),M.rubber,dx,0,0);
-        for(let f=0;f<4;f++)add(new THREE.CapsuleGeometry(0.032,0.2,4,8),M.rubber,dx-0.085+f*0.056,0.26,0);
-        add(new THREE.CapsuleGeometry(0.035,0.16,4,8),M.rubber,dx+0.15,0.06,0,0,0,-0.7);
-        add(new THREE.CylinderGeometry(0.13,0.15,0.12,16),M.rubber,dx,-0.2,0);
-      });
-      break;}
-    case 'wrench': /* 绝缘扳手 */
-      add(new THREE.BoxGeometry(0.14,0.62,0.05),M.metal,0,0,0);
-      add(new THREE.TorusGeometry(0.11,0.045,10,24,Math.PI*1.35),M.metal,0,0.36,0);
-      add(new THREE.TorusGeometry(0.11,0.045,10,24,Math.PI*1.35),M.metal,0,-0.36,0,0,0,Math.PI);
-      add(new THREE.BoxGeometry(0.16,0.2,0.06),M.orange,0,-0.05,0);
+    }
+    case 'gloves':{
+      for(const side of [-1,1]){
+        const hand=new THREE.Group();hand.position.set(side*.205,0,0);hand.rotation.z=-side*.08;body.add(hand);
+        const palm=toolLathe(hand,[[0,-.14],[.08,-.14],[.105,-.09],[.118,.025],[.107,.12],[.075,.15],[0,.15]],f.yellow);palm.scale.z=.57;
+        const cuff=toolLathe(hand,[[.12,-.27],[.132,-.25],[.119,-.12],[.108,-.10],[.101,-.12],[.111,-.25],[.12,-.27]],f.yellow);cuff.scale.z=.62;
+        const lip=toolRing(hand,.122,.009,f.orange,0,-.261,0,Math.PI/2);lip.scale.y=.62;
+        const lengths=[.18,.225,.21,.16];
+        for(let i=0;i<4;i++){
+          const finger=toolMesh(hand,new THREE.CapsuleGeometry(.029,lengths[i],8,28),f.yellow,(i-1.5)*.054,.135+lengths[i]*.46,.002+i*.003,.06,0,(1.5-i)*.055);finger.scale.z=.82;
+          toolMesh(hand,new THREE.SphereGeometry(.029,24,16),f.orange,(i-1.5)*.054,.13,.027).scale.set(.9,.7,.6);
+        }
+        const thumb=toolMesh(hand,new THREE.CapsuleGeometry(.035,.175,8,28),f.yellow,-side*.124,.025,.008,.10,0,side*.67);thumb.scale.z=.86;
+        for(const x of [-.072,.072])toolCable(hand,[[x,-.1,.047],[x*1.25,-.015,.068],[x,.09,.055]],.0028,f.orange);
+      }
       break;
-    case 'torque': /* 扭力扳手 */
-      add(new THREE.CylinderGeometry(0.035,0.045,0.85,12),M.metal,0,0,0);
-      add(new THREE.CylinderGeometry(0.14,0.14,0.09,24),M.white,0,0.45,0);
-      add(new THREE.CylinderGeometry(0.11,0.11,0.1,24),M.red,0,0.45,0);
-      add(new THREE.BoxGeometry(0.1,0.22,0.08),M.dark,0,-0.42,0);
+    }
+    case 'wrench':{
+      add(new THREE.BoxGeometry(.088,.56,.032),f.steel,0,.02,0);
+      toolPlate(body,[[-.066,-.115],[-.125,-.04],[-.133,.065],[-.078,.13],[-.054,.122],[-.057,.043],[.057,.043],[.054,.122],[.078,.13],[.133,.065],[.125,-.04],[.066,-.115]],.045,.004,f.alloy,0,.365,0,0,0,-.18);
+      const ring=new THREE.Shape();ring.absarc(0,0,.125,0,Math.PI*2,false);
+      const hole=new THREE.Path();for(let i=0;i<24;i++){const a=i*Math.PI/12,r=i%2?.074:.088; i?hole.lineTo(Math.cos(a)*r,Math.sin(a)*r):hole.moveTo(r,0)}hole.closePath();ring.holes.push(hole);
+      toolExtrude(body,ring,.038,.003,f.alloy,0,-.365,0,0,0,.12);
+      add(new THREE.BoxGeometry(.128,.50,.055),f.orange,0,.02,0);
+      for(const x of [-.049,.049])add(new THREE.BoxGeometry(.018,.235,.008),f.rubber,x,-.01,.03);
+      for(const y of [-.23,.27])add(new THREE.BoxGeometry(.141,.025,.063),f.red,0,y,0);
       break;
-    case 'meter': { /* 万用表 + 表笔 */
-      add(new THREE.BoxGeometry(0.42,0.55,0.14),M.dark,0,0,0);
-      add(new THREE.BoxGeometry(0.3,0.2,0.02),M.screen,0,0.12,0.075);
-      add(new THREE.CylinderGeometry(0.09,0.09,0.05,20),M.rubber,0,-0.13,0.075,Math.PI/2,0,0);
-      const pr1=add(new THREE.CylinderGeometry(0.014,0.014,0.5,8),M.red,0.34,0.05,0,0,0,-0.5);
-      const pr2=add(new THREE.CylinderGeometry(0.014,0.014,0.5,8),M.dark,-0.34,0.05,0,0,0,0.5);
-      add(new THREE.ConeGeometry(0.018,0.08,8),M.metal,0.46,-0.18,0,0,0,-0.5);
-      add(new THREE.ConeGeometry(0.018,0.08,8),M.metal,-0.46,-0.18,0,0,0,0.5);
-      break;}
-    case 'diag': { /* 诊断仪 */
-      add(new THREE.BoxGeometry(0.5,0.34,0.06),M.dark,0,0,0);
-      add(new THREE.BoxGeometry(0.42,0.26,0.02),M.screen,0,0,0.035);
-      add(new THREE.CylinderGeometry(0.02,0.02,0.5,8),M.orange,0.32,-0.2,0,0,0,0.6);
-      break;}
-    case 'heatgun': /* 热风枪 */
-      add(new THREE.CylinderGeometry(0.09,0.11,0.42,16),M.dark,0,0.16,0);
-      add(new THREE.CylinderGeometry(0.11,0.075,0.16,16),M.metal,0,0.45,0);
-      add(new THREE.BoxGeometry(0.1,0.26,0.12),M.dark,0,-0.14,0.02);
-      add(new THREE.CylinderGeometry(0.02,0.02,0.3,8),M.red,0,-0.32,0.02);
+    }
+    case 'torque':{
+      add(new THREE.CylinderGeometry(.028,.03,.58,40),f.alloy,0,.01,0);
+      toolPlate(body,[[-.04,-.12],[-.082,-.07],[-.11,.015],[-.085,.085],[0,.11],[.085,.085],[.11,.015],[.082,-.07],[.04,-.12]],.06,.008,f.steel,0,.405,0);
+      add(new THREE.CylinderGeometry(.073,.073,.016,48),f.alloy,0,.422,.043,Math.PI/2);
+      add(new THREE.BoxGeometry(.044,.044,.075),f.steel,0,.422,.087);
+      const socket=new THREE.Shape();for(let i=0;i<6;i++){const a=i*Math.PI/3,r=.06;i?socket.lineTo(Math.cos(a)*r,Math.sin(a)*r):socket.moveTo(r,0)}socket.closePath();
+      const bore=new THREE.Path();for(let i=0;i<6;i++){const a=i*Math.PI/3,r=.038;i?bore.lineTo(Math.cos(a)*r,Math.sin(a)*r):bore.moveTo(r,0)}bore.closePath();socket.holes.push(bore);toolExtrude(body,socket,.075,.003,f.alloy,0,.422,.153);
+      toolPlate(body,[[-.014,-.008],[.014,-.008],[.022,.025],[0,.035],[-.015,.02]],.012,.003,f.rubber,.043,.476,.046);
+      grip(.052,.28,0,-.408,0,f.rubber);
+      for(let i=0;i<8;i++)toolRing(body,.052,.003,f.grip,0,-.515+i*.028,0,Math.PI/2);
+      add(new THREE.CylinderGeometry(.047,.047,.075,40),f.alloy,0,-.235,0);
+      for(let i=0;i<5;i++)add(new THREE.BoxGeometry(.018,.003,.002),f.ink,.023,-.264+i*.014,.042);
+      toolFace(body,'N m\n40',.055,.07,-.005,-.235,.049,'lcd');
+      add(new THREE.CylinderGeometry(.047,.047,.035,32),f.orange,0,-.565,0);
       break;
-    case 'paint': { /* 绝缘漆刷 + 漆罐 */
-      add(new THREE.CylinderGeometry(0.05,0.05,0.5,12),M.orange,0,0.05,0);
-      add(new THREE.CylinderGeometry(0.055,0.045,0.1,12),M.metal,0,0.33,0);
-      add(new THREE.ConeGeometry(0.05,0.16,10),M.copper,0,-0.26,0,Math.PI,0,0);
-      add(new THREE.CylinderGeometry(0.12,0.12,0.24,16),M.metal,0.32,-0.18,0);
-      add(new THREE.CylinderGeometry(0.105,0.105,0.02,16),M.copper,0.32,-0.06,0);
-      break;}
-    case 'megger': { /* 兆欧表（摇表） */
-      add(new THREE.BoxGeometry(0.46,0.5,0.2),M.red,0,0,0);
-      add(new THREE.CylinderGeometry(0.13,0.13,0.02,24),M.screen,0,0.06,0.105,Math.PI/2,0,0);
-      add(new THREE.BoxGeometry(0.05,0.05,0.12),M.metal,-0.12,-0.14,0.12);
-      add(new THREE.BoxGeometry(0.05,0.05,0.12),M.metal,0.12,-0.14,0.12);
-      const crank=add(new THREE.BoxGeometry(0.3,0.04,0.04),M.dark,0,0.36,0);
-      add(new THREE.CylinderGeometry(0.03,0.03,0.12,10),M.rubber,0.17,0.36,0,0,0,Math.PI/2);
-      g.userData.crank=crank;
-      break;}
-    case 'fill': { /* 加注器（漏斗+油壶） */
-      add(new THREE.ConeGeometry(0.18,0.22,20,1,true),M.green,0,0.25,0,Math.PI,0,0);
-      add(new THREE.CylinderGeometry(0.03,0.03,0.2,10),M.green,0,0.06,0);
-      add(new THREE.CylinderGeometry(0.13,0.15,0.34,16),M.white,0.32,-0.12,0);
-      add(new THREE.CylinderGeometry(0.02,0.02,0.4,8),M.blue,0.16,-0.1,0,0,0,1.1);
-      break;}
-    case 'vac': { /* 真空抽注机 */
-      add(new THREE.BoxGeometry(0.5,0.4,0.34),M.blue,0,0,0);
-      add(new THREE.CylinderGeometry(0.1,0.1,0.03,20),M.white,0.12,0.1,0.18,Math.PI/2,0,0);
-      add(new THREE.CylinderGeometry(0.02,0.02,0.55,8),M.dark,-0.3,0.1,0,0,0,1.2);
-      break;}
-    case 'clamp': { /* 压线钳 */
-      add(new THREE.BoxGeometry(0.08,0.5,0.06),M.red,-0.06,-0.1,0,0,0,0.12);
-      add(new THREE.BoxGeometry(0.08,0.5,0.06),M.red,0.06,-0.1,0,0,0,-0.12);
-      add(new THREE.BoxGeometry(0.16,0.14,0.08),M.metal,0,0.2,0);
-      break;}
-    case 'cleaner': { /* 清洁剂喷壶 */
-      add(new THREE.CylinderGeometry(0.12,0.13,0.3,16),M.white,0,-0.1,0);
-      add(new THREE.CylinderGeometry(0.04,0.04,0.1,10),M.blue,0,0.1,0);
-      add(new THREE.BoxGeometry(0.16,0.06,0.05),M.blue,0.08,0.15,0);
-      break;}
+    }
+    case 'meter':{
+      add(new THREE.BoxGeometry(.35,.54,.155),f.orange,0,0,0);
+      add(new THREE.BoxGeometry(.31,.49,.022),f.ink,0,0,.084);
+      for(const x of [-.151,.151])for(const y of [-.22,.22])add(new THREE.BoxGeometry(.058,.10,.178),f.rubber,x,y,-.001);
+      add(new THREE.BoxGeometry(.264,.166,.018),f.rubber,0,.135,.104);
+      toolFace(body,'AUTO DC\n0.00 V',.235,.135,0,.135,.115,'lcd');
+      toolDial(body,.076,0,-.075,.112,f,false);
+      add(new THREE.BoxGeometry(.012,.057,.016),f.grip,0,-.075,.135,0,0,-.48);
+      for(const[x,mat]of [[-.105,f.red],[0,f.rubber],[.105,f.red]]){
+        toolRing(body,.016,.005,mat,x,-.221,.103);
+        add(new THREE.CylinderGeometry(.01,.01,.008,24),f.ink,x,-.221,.106,Math.PI/2);
+      }
+      for(const side of [-1,1]){
+        const probe=new THREE.Group();probe.position.set(side*.335,.015,.005);probe.rotation.z=-side*.16;body.add(probe);const color=side<0?f.rubber:f.red;
+        toolGrip(probe,.024,.26,color,0,.025,0);
+        toolMesh(probe,new THREE.CylinderGeometry(.038,.033,.023,32),color,0,-.091,0);
+        toolMesh(probe,new THREE.CylinderGeometry(.009,.013,.052,24),f.rubber,0,-.135,0);
+        toolMesh(probe,new THREE.CylinderGeometry(.0045,.0045,.10,24),f.steel,0,-.211,0);
+        toolMesh(probe,new THREE.ConeGeometry(.0045,.026,24),f.alloy,0,-.274,0,Math.PI);
+        toolCable(body,[[side*.105,-.22,.10],[side*.19,-.435,.025],[side*.43,-.37,.02],[side*.308,.17,.005]],.009,color);
+      }
+      toolPlate(body,[[-.10,-.19],[-.08,.04],[.08,.04],[.10,-.19],[.076,-.19],[.06,.015],[-.06,.015],[-.076,-.19]],.012,.003,f.grip,0,-.045,-.101,-.15);
+      break;
+    }
+    case 'diag':{
+      add(new THREE.BoxGeometry(.51,.345,.068),f.rubber);
+      add(new THREE.BoxGeometry(.454,.3,.015),f.ink,0,0,.038);
+      toolFace(body,'DIAGNOSTIC\nSCAN READY',.407,.233,0,.018,.049,'tablet');
+      for(const x of [-.244,.244])for(const y of [-.132,.132])add(new THREE.BoxGeometry(.043,.075,.08),f.grip,x,y,0);
+      for(const x of [-.243,.243])for(let i=0;i<3;i++)add(new THREE.BoxGeometry(.026,.012,.012),f.blue,x,-.056+i*.052,.047);
+      add(new THREE.CylinderGeometry(.008,.008,.006,20),f.alloy,0,-.142,.05,Math.PI/2);
+      toolCable(body,[[.0,-.17,0],[.12,-.315,-.015],[.285,-.39,-.005],[.09,-.445,.02],[-.19,-.35,.01]],.012,f.rubber);
+      const plug=new THREE.Group();plug.position.set(-.20,-.34,.01);plug.rotation.z=-.18;body.add(plug);
+      toolPlate(plug,[[-.074,.029],[.074,.029],[.06,-.032],[-.06,-.032]],.058,.004,f.grip);
+      toolPlate(plug,[[-.057,.019],[.057,.019],[.048,-.021],[-.048,-.021]],.006,.001,f.ink,0,0,.033);
+      for(let row=0;row<2;row++)for(let i=0;i<8;i++)toolMesh(plug,new THREE.CylinderGeometry(.0028,.0028,.009,12),f.brass,(i-3.5)*.012,-.009+row*.018,.04,Math.PI/2);
+      for(let i=0;i<4;i++)toolRing(plug,.016,.0025,f.rubber,0,.044+i*.009,0,Math.PI/2);
+      break;
+    }
+    case 'heatgun':{
+      toolLathe(body,[[0,-.045],[.083,-.045],[.106,-.01],[.109,.13],[.092,.28],[.076,.33],[0,.33]],f.rubber);
+      toolHollow(body,.069,.052,.158,f.alloy,0,.408,0);
+      toolRing(body,.069,.004,f.steel,0,.482,0,Math.PI/2);
+      add(new THREE.CylinderGeometry(.081,.081,.04,40),f.orange,0,.295,0);
+      for(let i=0;i<7;i++)add(new THREE.BoxGeometry(.008,.085,.006),f.ink,-.062+i*.020,.08,.095);
+      grip(.05,.30,.016,-.176,.027,f.orange,-.15);
+      add(new THREE.BoxGeometry(.064,.20,.012),f.rubber,.004,-.18,.077,0,0,-.15);
+      toolPlate(body,[[0,0],[.019,.012],[.034,-.022],[.023,-.080],[.007,-.093],[-.003,-.082],[.012,-.027]],.034,.004,f.grip,.055,-.048,.026);
+      add(new THREE.BoxGeometry(.026,.05,.014),f.ink,-.008,-.11,.087);
+      toolCable(body,[[.038,-.32,.025],[.015,-.376,.03],[-.067,-.421,.015],[-.112,-.375,0]],.012,f.rubber);
+      toolPlate(body,[[-.032,-.024],[.032,-.024],[.026,.022],[-.026,.022]],.04,.006,f.rubber,-.119,-.37,0);
+      for(const x of [-.13,-.108])add(new THREE.BoxGeometry(.006,.035,.009),f.steel,x,-.334,0);
+      break;
+    }
+    case 'paint':{
+      toolLathe(body,[[0,-.13],[.022,-.13],[.033,-.08],[.041,.055],[.029,.19],[.024,.285],[0,.29]],f.orange);
+      toolRing(body,.011,.004,f.rubber,0,.255,.026);
+      add(new THREE.BoxGeometry(.112,.088,.045),f.steel,0,-.151,0);
+      for(const y of [-.12,-.18])add(new THREE.BoxGeometry(.114,.006,.047),f.alloy,0,y,0);
+      toolPlate(body,[[-.052,0],[.052,0],[.044,-.14],[-.047,-.14]],.038,.002,f.amber,0,-.19,0);
+      for(let i=0;i<15;i++)add(new THREE.CylinderGeometry(.0018,.001,.105,8),i%3?f.amber:f.yellow,-.042+i*.006,-.266,.02);
+      toolHollow(body,.116,.105,.22,f.alloy,.285,-.16,0);
+      toolRing(body,.112,.006,f.steel,.285,-.047,0,Math.PI/2);
+      add(new THREE.CylinderGeometry(.102,.102,.008,40),f.amber,.285,-.061,0);
+      add(new THREE.CylinderGeometry(.105,.105,.01,40),f.steel,.285,-.272,0);
+      toolCable(body,[[.17,-.12,0],[.185,.025,.01],[.285,.067,.012],[.385,.025,.01],[.4,-.12,0]],.005,f.steel);
+      toolFace(body,'INSULATING\nVARNISH',.139,.085,.285,-.16,.117,'label');
+      break;
+    }
+    case 'megger':{
+      add(new THREE.BoxGeometry(.43,.445,.18),f.orange,0,-.012,0);
+      add(new THREE.BoxGeometry(.387,.399,.017),f.rubber,0,-.012,.098);
+      toolDial(body,.122,0,.056,.111,f,true);
+      toolFace(body,'M OHM',.102,.04,0,.021,.129,'gauge');
+      for(const[x,mat]of [[-.105,f.red],[.105,f.rubber]]){
+        add(new THREE.CylinderGeometry(.019,.019,.025,24),mat,x,-.159,.115,Math.PI/2);
+        add(new THREE.CylinderGeometry(.008,.008,.027,16),f.brass,x,-.159,.135,Math.PI/2);
+      }
+      toolPlate(body,[[-.144,0],[-.144,.063],[-.12,.086],[.12,.086],[.144,.063],[.144,0],[.115,0],[.115,.052],[-.115,.052],[-.115,0]],.048,.006,f.rubber,0,.209,0);
+      const mount=new THREE.Group();mount.position.set(.228,-.025,0);mount.rotation.y=Math.PI/2;body.add(mount);
+      const crank=new THREE.Group();mount.add(crank);g.userData.crank=crank;
+      toolMesh(crank,new THREE.CylinderGeometry(.03,.03,.044,32),f.steel,0,0,.006,Math.PI/2);
+      toolPlate(crank,[[-.017,-.014],[.017,-.014],[.024,.13],[-.024,.13]],.016,.004,f.alloy,0,0,.035);
+      toolMesh(crank,new THREE.CylinderGeometry(.016,.016,.065,24),f.steel,0,.129,.059,Math.PI/2);
+      toolMesh(crank,new THREE.CapsuleGeometry(.025,.075,8,28),f.rubber,0,.129,.092,Math.PI/2);
+      toolCable(body,[[-.105,-.16,.13],[-.20,-.32,.04],[.02,-.35,.035],[.12,-.24,.08]],.008,f.rubber);
+      break;
+    }
+    case 'fill':{
+      toolLathe(body,[[.028,-.075],[.028,.085],[.163,.291],[.157,.305],[.149,.293],[.020,.087],[.020,-.075],[.028,-.075]],f.green);
+      toolRing(body,.157,.006,f.green,0,.297,0,Math.PI/2);
+      toolLathe(body,[[0,-.275],[.105,-.275],[.127,-.254],[.129,-.06],[.116,.008],[.052,.055],[.046,.09],[0,.09]],f.bottle,.302,0,0);
+      grip(.052,.044,.302,.092,0,f.blue);
+      for(let i=0;i<4;i++)add(new THREE.BoxGeometry(.03+i*.005,.003,.004),f.blue,.334,-.217+i*.045,.123);
+      toolCable(body,[[.302,.10,0],[.22,.16,.01],[.115,.115,.01],[.04,.035,0]],.013,f.blue);
+      toolHollow(body,.02,.012,.075,f.steel,.021,.007,0,0,0,-.65);
+      toolPlate(body,[[0,-.06],[0,.072],[.077,.072],[.103,.047],[.103,-.05],[.075,-.065],[.075,-.032],[.076,.035],[.029,.04],[.029,-.06]],.025,.006,f.white,.372,-.056,0);
+      break;
+    }
+    case 'vac':{
+      add(new THREE.BoxGeometry(.46,.17,.29),f.blue,0,-.135,0);
+      add(new THREE.CylinderGeometry(.105,.105,.27,48),f.steel,-.07,.01,0,0,0,Math.PI/2);
+      for(let i=0;i<8;i++)toolRing(body,.106,.006,f.alloy,-.19+i*.033,.01,0,0,Math.PI/2);
+      add(new THREE.CylinderGeometry(.078,.086,.22,40),f.alloy,.171,.014,0);
+      toolDial(body,.081,-.12,.11,.146,f,true);
+      add(new THREE.CylinderGeometry(.029,.029,.006,32),f.amber,.145,-.105,.152,Math.PI/2);
+      toolRing(body,.031,.005,f.steel,.145,-.105,.156);
+      toolPlate(body,[[-.19,0],[-.19,.066],[-.155,.09],[.155,.09],[.19,.066],[.19,0],[.157,0],[.157,.049],[-.157,.049],[-.157,0]],.047,.006,f.rubber,0,.155,0);
+      for(const x of [-.169,.169])for(const z of [-.105,.105])add(new THREE.CylinderGeometry(.032,.039,.042,28),f.rubber,x,-.24,z);
+      add(new THREE.CylinderGeometry(.024,.024,.07,24),f.brass,.171,.158,0);
+      add(new THREE.BoxGeometry(.086,.014,.022),f.blue,.171,.19,0);
+      toolCable(body,[[.171,.155,0],[.35,.055,.02],[.385,-.23,.065],[.21,-.343,.11],[-.235,-.31,.12],[-.36,-.13,.06]],.016,f.rubber);
+      toolHollow(body,.029,.015,.075,f.brass,-.372,-.11,.06,0,0,-.45);
+      for(let i=0;i<4;i++)add(new THREE.BoxGeometry(.084,.008,.004),f.ink,-.12,-.164+i*.024,.147);
+      break;
+    }
+    case 'clamp':{
+      for(const side of [-1,1]){
+        const arm=new THREE.Group();arm.rotation.z=-side*.17;body.add(arm);
+        toolMesh(arm,new THREE.BoxGeometry(.034,.34,.028),f.steel,side*.037,-.072,0);
+        toolGrip(arm,.041,.30,side<0?f.red:f.orange,side*.052,-.2,0);
+        toolMesh(arm,new THREE.BoxGeometry(.027,.20,.012),f.rubber,side*.073,-.215,.036);
+      }
+      const jaw=[[-.104,.12],[-.104,.29],[-.014,.29],[-.014,.267],[-.052,.248],[-.052,.222],[-.014,.203],[-.014,.12]];
+      for(const side of [-1,1])toolPlate(body,jaw.map(([x,y])=>[side*x,y]),.068,.003,f.steel);
+      add(new THREE.CylinderGeometry(.054,.054,.091,32),f.alloy,0,.108,0,Math.PI/2);
+      add(new THREE.CylinderGeometry(.025,.025,.012,6),f.steel,0,.108,.052,Math.PI/2);
+      toolPlate(body,[[-.057,.065],[.058,.065],[.035,.018],[-.035,.018]],.02,.002,f.rubber,0,0,.027);
+      for(let i=0;i<5;i++)add(new THREE.BoxGeometry(.009,.016,.014),f.steel,-.022+i*.011,.034-i*.007,.033,0,0,-.45);
+      toolCable(body,[[-.042,-.075,.017],[-.024,-.019,.022],[.025,-.018,.022],[.042,-.075,.017]],.004,f.steel);
+      break;
+    }
+    case 'cleaner':{
+      const bottle=toolLathe(body,[[0,-.255],[.093,-.255],[.117,-.23],[.122,-.115],[.109,-.025],[.046,.035],[.035,.085],[0,.085]],f.bottle);bottle.scale.z=.74;
+      add(new THREE.CylinderGeometry(.044,.044,.045,32),f.blue,0,.07,0);
+      for(let i=0;i<3;i++)toolRing(body,.043,.0025,f.grip,0,.055+i*.014,0,Math.PI/2);
+      toolPlate(body,[[-.036,-.005],[-.041,.036],[-.022,.07],[.073,.074],[.145,.049],[.15,.016],[.07,.016],[.047,-.004]],.058,.006,f.blue,.008,.092,0);
+      toolHollow(body,.024,.013,.045,f.grip,.174,.129,0,0,0,Math.PI/2);
+      toolPlate(body,[[0,0],[.018,.005],[.045,-.05],[.034,-.09],[.018,-.095],[.016,-.082],[.026,-.05]],.027,.004,f.rubber,.06,.11,0);
+      toolCable(body,[[0,.054,-.003],[.012,-.04,-.008],[.021,-.17,-.011]],.004,f.white);
+      for(const x of [-.073,.073])toolCable(body,[[x,-.20,.066],[x*1.18,-.12,.079],[x,-.055,.068]],.0035,f.grip);
+      break;
+    }
   }
+  // The animation controls the root scale. Keep the detailed body inside its original envelope.
+  const limit={poweroff:.80,gloves:.85,wrench:1.03,torque:1.04,meter:.99,diag:.73,heatgun:1.01,paint:.73,megger:.66,fill:.66,vac:.88,clamp:.66,cleaner:.44}[id];
+  const bounds=new THREE.Box3().setFromObject(body),size=bounds.getSize(new THREE.Vector3()),extent=Math.max(size.x,size.y,size.z);
+  if(limit&&extent>limit*1.04)body.scale.setScalar(limit/extent);
+  g.userData.toolId=id;g.userData.toolEnvelope=limit;
   return g;
+}
+
+function toolMesh(parent,geometry,material,x=0,y=0,z=0,rx=0,ry=0,rz=0){
+  const m=P(parent,geometry,material,x,y,z,rx,ry,rz);m.userData.manufacturingDetail=true;return m;
+}
+function toolLathe(parent,profile,material,x=0,y=0,z=0,rx=0,ry=0,rz=0){return toolMesh(parent,new THREE.LatheGeometry(profile.map(p=>new THREE.Vector2(...p)),48),material,x,y,z,rx,ry,rz)}
+function toolRing(parent,r,t,material,x=0,y=0,z=0,rx=0,ry=0,rz=0){return toolMesh(parent,new THREE.TorusGeometry(r,t,10,48),material,x,y,z,rx,ry,rz)}
+function toolExtrude(parent,shape,depth,bevel,material,x=0,y=0,z=0,rx=0,ry=0,rz=0){
+  const geo=new THREE.ExtrudeGeometry(shape,{depth,steps:1,bevelEnabled:true,bevelSegments:3,bevelThickness:bevel,bevelSize:bevel,curveSegments:24});geo.translate(0,0,-depth/2);return toolMesh(parent,geo,material,x,y,z,rx,ry,rz);
+}
+function toolPlate(parent,points,depth,bevel,material,x=0,y=0,z=0,rx=0,ry=0,rz=0){const shape=new THREE.Shape();points.forEach(([px,py],i)=>i?shape.lineTo(px,py):shape.moveTo(px,py));shape.closePath();return toolExtrude(parent,shape,depth,bevel,material,x,y,z,rx,ry,rz)}
+function toolGrip(parent,r,h,material,x=0,y=0,z=0,rz=0){return toolLathe(parent,[[0,-h/2],[r*.78,-h/2],[r*.97,-h*.44],[r,-h*.3],[r*.9,h*.23],[r*.99,h*.39],[r*.86,h/2],[0,h/2]],material,x,y,z,0,0,rz)}
+function toolHollow(parent,outer,inner,h,material,x=0,y=0,z=0,rx=0,ry=0,rz=0){return toolLathe(parent,[[outer,-h/2],[outer,h/2],[inner,h/2],[inner,-h/2],[outer,-h/2]],material,x,y,z,rx,ry,rz)}
+function toolCable(parent,points,r,material){const m=cable(parent,points,r,material);m.userData.manufacturingDetail=true;return m}
+function toolDial(parent,r,x,y,z,f,analog){
+  toolMesh(parent,new THREE.CylinderGeometry(r,r,.025,48),f.steel,x,y,z,Math.PI/2);
+  toolMesh(parent,new THREE.CircleGeometry(r*.88,48),analog?f.white:f.rubber,x,y,z+.014);
+  toolRing(parent,r*.94,r*.055,f.alloy,x,y,z+.016);
+  const count=analog?15:10;for(let i=0;i<count;i++){const a=-Math.PI*.18+i*Math.PI*1.35/(count-1),rr=r*.72;toolMesh(parent,new THREE.BoxGeometry(r*.025,r*(i%3?.11:.17),.002),analog?f.ink:f.white,x+Math.cos(a)*rr,y+Math.sin(a)*rr,z+.018,0,0,a-Math.PI/2)}
+  if(analog){toolPlate(parent,[[-r*.025,0],[0,r*.68],[r*.025,0]],.002,.0005,f.red,x,y-r*.05,z+.022,0,0,-.62);toolMesh(parent,new THREE.CylinderGeometry(r*.085,r*.085,.007,20),f.ink,x,y-r*.05,z+.023,Math.PI/2)}
+}
+function toolFace(parent,text,w,h,x,y,z,kind='lcd'){
+  const c=document.createElement('canvas');c.width=512;c.height=256;const ctx=c.getContext('2d');
+  const colors=kind==='lcd'?['#c6d4b4','#263328']:kind==='tablet'?['#192b32','#b8e1d0']:kind==='gauge'?['#dde0d5','#253238']:['#dfd9bd','#303936'];
+  ctx.fillStyle=colors[0];ctx.fillRect(0,0,512,256);ctx.strokeStyle=colors[1];ctx.lineWidth=4;ctx.strokeRect(8,8,496,240);ctx.fillStyle=colors[1];ctx.font=kind==='tablet'?'bold 46px monospace':'bold 58px monospace';ctx.textAlign='center';
+  const lines=text.split('\n');lines.forEach((line,i)=>ctx.fillText(line,256,lines.length===1?145:94+i*87));
+  const tex=new THREE.CanvasTexture(c);tex.colorSpace=THREE.SRGBColorSpace;
+  return toolMesh(parent,new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({map:tex,toneMapped:false}),x,y,z);
 }
 
 /* 道具图标：离屏渲染为 PNG */
@@ -292,21 +611,19 @@ const iconR=new THREE.WebGLRenderer({alpha:true,antialias:true});
 iconR.setSize(190,140);
 const iconCam=new THREE.PerspectiveCamera(30,190/140,0.1,50);
 function toolIcon(id){
-  const m=buildTool(id);
-  const s=new THREE.Scene();
-  s.add(new THREE.HemisphereLight(0xd8e8ff,0x2a3648,1.6));
-  const d=new THREE.DirectionalLight(0xffffff,1.4);d.position.set(2.5,4,3);s.add(d);
-  const b=new THREE.Box3().setFromObject(m);
-  const c=b.getCenter(new THREE.Vector3()),sz=b.getSize(new THREE.Vector3());
-  const sc=1.9/Math.max(sz.x,sz.y,sz.z);
-  m.scale.setScalar(sc);m.position.sub(c.clone().multiplyScalar(sc));
-  m.rotation.set(0.25,0.65,0);
-  s.add(m);
-  iconCam.position.set(0,0,2.6);iconCam.lookAt(0,0,0);
-  iconR.render(s,iconCam);
-  const url=iconR.domElement.toDataURL();
-  m.traverse(o=>{if(o.geometry)o.geometry.dispose()});
-  return url;
+  const m=buildTool(id),s=new THREE.Scene();s.environment=scene.environment;
+  s.add(new THREE.HemisphereLight(0xeee9dc,0x35423c,1.7));
+  const key=new THREE.DirectionalLight(0xffffff,1.7);key.position.set(2.5,4,3);s.add(key);
+  const rim=new THREE.DirectionalLight(0xc2d9dd,.8);rim.position.set(-3,1,-2);s.add(rim);
+  m.rotation.set(.15,.42,-.03);m.updateMatrixWorld(true);
+  const box=new THREE.Box3().setFromObject(m),center=box.getCenter(new THREE.Vector3()),size=box.getSize(new THREE.Vector3());
+  m.position.sub(center);s.add(m);
+  const halfFov=THREE.MathUtils.degToRad(iconCam.fov)/2;
+  const distance=Math.max(size.y/(2*Math.tan(halfFov)),size.x/(2*Math.tan(halfFov)*iconCam.aspect))*1.13+size.z/2;
+  iconCam.position.set(0,0,distance);iconCam.near=Math.max(.001,distance/100);iconCam.far=distance+10;iconCam.updateProjectionMatrix();iconCam.lookAt(0,0,0);
+  iconR.toneMapping=THREE.ACESFilmicToneMapping;iconR.toneMappingExposure=1.05;
+  iconR.render(s,iconCam);const url=iconR.domElement.toDataURL();
+  disposeAssembly(m,[...Object.values(M),...Object.values(toolFinishes)]);return url;
 }
 /* ================= 共享粒子特效 ================= */
 function puffTexture(){
@@ -334,7 +651,7 @@ function arcFlash(p){
 function ease(u){u=Math.max(0,Math.min(1,u));return 1-(1-u)**3}
 
 /* ================= 关卡建模助手 ================= */
-function P(parent,geo,mat,x=0,y=0,z=0,rx=0,ry=0,rz=0){const m=new THREE.Mesh(geo,mat);m.position.set(x,y,z);m.rotation.set(rx,ry,rz);parent.add(m);return m}
+function P(parent,geo,mat,x=0,y=0,z=0,rx=0,ry=0,rz=0){const m=new THREE.Mesh(qualityGeometry(geo),mat);m.position.set(x,y,z);m.rotation.set(rx,ry,rz);m.castShadow=m.receiveShadow=true;parent.add(m);return m}
 function anchor(parent,name,bag,x,y,z){const o=new THREE.Object3D();o.position.set(x,y,z);parent.add(o);bag[name]=o;return o}
 const V3=(x,y,z)=>new THREE.Vector3(x,y,z);
 const wp=o=>o.getWorldPosition(new THREE.Vector3());
@@ -2346,8 +2663,12 @@ const LEVELS=[
 ];
 /* ================= 游戏引擎 ================= */
 const $=id=>document.getElementById(id);
-let cur=null,ctx=null,lvIdx=0,stepIdx=0,mistakes=0,t0=0,finished=false,busy=false,selected=null;
-const tray=$('tray');
+let cur=null,ctx=null,lvIdx=0,stepIdx=0,mistakes=0,t0=0,finished=false,busy=false,selected=null,demoUsed=false,resultT=null,lastResult=null,lockedAccess=null;
+function emitGame(event,extra={}){
+  if(EMBED&&parent!==window)parent.postMessage({source:messageSource,version:1,type:'studio:game-'+event,level:cur?.id||requestedLevel,step:stepIdx,total:cur?.steps.length||0,mistakes,seconds:t0?Math.floor((Date.now()-t0)/1000):0,demo:demoUsed,...extra},location.origin);
+}
+const tray=$('tray'),toolStrip=$('toolStrip'),trayActions=$('trayActions');
+new ResizeObserver(()=>document.documentElement.style.setProperty('--game-tray-height',tray.clientHeight+'px')).observe(tray);
 const icons={};
 /* 道具显示名（关卡数据只有工序描述 obj，这里给每个道具一个名称） */
 const TN={poweroff:'验电笔',gloves:'绝缘手套',wrench:'扳手',torque:'力矩扳手',meter:'万用表',diag:'诊断仪',heatgun:'热风枪',paint:'绝缘漆',megger:'兆欧表',fill:'加注器',vac:'真空泵',clamp:'压线钳',cleaner:'清洁剂'};
@@ -2356,7 +2677,41 @@ const helpBtn=document.createElement('button');
 helpBtn.id='helpBtn';helpBtn.textContent='师傅帮助';
 helpBtn.onclick=()=>demo();
 let toastT=null;
-function toast(msg,good){const t=$('toast');t.innerHTML=msg;t.className='toast show'+(good?' good':'');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2600)}
+function toast(msg,good){const t=$('toast');t.innerHTML=msg;t.className='toast show'+(good?' good':'');t.parentElement.scrollTop=0;clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2600)}
+function setToolsEnabled(enabled){toolStrip.inert=!enabled;helpBtn.disabled=!enabled}
+function requireGameAccount(){
+  if(gameAccountChanged)return false;
+  if(gameAccountIdentity()===boundGameAccount)return true;
+  gameAccountChanged=true;clearTimeout(resultT);t0=0;selected=null;setToolsEnabled(false);
+  location.reload();return false;
+}
+addEventListener('storage',event=>{if(event.key==='et_session'||event.key===null)requireGameAccount()});
+/* All direct URLs, hub cards and host commands use the same persisted prerequisite. */
+function trainingAccess(level){
+  const progress=window.CourseProgress;
+  let course=null;
+  if(!hasCourseContext||(courseContext.vehicle&&courseContext.part))course=progress?.courseForGame(level,courseContext)||null;
+  const unlocked=!!course&&!!progress.trainingUnlocked(course.vehicle,course.part);
+  return {level,course,unlocked};
+}
+function requireLearning(level){
+  if(!requireGameAccount())return false;
+  const access=trainingAccess(level);
+  if(access.unlocked){lockedAccess=null;document.body.classList.remove('training-locked');$('learningGate').classList.add('hide');return true}
+  const course=access.course||window.CourseProgress?.courseForGame(level)||null;
+  lockedAccess={reason:'learning-required',level,course,learnUrl:course?.learnUrl||'/#course',message:!access.course&&hasCourseContext?'此实训与当前部件不对应，请从对应课程重新进入。':course?'请先学完「'+course.name+'」的原理与练习，再进入维修实训。':'课程进度暂不可用，请从课程目录重新进入。'};
+  clearTimeout(resultT);t0=0;selected=null;setToolsEnabled(false);
+  for(const id of ['hub','intro','result'])$(id).classList.add('hide');
+  document.body.classList.add('training-locked');$('learningGateBody').textContent=lockedAccess.message;$('learningLink').href=lockedAccess.learnUrl;
+  $('learningGate').classList.remove('hide');$('statusChip').textContent='学习未完成';$('statusChip').className='chip';$('statusChip').style.color='';$('statusChip').style.borderColor='';
+  $('objective').textContent='完成对应部件学习后解锁实训';emitGame('error',lockedAccess);return false;
+}
+$('learningLink').onclick=event=>{if(EMBED){event.preventDefault();emitGame('error',lockedAccess||{reason:'learning-required'})}};
+function refreshHub(){
+  if(!requireGameAccount())return;
+  document.querySelectorAll('.lv-card[data-level]').forEach(card=>{const access=trainingAccess(card.dataset.level),label=card.querySelector('.lv-state');label.textContent=access.unlocked?'已解锁 · 开始实训':'先完成对应部件学习';label.classList.toggle('unlocked',access.unlocked);card.setAttribute('aria-label',card.querySelector('h4').textContent+'，'+label.textContent)});
+}
+addEventListener('focus',refreshHub);
 function showMeter(val,lbl,ok){$('meter').classList.add('show');$('meterVal').textContent=val;$('meterVal').className='val'+(ok?' ok':'');$('meterLbl').textContent=lbl}
 function addOrderDone(t){const d=document.createElement('div');d.className='done-step';d.textContent=t;$('orderDone').appendChild(d)}
 function setObjective(){
@@ -2371,17 +2726,24 @@ function wrongSay(id){
 }
 /* 关卡装载 */
 function clearLevel(){
-  if(ctx){scene.remove(ctx.g);ctx.g.traverse(o=>{if(o.geometry)o.geometry.dispose()})}
+  clearTimeout(resultT);clearTimeout(toastT);$('toast').className='toast';demoUsed=false;lastResult=null;setToolsEnabled(false);
+  if(ctx){scene.remove(ctx.g);disposeAssembly(ctx.g,[...Object.values(M),...Object.values(toolFinishes)])}
   ctx=null;cur=null;finished=false;busy=false;selected=null;t0=0;stepIdx=0;mistakes=0;
   $('mist').textContent='0';$('timer').textContent='00:00';$('orderDone').innerHTML='';$('meter').classList.remove('show');
   $('stepDots').innerHTML='';
 }
 function loadLevel(idx){
+  if(!requireGameAccount())return;
+  if(busy||!Number.isInteger(idx)||!LEVELS[idx])return;
+  lvIdx=idx;
+  if(!requireLearning(LEVELS[idx].id))return;
   clearLevel();
   lvIdx=idx;cur=LEVELS[idx];
   /* 工序对应的工具序号（同名工具多次出现时按出现顺序匹配） */
   const cnt={};cur._toolSeq=cur.steps.map(s=>{const list=cur.tools.map((t,i)=>i).filter(i=>cur.tools[i].id===s.tool);const k=(cnt[s.tool]||0);cnt[s.tool]=k+1;return list[k]!==undefined?list[k]:0});
   ctx=cur.build();
+  refineAssembly(ctx.g);
+  frameModel(ctx.g);
   cur.steps.forEach(()=>{const d=document.createElement('span');d.className='dot';$('stepDots').appendChild(d)});
   $('orderBody').innerHTML=cur.order;
   $('lvLabel').textContent=cur.no+' · '+cur.name;
@@ -2400,16 +2762,22 @@ function loadLevel(idx){
   uniq.sort(()=>Math.random()-0.5);
   uniq.forEach(i=>{
     const t=cur.tools[i];
-    const el=document.createElement('div');el.className='tool';el.draggable=true;el.id='tool-'+i;
-    el.innerHTML=`<img src="${icons[t.id]}" alt="${t.nm||TN[t.id]||''}"><div class="nm">${t.nm||TN[t.id]||''}</div>`;
+    const el=document.createElement('div');el.className='tool';el.draggable=true;el.id='tool-'+i;el.tabIndex=0;el.setAttribute('role','button');el.setAttribute('aria-pressed','false');
+    el.innerHTML=`<img src="${icons[t.id]}" alt="${t.nm||TN[t.id]||''} · 3D示意"><div class="nm">${t.nm||TN[t.id]||''}</div>`;
     el.addEventListener('dragstart',e=>{e.dataTransfer.setData('text/tool',i);selectTool(i)});
     el.addEventListener('click',()=>selectTool(i));
-    tray.appendChild(el);
+    el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();selectTool(i);stage.focus();}});
+    toolStrip.appendChild(el);
   });
-  tray.appendChild(helpBtn);
+  trayActions.appendChild(helpBtn);
+  toolStrip.scrollLeft=0;
+  emitGame('ready');
 }
 function showHub(){
-  clearLevel();
+  if(!requireGameAccount())return;
+  if(EMBED)return;
+  if(busy){toast('当前工序演示中，请稍候。');return}
+  clearLevel();lockedAccess=null;document.body.classList.remove('training-locked');$('learningGate').classList.add('hide');refreshHub();
   $('intro').classList.add('hide');$('result').classList.add('hide');
   $('hub').classList.remove('hide');
   $('lvLabel').textContent='3D 维修实训 · 15 大部件';
@@ -2417,15 +2785,16 @@ function showHub(){
   $('objective').textContent='选择一个关卡开始维修';
 }
 function selectTool(i){
-  if(busy||finished||!t0)return;
+  if(!cur||!requireLearning(cur.id)||busy||finished||!t0)return;
   selected=i;
-  document.querySelectorAll('.tool').forEach(e=>e.classList.toggle('sel',e.id==='tool-'+i));
+  document.querySelectorAll('.tool').forEach(e=>{const active=e.id==='tool-'+i;e.classList.toggle('sel',active);e.setAttribute('aria-pressed',String(active));});
   const s=cur.steps[stepIdx];
   $('hint').innerHTML=(s&&cur._toolSeq[stepIdx]===i)?'选对了——<b>点击零件</b>即可使用。':'已选「'+(cur.tools[i].nm||TN[cur.tools[i].id])+'」——再点击零件使用。';
 }
 stage.addEventListener('dragover',e=>e.preventDefault());
 stage.addEventListener('drop',e=>{e.preventDefault();const i=e.dataTransfer.getData('text/tool');if(i!=='')useTool(+i)});
 stage.addEventListener('click',()=>{if(selected!==null)useTool(selected)});
+stage.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&selected!==null){e.preventDefault();useTool(selected);}});
 /* 实操动画引擎 */
 let fxList=[];
 function spawnTool(id,target){
@@ -2534,7 +2903,7 @@ function updateFx(f,dt){
     if(cur.stepFx)cur.stepFx(f.idx,lu,dt,f);
   }
   if(u>=1){
-    scene.remove(m);m.traverse(o=>{if(o.geometry)o.geometry.dispose()});
+    scene.remove(m);disposeAssembly(m,[...Object.values(M),...Object.values(toolFinishes)]);
     if(f.probes){scene.remove(f.probes);f.probes.children.forEach(p=>p.geometry.dispose())}
     if(f.jet)f.jet.forEach(sp=>{scene.remove(sp);sp.material.dispose()});
     heatOn=false;if(ctx&&ctx.A)heatLight(f.target,0);
@@ -2559,13 +2928,14 @@ function recordGameMistake(i){
   }catch(e){}
 }
 async function useTool(i,demo){
-  if(busy||finished||!t0)return;
+  if(!cur||!requireLearning(cur.id)||busy||finished||!t0||!Number.isInteger(i)||!cur.tools[i])return;
+  if(demo)demoUsed=true;
   const s=cur.steps[stepIdx];
   if(!s)return;
   if(cur._toolSeq[stepIdx]!==i&&!demo){
     mistakes++;$('mist').textContent=mistakes;
     toast('师傅：不对！'+wrongSay(cur.tools[i].id));
-    recordGameMistake(i);
+    recordGameMistake(i);emitGame('progress',{correct:false});
     if(ctx)ctx.g.position.x=0.14;setTimeout(()=>{if(ctx)ctx.g.position.x=0},120);
     return;
   }
@@ -2574,52 +2944,67 @@ async function useTool(i,demo){
   const tt=cur.tools[cur._toolSeq[stepIdx]];
   $('hint').innerHTML='<b>实操中：</b>'+(s.obj||tt.obj)+'…';
   await runFx(s);
+  if(!requireLearning(cur.id)){busy=false;return}
   try{s.done&&s.done(ctx)}catch(err){console.error('step done error',err)}
   $('hint').innerHTML=(demo?'师傅演示：':'')+s.say;
   document.querySelectorAll('#stepDots .dot')[stepIdx].classList.add('on');
   stepIdx++;
+  emitGame('progress',{correct:true,assisted:!!demo});
   document.querySelectorAll('#stepDots .dot').forEach((d,k)=>d.classList.toggle('cur',k===stepIdx));
   setObjective();
   if(stepIdx>=cur.steps.length)finish();
   busy=false;
 }
 function demo(){
-  if(busy||finished||!t0)return;
+  if(!cur||!requireLearning(cur.id)||busy||finished||!t0)return;
   const s=cur.steps[stepIdx];
   if(!s)return;
-  helpBtn.disabled=true;
+  demoUsed=true;helpBtn.disabled=true;
   $('hint').innerHTML='师傅：看好了，这一步该用「'+(cur.tools[cur._toolSeq[stepIdx]].nm||TN[cur.tools[cur._toolSeq[stepIdx]].id])+'」。';
   useTool(cur._toolSeq[stepIdx],true).then(()=>{
-    helpBtn.disabled=false;
+    helpBtn.disabled=finished||!!lockedAccess||gameAccountChanged;
+    if(lockedAccess||gameAccountChanged)return;
     $('hint').innerHTML='师傅：'+s.say+'<br>轮到你了，剩下的工序自己试试。';
   });
 }
 function finish(){
+  if(!cur||!requireLearning(cur.id))return;
+  const course=trainingAccess(cur.id).course;
+  const result=lastResult?.result||{level:cur.id,stars:mistakes===0?3:(mistakes<=2?2:1),mistakes,seconds:Math.floor((Date.now()-t0)/1000),demo:demoUsed};
+  const {seconds:secs,stars:sc}=result;
+  const saved=course&&window.CourseProgress.recordTraining?.(course.vehicle,course.part,result);
+  if(!saved&&!requireLearning(cur.id))return;
+  clearTimeout(resultT);setToolsEnabled(false);
+  if(ctx&&!finished){ctx._setFin&&ctx._setFin();ctx.live=false;ctx.smokeOn=false;ctx.leakOn=false;ctx.glowOn=false}
   finished=true;
-  if(ctx){ctx._setFin&&ctx._setFin();ctx.live=false;ctx.smokeOn=false;ctx.leakOn=false;ctx.glowOn=false}
   const chip=$('statusChip');chip.textContent='维修合格';chip.className='chip';chip.style.color='#35d07f';chip.style.borderColor='#1d7a4c';
-  const secs=Math.floor((Date.now()-t0)/1000);
-  const sc=mistakes===0?3:(mistakes<=2?2:1);
-  try{const rec=+(localStorage.getItem('rg_star_'+cur.id)||0);if(sc>rec)localStorage.setItem('rg_star_'+cur.id,sc)}catch(e){}
-  setTimeout(()=>{
-    $('resultTitle').textContent=cur.name+'修复完成';
+  lastResult=saved?{stars:sc,seconds:secs}:{reason:'progress-save-failed',result,message:'本次实训结果尚未保存，请点击「重试保存」。'};
+  if(!saved)chip.textContent='结果未保存';
+  if(saved)try{const rec=+(localStorage.getItem('rg_star_'+cur.id)||0);if(sc>rec)localStorage.setItem('rg_star_'+cur.id,sc)}catch(e){}
+  resultT=setTimeout(()=>{
+    if(!requireGameAccount())return;
+    $('resultTitle').textContent=saved?cur.name+'修复完成':'实训记录暂未保存';
+    $('retryBtn').textContent=saved?'再修一次':'重试保存';
     document.querySelectorAll('#stars .s').forEach((s,i)=>s.classList.toggle('on',i<sc));
     $('rTime').textContent=String(Math.floor(secs/60)).padStart(2,'0')+':'+String(secs%60).padStart(2,'0');
     $('rMist').textContent=mistakes;
     $('rSteps').textContent=cur.steps.length+'/'+cur.steps.length;
     $('resultText').innerHTML=sc===3?'完美！安全规程一步不差，师傅给你五星好评！':sc===2?'合格！流程走通了，下次注意按提示来，少返工。':'修好了，但工序有点乱。高压作业讲规范，建议重练一次拿满星。';
+    if(!saved)$('resultText').textContent=lastResult.message;
     $('result').classList.remove('hide');
+    emitGame(saved?'complete':'error',lastResult);
   },1600);
 }
 function startGame(){
+  if(!cur||!requireLearning(cur.id)||t0||busy||finished)return;
   $('intro').classList.add('hide');
-  t0=Date.now();
+  t0=Date.now();setToolsEnabled(true);emitGame('start');
   document.querySelectorAll('#stepDots .dot')[0].classList.add('cur');
   setObjective();
   $('hint').innerHTML='第一工序：<b>'+(cur.steps[0].obj||cur.tools[cur._toolSeq[0]].obj)+'</b>。道具栏是乱序的，自己找工具。不会就点「师傅帮助」。';
 }
 $('startBtn').onclick=startGame;
-$('retryBtn').onclick=()=>loadLevel(lvIdx);
+$('retryBtn').onclick=()=>lastResult?.reason==='progress-save-failed'?finish():loadLevel(lvIdx);
 setInterval(()=>{
   if(!t0||finished)return;
   const s=Math.floor((Date.now()-t0)/1000);
@@ -2630,11 +3015,13 @@ setInterval(()=>{
   const grid=$('lvGrid');
   LEVELS.forEach((L,i)=>{
     const rec=(()=>{try{return +localStorage.getItem('rg_star_'+L.id)||0}catch(e){return 0}})();
-    const card=document.createElement('div');card.className='lv-card';
-    card.innerHTML=`<div class="bar" style="background:${L.color}"></div><h4>${L.no} ${L.name}</h4><p>${L.title.split('·')[1]||''}</p><div class="rec">${rec?'★'.repeat(rec):''}</div>`;
+    const card=document.createElement('div');card.className='lv-card';card.dataset.level=L.id;card.tabIndex=0;card.setAttribute('role','button');
+    card.innerHTML=`<div class="bar" style="background:${L.color}"></div><h4>${L.no} ${L.name}</h4><p>${L.title.split('·')[1]||''}</p><div class="rec">${rec?'★'.repeat(rec):''}</div><span class="lv-state"></span>`;
     card.onclick=()=>loadLevel(i);
+    card.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();loadLevel(i);}};
     grid.appendChild(card);
   });
+  refreshHub();
 })();
 /* 动画循环 */
 const clock=new THREE.Clock();
@@ -2678,14 +3065,27 @@ function animate(){
 }
 animate();
 /* 入口：URL 参数直进关卡 */
+addEventListener('message',event=>{
+  if(!EMBED||event.source!==parent||event.origin!==location.origin||event.data?.type!=='studio:game-command')return;
+  const action=event.data.action;
+  if(action==='status'){if(lockedAccess){if(busy){emitGame('error',lockedAccess);return}const level=lockedAccess.level;if(requireLearning(level))loadLevel(LEVELS.findIndex(L=>L.id===level));return}if(cur&&requireLearning(cur.id))emitGame(finished?(lastResult?.reason?'error':'complete'):t0?'progress':'ready',lastResult||{});}
+  else if(action==='start')startGame();
+  else if(action==='restart'&&!busy)loadLevel(lvIdx);
+  else if(action==='demo')demo();
+});
 (function boot(){
-  const q=new URLSearchParams(location.search).get('level');
-  if(q){const i=LEVELS.findIndex(L=>L.id===q);if(i>=0){loadLevel(i);return}}
+  if(requestedLevel){const i=LEVELS.findIndex(L=>L.id===requestedLevel);if(i>=0){loadLevel(i);return}}
+  if(EMBED){
+    $('hub').classList.add('hide');$('intro').classList.remove('hide');
+    $('introTitle').textContent='无法打开此实训';$('introBody').textContent='请返回课程，重新选择实训项目。';
+    emitGame('error',{message:requestedLevel?'未找到指定关卡':'缺少实训关卡'});return;
+  }
   showHub();
 })();
 window.__game={ready:true,LEVELS:LEVELS.map(l=>({id:l.id,name:l.name,steps:l.steps.length,tools:l.tools.length})),get step(){return stepIdx},get mistakes(){return mistakes},get level(){return cur?cur.id:null},get seq(){return cur?cur._toolSeq.slice():null},useTool,demo,startGame,loadLevel:(i)=>loadLevel(i)};
 window.__dbg={get frame(){return renderer.info.render.frame},get fx(){return fxList.length},get t(){return clock.elapsedTime},kick(){animate()}};
 window.startGame=startGame;window.showHub=showHub;
 </script>
+<script src="/ui/navigation.js" defer></script>
 </body>
 </html>

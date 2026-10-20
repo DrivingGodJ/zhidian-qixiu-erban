@@ -21,7 +21,7 @@ function saveDB(){fs.writeFileSync(DBF,JSON.stringify(db))}
 const sha=s=>crypto.createHash('sha256').update(s).digest('hex');
 const sign=o=>crypto.createHmac('sha256',SECRET).update(JSON.stringify(o)).digest('base64url');
 function auth(req){const h=req.headers['x-token'];if(!h)return null;try{const[p2,s]=h.split('.');const o=JSON.parse(Buffer.from(p2,'base64url').toString('utf8'));if(sign(o)!==s)return null;if(o.exp&&o.exp<Date.now())return null;return o.u}catch(e){return null}}
-const MIME={'.html':'text/html','.js':'application/javascript','.json':'application/json','.png':'image/png','.jpg':'image/jpeg','.gif':'image/gif','.css':'text/css','.md':'text/plain','.ico':'image/x-icon','.mp4':'video/mp4','.webm':'video/webm'};
+const MIME={'.html':'text/html','.js':'application/javascript','.json':'application/json','.png':'image/png','.jpg':'image/jpeg','.gif':'image/gif','.css':'text/css','.md':'text/plain','.ico':'image/x-icon','.mp4':'video/mp4','.webm':'video/webm','.glb':'model/gltf-binary','.gltf':'model/gltf+json','.svg':'image/svg+xml','.webp':'image/webp'};
 function send(res,code,obj){const b=JSON.stringify(obj);res.writeHead(code,{'Content-Type':'application/json; charset=utf-8'});res.end(b)}
 function readBody(req,limit){
   limit=limit||32*1024*1024;
@@ -339,7 +339,9 @@ const server=http.createServer(async(req,res)=>{
       fs.readFile(path.join(ROOT,'index.html'),(e2,d2)=>{if(e2)return send(res,404,{err:'not found'});res.writeHead(200,{'Content-Type':'text/html; charset=utf-8'});res.end(d2)});
       return;
     }
-    res.writeHead(200,{'Content-Type':(MIME[path.extname(fp).toLowerCase()]||'application/octet-stream')+'; charset=utf-8','Cache-Control':(fp.includes('images/')||fp.includes('videos/'))?'max-age=86400':'no-cache'});
+    const ext=path.extname(fp).toLowerCase();
+    const textAsset=['.html','.js','.css','.json','.md','.svg','.gltf'].includes(ext);
+    res.writeHead(200,{'Content-Type':(MIME[ext]||'application/octet-stream')+(textAsset?'; charset=utf-8':''),'Cache-Control':textAsset?'no-cache':'max-age=86400'});
     res.end(data);
   });
 });

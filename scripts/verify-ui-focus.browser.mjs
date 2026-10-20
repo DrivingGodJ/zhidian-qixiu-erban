@@ -1,0 +1,30 @@
+import assert from 'node:assert/strict';
+// Override these when running outside this task; never creates a new browser space.
+const task=await taskSpace(Number(process.env.UI_QA_SPACE)),page=task.page(process.env.UI_QA_PAGE||'p1');
+const base=process.env.UI_QA_URL||'http://localhost:8088';
+await page.cdp('Network.enable',{});await page.cdp('Network.setCacheDisabled',{cacheDisabled:true});
+await page.goto(base+'/?ui=focus-check-'+Date.now()+'#home');
+await page.cdp('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
+const errors=await page.evaluate(()=>{window.__focusErrors=[];addEventListener('error',e=>__focusErrors.push(e.message));return __focusErrors});
+for(const section of ['home','models','course','trainer','cases','exam','dash','wrong','app']){
+ const state=await page.evaluate(s=>{go(s);const nav=[...document.querySelectorAll('#sidebar [data-p]')];return {hash:location.hash,active:nav.filter(b=>b.classList.contains('active')).map(b=>b.dataset.p),current:nav.filter(b=>b.getAttribute('aria-current')==='page').map(b=>b.dataset.p),rootBack:!!document.querySelector('.page.active .section-back')&&document.querySelector('.page.active .section-back').checkVisibility()}},section);
+ assert.equal(state.hash,'#'+section);assert.deepEqual(state.active,[section]);assert.deepEqual(state.current,[section]);assert.equal(state.rootBack,false);
+}
+await page.evaluate(()=>go('course'));
+assert.deepEqual(await page.evaluate(()=>({starter:[...document.querySelectorAll('.course-start-row a')].map(a=>a.getAttribute('href')),groups:document.querySelectorAll('.foundation-part').length,chapters:document.querySelectorAll('#theoryCol .chapter-row').length,unclean:[...document.querySelectorAll('.chapter-row h4')].filter(h=>/^(第[0-9０-９]+课|部件课[①-⑳])/.test(h.textContent)).length})),{starter:[],groups:5,chapters:35,unclean:0});
+await page.evaluate(()=>{document.querySelector('.foundation-part').open=true;const tabs=document.querySelector('.course-vehicle-tabs');window.scrollTo({top:tabs.getBoundingClientRect().top+scrollY-120,behavior:'instant'});window.__beforeVehicleScroll=scrollY});
+await page.click('[data-course-vehicle="phev"]');assert.equal(await page.evaluate(()=>Math.abs(scrollY-window.__beforeVehicleScroll)<2&&document.querySelector('.foundation-part').open),true,'vehicle switch must keep scroll position and foundation expansion');assert.equal(await page.evaluate(()=>new URL(location.href).searchParams.get('vehicle')),'phev');
+assert.deepEqual(await page.evaluate(()=>({rows:document.querySelectorAll('#partCol .chapter-row').length,current:document.querySelector('[data-course-vehicle][aria-pressed="true"]').dataset.courseVehicle,bad:[...document.querySelectorAll('#partCol .chapter-row')].filter(row=>row.querySelectorAll('a').length!==1||!row.querySelector('a').getAttribute('href').startsWith('/learn.html?vehicle=phev&part=')).length})),{rows:13,current:'phev',bad:0});
+await page.evaluate(()=>{go('cases');openCase(0)});assert.equal(await page.evaluate(()=>studioLocation().parent),'#cases');await page.evaluate(()=>studioBack());assert.equal(await page.evaluate(()=>location.hash),'#cases');
+await page.evaluate(()=>history.back());await page.waitForFunction(()=>location.hash==='#cases/view/0');await page.evaluate(()=>history.forward());await page.waitForFunction(()=>location.hash==='#cases');
+await page.evaluate(()=>go('home'));assert.equal(await page.evaluate(()=>document.getElementById('sidebar').inert),true);
+await page.click('.menu-toggle');assert.deepEqual(await page.evaluate(()=>({inert:document.getElementById('sidebar').inert,focus:document.activeElement.dataset.p})),{inert:false,focus:'home'});
+await page.evaluate(()=>document.querySelector('#sidebar .sidebar-bottom a').focus());await page.keyboard.press('Tab');assert.equal(await page.evaluate(()=>document.activeElement.className),'brand');await page.keyboard.press('Shift+Tab');assert.equal(await page.evaluate(()=>document.activeElement.getAttribute('href')),'/teacher.html');
+await page.keyboard.press('Escape');assert.deepEqual(await page.evaluate(()=>({inert:document.getElementById('sidebar').inert,focus:document.activeElement.className,expanded:document.querySelector('.menu-toggle').getAttribute('aria-expanded')})),{inert:true,focus:'menu-toggle',expanded:'false'});
+await page.click('.menu-toggle');await page.click('#sidebar [data-p="course"]');assert.deepEqual(await page.evaluate(()=>({hash:location.hash,inert:document.getElementById('sidebar').inert,focus:document.activeElement.className})),{hash:'#course',inert:true,focus:'sec'});
+await page.click('#userChip');assert.equal(await page.evaluate(()=>document.activeElement.id),'aUser');await page.click('#aSubmit');assert.equal(await page.evaluate(()=>document.getElementById('aErr').textContent),'用户名需2-12位');
+await page.evaluate(()=>[...document.querySelectorAll('#authMask a')].at(-1).focus());await page.keyboard.press('Tab');assert.equal(await page.evaluate(()=>document.activeElement.className),'modal-close');await page.keyboard.press('Shift+Tab');assert.equal(await page.evaluate(()=>document.activeElement.textContent.includes('游客')),true);
+await page.keyboard.press('Escape');assert.deepEqual(await page.evaluate(()=>({open:document.getElementById('authMask').classList.contains('show'),focus:document.activeElement.id})),{open:false,focus:'userChip'});
+await page.evaluate(()=>go('app'));assert.equal(await page.evaluate(()=>document.querySelectorAll('.platform-actions button').length),6);await page.click('.platform-card:nth-child(5) button');assert.equal(await page.evaluate(()=>document.querySelector('#installSteps h3').textContent),'安装应用 · iPhone');await page.keyboard.press('Escape');assert.equal(await page.evaluate(()=>document.getElementById('installMask').classList.contains('show')),false);
+assert.deepEqual(await page.evaluate(()=>__focusErrors),[]);await page.evaluate(()=>go('home'));
+console.log('PASS: 9 unique main navigation states, vehicle curriculum links, root/detail returns, browser back/forward, mobile menu keyboard/focus, login validation/trap/return, six platform installation guides.');

@@ -46,24 +46,27 @@ jty:{name:'新能源汽车检测维修专业能力证书',book:'依据交通部/
 };
 (function(){
 // ---------- 学习路线渲染 ----------
-var CSS='.sday{border:1px solid var(--line);border-radius:10px;margin:10px 0;background:#fff;overflow:hidden}'
- +'.sday .shd{display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;font-weight:600;font-size:14.5px}'
- +'.sday .shd:hover{background:#f6f9ff}'
- +'.sday .sbd{display:none;padding:0 14px 14px;border-top:1px dashed var(--line)}'
+var CSS='.sday{border:1px solid var(--line);border-radius:12px;margin:16px 0;background:var(--card);overflow:hidden}'
+ +'.sday .shd{display:flex;align-items:center;gap:16px;padding:16px;flex-wrap:wrap}'
+ +'.sday-title{display:flex;align-items:center;gap:12px;flex:1;min-width:180px;min-height:44px;padding:0;background:none;border:0;color:var(--text);text-align:left;font:inherit;font-weight:600;font-size:14px;line-height:1.7;cursor:pointer}'
+ +'.sday .shd>.btn{min-height:44px;flex:none}'
+ +'.sday .sbd{display:none;padding:8px 16px 24px;border-top:1px solid var(--line)}'
  +'.sday.open .sbd{display:block}'
- +'.sday.done .shd{background:#f0fbf3}'
- +'.sdot{width:26px;height:26px;border-radius:50%;background:var(--line);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:13px;flex:none}'
- +'.sday.done .sdot{background:var(--ok)}'
- +'.sprog{height:8px;background:var(--line);border-radius:4px;overflow:hidden;margin:8px 0 14px}'
+ +'.sday.done .shd{background:#243021}'
+ +'.sdot{width:28px;height:28px;border-radius:50%;background:var(--surface);color:var(--text);display:inline-flex;align-items:center;justify-content:center;font-size:12px;flex:none}'
+ +'.sday.done .sdot{background:var(--ok);color:#14200d}'
+ +'.sprog{height:8px;background:var(--line);border-radius:4px;overflow:hidden;margin:8px 0 16px}'
  +'.sprog i{display:block;height:100%;background:var(--ok);border-radius:4px}'
- +'.spt{margin:7px 0;padding-left:16px;position:relative;font-size:13.8px;line-height:1.65}'
- +'.spt:before{content:"▸";position:absolute;left:0;color:var(--blue)}'
- +'.sqz{margin-top:10px;border-top:1px dashed var(--line);padding-top:10px}'
- +'.sqz .qo{display:block;margin:5px 0;padding:8px 10px;border:1px solid var(--line);border-radius:8px;cursor:pointer;font-size:13.5px}'
- +'.sqz .qo:hover{background:#f6f9ff}'
- +'.sqz .qo.right{border-color:var(--ok);background:#f0fbf3}'
- +'.sqz .qo.wrong{border-color:var(--bad);background:#fdf3f3}'
- +'.sexp{font-size:12.5px;color:var(--muted);margin-top:6px}';
+ +'.spt{margin:12px 0;padding-left:16px;position:relative;font-size:14px;line-height:1.8}'
+ +'.spt:before{content:"▸";position:absolute;left:0;color:var(--lime)}'
+ +'.sqz{margin-top:24px;border-top:1px solid var(--line);padding-top:16px}'
+ +'.sqz .qo{display:block;width:100%;min-height:44px;margin:8px 0;padding:12px 16px;border:1px solid var(--line);border-radius:8px;cursor:pointer;font-size:14px;text-align:left;color:var(--text);background:var(--surface);font-family:inherit}'
+ +'.sqz .qo:hover{background:#2c382a}'
+ +'.sqz .qo.right{border-color:var(--ok);background:#263b25;color:#c8edb8}'
+ +'.sqz .qo.wrong{border-color:var(--bad);background:#422923;color:#ffd1c8}'
+ +'.sexp{font-size:13px;color:var(--muted);margin-top:12px;line-height:1.8}'
+ +'.sday :focus-visible{outline:2px solid var(--lime);outline-offset:3px}'
+ +'@media(max-width:520px){.sday .shd{gap:8px;padding:16px}.sday-title{min-width:100%;}.sday .shd>.btn{margin-left:40px}.sday .shd>.tag{margin-left:40px}}';
 var st=document.createElement('style');st.textContent=CSS;document.head.appendChild(st);
 function sGet(id){return get(ukey('et_study:'+id),{done:{}})}
 function sSet(id,v){set(ukey('et_study:'+id),v)}
@@ -74,7 +77,7 @@ window.openBank=function(id){
   var row=document.querySelector('#examBox .case div[style*="display:flex"]');
   if(S&&row){
     var btn=document.createElement('button');
-    btn.className='btn sm';btn.style.background='var(--blue)';btn.style.color='#fff';
+    btn.className='btn sm';btn.style.background='var(--blue)';btn.style.color='var(--bg)';
     btn.textContent='📖 教材学习路线（'+S.days.length+'天）';
     btn.onclick=function(){renderStudy(id)};
     row.appendChild(btn);
@@ -84,8 +87,7 @@ window.renderStudy=function(id){
   var S=window.STUDY[id];var st=sGet(id);
   var doneN=S.days.filter(function(_,i){return st.done[i]}).length;
   var box=document.getElementById('examBox');
-  box.innerHTML='<button class="btn gray sm" onclick="openBank(\''+id+'\')">← 返回证书页</button>'
-   +'<div class="case" style="margin-top:12px"><h3>📖 '+S.name+' · 教材学习路线</h3>'
+  box.innerHTML='<div class="case"><h3>📖 '+S.name+' · 教材学习路线</h3>'
    +'<div class="row"><b>教材依据</b>'+S.book+'</div>'
    +'<div class="row"><b>学习进度</b>已完成 '+doneN+'/'+S.days.length+' 天'
    +'<div class="sprog"><i style="width:'+(doneN/S.days.length*100)+'%"></i></div>'
@@ -93,8 +95,8 @@ window.renderStudy=function(id){
    +S.days.map(function(d,i){
      var done=st.done[i]?'done':'';
      return '<div class="sday '+done+'" id="sday'+i+'">'
-      +'<div class="shd" onclick="toggleDay('+i+')"><span class="sdot">'+(st.done[i]?'✓':(i+1))+'</span>'
-      +'<span style="flex:1">第'+(i+1)+'天 · '+d.t+'</span>'
+      +'<div class="shd"><button type="button" class="sday-title" aria-expanded="false" onclick="toggleDay('+i+')"><span class="sdot">'+(st.done[i]?'✓':(i+1))+'</span>'
+      +'<span style="flex:1">第'+(i+1)+'天 · '+d.t+'</span></button>'
       +'<span class="tag">'+d.pts.length+'个考点</span>'
       +'<button class="btn gray sm" onclick="event.stopPropagation();markDay(\''+id+'\','+i+')">'+(st.done[i]?'已完成 ✓':'标记完成')+'</button></div>'
       +'<div class="sbd"><div style="padding-top:10px">'
@@ -103,7 +105,7 @@ window.renderStudy=function(id){
       +d.qz.map(function(q,qi){
         return '<div class="qq"><div style="margin-top:8px;font-size:13.5px">Q'+(qi+1)+'. '+q.q+'</div>'
          +q.o.map(function(o,oi){
-           return '<span class="qo" onclick="pickOpt(this,'+q.a+','+oi+','+i+','+qi+',\''+id+'\')">'+String.fromCharCode(65+oi)+'. '+o+'</span>'
+           return '<button type="button" class="qo" onclick="pickOpt(this,'+q.a+','+oi+','+i+','+qi+',\''+id+'\')">'+String.fromCharCode(65+oi)+'. '+o+'</button>'
          }).join('')
          +'<div class="sexp" id="sexp-'+i+'-'+qi+'" style="display:none">💡 '+q.e+'</div></div>'
       }).join('')
@@ -111,10 +113,10 @@ window.renderStudy=function(id){
    }).join('');
   window.scrollTo(0,0);
 };
-window.toggleDay=function(i){var el=document.getElementById('sday'+i);if(el)el.classList.toggle('open')};
+window.toggleDay=function(i){var el=document.getElementById('sday'+i);if(el){var open=el.classList.toggle('open');el.querySelector('.sday-title').setAttribute('aria-expanded',String(open))}};
 window.markDay=function(id,i){
   var st=sGet(id);st.done[i]=!st.done[i];sSet(id,st);renderStudy(id);
-  var el=document.getElementById('sday'+i);if(el)el.classList.add('open');
+  var el=document.getElementById('sday'+i);if(el){el.classList.add('open');el.querySelector('.sday-title').setAttribute('aria-expanded','true');}
 };
 window.pickOpt=function(el,a,oi,di,qi,id){
   var zone=el.parentNode;
@@ -128,8 +130,8 @@ window.pickOpt=function(el,a,oi,di,qi,id){
   st.qz[k]=(st.qz[k]||0)+(oi===a?1:0);sSet(id,st);
 };
 /* ---------- 全站核心知识点：深蓝色笔标注加粗 ---------- */
-var KPCSS='b.kp{color:#003a8c;font-weight:700;border-bottom:2px solid rgba(0,58,140,.4);padding:0 1px}'
- +'.nav b.kp,.hero b.kp{color:#fff;border-bottom-color:rgba(255,255,255,.6)}';
+var KPCSS='b.kp{color:#d2e4a5;font-weight:700;border-bottom:1px solid rgba(198,239,116,.35);padding:0 1px}'
+ +'.nav b.kp,.hero b.kp,.right b.kp,.wrong b.kp{color:inherit;border-bottom-color:currentColor}';
 var st2=document.createElement('style');st2.textContent=KPCSS;document.head.appendChild(st2);
 var KP_TERMS=['断电、验电、挂牌上锁','挂牌上锁','先断电','断电','验电','高压互锁','互锁','绝缘电阻','绝缘手套','绝缘垫','绝缘鞋','绝缘','预充电阻','预充继电器','预充','星三角降压启动','星三角','正反转','自锁','漏电保护器','剩余电流','热继电器','熔断器','断路器','刀开关','双重绝缘','保护接零','保护接地','等电位联结','等电位','跨步电压','安全电压','心肺复苏','胸外按压','人工呼吸','触电急救','脱离电源','电击防护','欧姆定律','功率因数','无功补偿','三相异步电动机','三相交流','单相交流','交流电','直流电','电容器','黄绿双色','左零右火上接地','终端电阻','故障码','冻结帧','数据流','高压配电盒','动力电池管理系统','电池管理系统','磷酸铁锂','三元锂','热失控','主动均衡','被动均衡','旋转变压器','危险废物','双人作业','兆欧表','万用表','钳形表','验电器','维修开关','绝缘工具','举升机','扭力扳手','四轮定位','网关','液冷','电芯','电池包','电池模组','均衡','跳枪','快充','慢充','跛行','橙色','三电系统','三电','高压断电','绝缘检测','上高压','高压安全','工频','接地电阻','缺相','转差率','过载','短路','断路','触电','接地','CP信号','CC信号','CAN总线','车载充电机','整车控制器','电机控制器','预充回路','互锁回路','绝缘故障','MSD','LOTO','HVIL','BMS','SOC','SOH','PDU','MCU','OBC','DCDC','DC/DC','IGBT','SiC','PWM','CPR','K1','K2','K3','K4','READY','380V','220V','36V','24V','12V','50Hz','120Ω','60Ω','30mA','50mA','10mA','5~6cm','100~120次','30:2','R134a'];
 KP_TERMS=KP_TERMS.filter(function(t,i){return KP_TERMS.indexOf(t)===i}).sort(function(a,b){return b.length-a.length});
