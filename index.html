@@ -1,0 +1,1927 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0b3d91">
+<title>智电汽修二班 · 新能源汽车3D虚拟维修教学系统</title>
+<link rel="manifest" href="/videos/manifest.json">
+<link rel="icon" type="image/png" href="/videos/app-icon-192.png">
+<link rel="apple-touch-icon" href="/videos/app-icon-192.png">
+<style>
+:root{--blue:#0b3d91;--blue2:#1266f1;--orange:#ff7a00;--bg:#f4f6fa;--card:#fff;--text:#1c2333;--muted:#6b7280;--ok:#0f9d58;--bad:#d93025;--line:#e5e9f0}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);line-height:1.65}
+.nav{position:sticky;top:0;z-index:50;background:var(--blue);display:flex;overflow-x:auto;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.nav button{flex:0 0 auto;background:none;border:none;color:#fff;padding:14px 16px;font-size:15px;cursor:pointer;border-bottom:3px solid transparent}
+.nav button.active{color:#fff;border-bottom-color:var(--orange);font-weight:700}
+.wrap{max-width:1440px;margin:0 auto;padding:16px 28px}
+.hero{background:linear-gradient(135deg,#0b3d91,#1266f1);color:#fff;border-radius:14px;padding:26px 20px;margin-bottom:16px}
+.hero h1{font-size:22px;margin-bottom:8px}
+.hero p{font-size:14px;opacity:.92}
+.badge{display:inline-block;background:var(--orange);color:#fff;font-size:12px;padding:2px 10px;border-radius:20px;margin-bottom:10px}
+.stats{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.stat{flex:1;min-width:100px;background:rgba(255,255,255,.14);border-radius:10px;padding:10px;text-align:center}
+.stat b{display:block;font-size:20px}
+.stat span{font-size:12px;opacity:.9}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;cursor:pointer;transition:.15s}
+.card:hover{border-color:var(--blue2);transform:translateY(-2px)}
+.card h3{font-size:16px;margin-bottom:6px;color:var(--blue)}
+.card p{font-size:13px;color:var(--muted)}
+.notice{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:10px;padding:12px 14px;font-size:13px;margin:14px 0}
+.notice b{color:#7c2d12}
+.page{display:none}
+.page.active{display:block;animation:fade .25s}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1}}
+h2.sec{font-size:18px;color:var(--blue);margin:6px 0 12px}
+.lesson{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:12px}
+.lesson.locked{opacity:.55}
+.lesson h3{font-size:15px;margin-bottom:4px}
+.lesson .meta{font-size:12px;color:var(--muted);margin-bottom:8px}
+.locktag{font-size:12px;color:var(--bad)}
+.donetag{font-size:12px;color:var(--ok)}
+.btn{display:inline-block;background:var(--blue2);color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:14px;cursor:pointer}
+.btn.gray{background:#9ca3af}
+.btn.orange{background:var(--orange)}
+.btn.sm{padding:6px 12px;font-size:13px}
+.btn:disabled{background:#c3cad6;cursor:not-allowed}
+.qa{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin:12px 0}
+.qa .q{font-weight:700;margin-bottom:10px}
+.opt{display:block;width:100%;text-align:left;background:#f8fafc;border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin-bottom:8px;font-size:14px;cursor:pointer}
+.opt:hover{border-color:var(--blue2)}
+.opt.right{background:#e6f4ea;border-color:var(--ok)}
+.opt.wrong{background:#fce8e6;border-color:var(--bad)}
+.exp{font-size:13px;color:var(--muted);background:#f8fafc;border-radius:8px;padding:10px;margin-top:8px;display:none}
+.lesson-body{font-size:14px}
+.lesson-body p{margin-bottom:10px}
+.lesson-body b{color:var(--blue)}
+/* chat trainer */
+.chatbox{background:var(--card);border:1px solid var(--line);border-radius:12px;height:420px;overflow-y:auto;padding:14px;margin-bottom:12px}
+.msg{margin-bottom:12px;max-width:88%}
+.msg .bub{padding:10px 13px;border-radius:12px;font-size:14px;white-space:pre-wrap}
+.msg.bot .bub{background:#eef4ff;border-top-left-radius:2px}
+.msg.me{margin-left:auto}
+.msg.me .bub{background:var(--blue2);color:#fff;border-top-right-radius:2px}
+.typing{color:var(--muted);font-size:13px;padding:6px 2px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.chip{background:#eef4ff;border:1px solid #c7dbff;color:var(--blue);border-radius:20px;padding:6px 13px;font-size:13px;cursor:pointer}
+.chip:hover{background:#dbe9ff}
+.controls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.media-box{display:none;gap:8px;flex-wrap:wrap;margin-block-end:12px}
+.mitem{position:relative;width:72px;height:72px;border-radius:8px;overflow:hidden;border:1px solid var(--line);flex:none}
+.mitem img{width:100%;height:100%;object-fit:cover;display:block}
+.mtag{position:absolute;left:0;bottom:0;font-size:10px;line-height:16px;background:rgba(0,0,0,.55);color:#fff;padding:0 5px;border-top-right-radius:6px}
+.mx{position:absolute;top:2px;right:2px;width:18px;height:18px;border:none;border-radius:50%;background:rgba(0,0,0,.55);color:#fff;font-size:12px;line-height:18px;cursor:pointer;padding:0;text-align:center}
+.controls input{flex:1;min-width:160px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-size:14px}
+.safety{background:#fce8e6;border:1px solid #f5c6c0;border-radius:8px;padding:9px 12px;font-size:13px;color:#8a1f17;margin-top:8px}
+.case{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:12px}
+.case h3{font-size:15px;color:var(--blue);margin-bottom:6px}
+.case .row{font-size:13.5px;margin-bottom:6px}
+.case .row b{display:inline-block;min-width:72px;color:var(--muted);font-weight:600}
+.case ol{margin:4px 0 4px 20px;font-size:13.5px}
+.tagrow{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.tag{font-size:11px;background:#eef4ff;color:var(--blue);border-radius:12px;padding:2px 9px}
+.dashrow{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.dashcard{flex:1;min-width:140px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;text-align:center}
+.dashcard b{display:block;font-size:26px;color:var(--blue2)}
+.dashcard span{font-size:12px;color:var(--muted)}
+.bar{height:10px;background:#eef1f6;border-radius:6px;overflow:hidden;margin-top:8px}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--blue2),#3b82f6)}
+.foot{font-size:12px;color:var(--muted);text-align:center;padding:22px 16px 40px}
+@media(max-width:768px){
+  #courseMain{flex-direction:column;height:auto!important}
+  #courseMain #partCol{flex:none;width:100%;max-height:42vh;border-right:0;border-bottom:1px solid #22375a}
+  #courseMain>div:last-child{min-width:0!important;width:100%;height:54vh}
+}
+@media(max-width:560px){
+  .hero h1{font-size:19px}.chatbox{height:380px}
+  .wrap{padding:12px 14px}
+  .nav button{padding:11px 12px;font-size:14px}
+  video.promo{object-fit:contain!important;min-height:0!important;height:auto!important}
+}
+/* 体系课一体框内层在窄屏的覆盖（同样对抗内联样式） */
+@media(max-width:768px){
+  #courseMain #partCol{flex:0 0 auto!important;min-width:0!important}
+}
+
+/* auth modal */
+.mask{position:fixed;inset:0;background:rgba(10,20,40,.5);z-index:100;display:none;align-items:center;justify-content:center;padding:16px}
+.mask.show{display:flex}
+.modal{background:#fff;border-radius:14px;padding:22px;width:100%;max-width:360px}
+.modal h3{color:var(--blue);margin-bottom:14px;font-size:17px}
+.modal input{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-size:14px;margin-bottom:10px}
+.modal .err{color:var(--bad);font-size:12.5px;min-height:18px;margin-bottom:6px}
+.usrtag{margin-left:auto;color:#fff;font-size:13px;padding:12px 16px;cursor:pointer;white-space:nowrap}
+table.stu{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}
+table.stu th,table.stu td{border-bottom:1px solid var(--line);padding:7px 6px;text-align:left}
+table.stu th{color:var(--muted);font-weight:600}
+
+.caseimgs{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin:10px 0 4px}
+.caseimgs img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;border:1px solid var(--line);cursor:zoom-in}
+
+.fixstep{border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:12px;background:#fcfdff}
+.fshead{font-weight:700;font-size:14.5px;margin-bottom:10px;color:var(--text)}
+.fsimg{width:100%;border-radius:8px;border:1px solid var(--line);margin-bottom:8px}
+.fsgif{width:100%;max-width:420px;border-radius:8px;border:1px solid var(--line);display:block}
+.fsvid{width:100%;max-width:560px;border-radius:8px;border:1px solid var(--line);display:block;background:#000}
+.fsnote{font-size:11px;color:var(--muted);margin-top:4px}
+
+/* ===== 全站暗色主题：字体仅 白 #e8f2ff / 浅蓝 #9fc2ef 两色 ===== */
+body{background:#070d1a !important}
+body,body *{color:#e8f2ff !important}
+h1,h2,h3,b,strong,.q,.right,.chip,.tag{color:#ffffff !important}
+.meta,.exp,.donetag,.locktag,.fsnote,.typing,.foot,.card p,.case .row b,.dashcard span,table.stu th,[style*="--muted"]{color:#9fc2ef !important}
+/* 深蓝底容器上的文字用浅蓝 */
+.nav button,.usrtag{color:#cfe6ff !important;background:none !important;border:none !important}
+.nav b,.nav strong{color:#cfe6ff !important}
+.msg.me .bub{color:#dbe9f8 !important}
+.mtag,.mx{color:#dbe9f8 !important}
+a[href*="/videos/nev3d.html"]{color:#dbe9f8 !important}
+/* 按钮统一：浅蓝底 深蓝字 */
+.btn,button{background:#cfe2fa !important;color:#0b3d91 !important;border-color:#3d7fe0 !important}
+.btn.orange,.btn.gray,.btn:disabled{background:#cfe2fa !important}
+.btn:disabled{opacity:.55}
+a.btn{background:linear-gradient(135deg,#0d2f5e,#1a5db1) !important;color:#dbe9f8 !important;border-color:#3d7fe0 !important}
+.badge{background:#0b3d91 !important;color:#dbe9f8 !important}
+/* 暗色内容面板 */
+.wrap{position:relative;z-index:1}
+.lesson,.qa,.card,.case,.dashcard,.modal,.opt,.exp,.chip,.fixstep{background:rgba(13,24,44,.94) !important;border-color:#274264 !important}
+.notice,.safety{background:rgba(21,34,58,.94) !important;border-color:#2c4a77 !important}
+.controls input,.modal input{background:#0c1626 !important;border-color:#2c4a77 !important;color:#e8f2ff !important}
+::placeholder{color:#7fa8d9 !important}
+table.stu th,table.stu td{border-color:#22375a !important}
+.chatbox{background:rgba(10,18,36,.88) !important;border-color:#274264 !important}
+.msg.bot .bub{background:rgba(21,34,58,.94) !important;border:1px solid #274264}
+.caseimgs img{border-color:#274264 !important}
+.bar{background:#132240 !important}
+.tag{background:rgba(21,34,58,.94) !important;border:1px solid #274264}
+/* 行内浅色背景统一压暗（学习路径/教材卡/双轨入口等） */
+div[style*="background:#fff"],div[style*="background:#f8fafc"],div[style*="background:#f0fdf4"],div[style*="background:#fffbeb"],div[style*="background:#f0f9ff"],div[style*="background:#f0f7ff"],div[style*="background:#eef4ff"],div[style*="background:#fcfdff"],div[style*="background:#f5f9ff"],div[style*="background:#f0f6ff"],div[style*="background:rgba(255,255,255"],span[style*="background:#e0f2fe"]{background:rgba(13,24,44,.94) !important}
+/* 3D车模背景层（课程/错题集/带教/案例库/考证页面） */
+.bg3d{position:fixed;inset:0;z-index:0;pointer-events:none}
+.bg3d iframe{width:100%;height:100%;border:0;display:block}
+.bg3d .bg3d-dim{position:absolute;inset:0;background:radial-gradient(1000px 620px at 50% 38%,rgba(5,10,22,.45) 0%,rgba(5,10,22,.72) 100%)}
+/* 按键灵动效果：悬浮弹起 + 点击回弹 + 光晕 */
+.nav button,.btn,.card,.opt,.chip,.usrtag{
+  transition:transform .18s cubic-bezier(.34,1.56,.64,1),box-shadow .18s ease,filter .18s ease;
+}
+.nav button:hover,.btn:hover,.card:hover,.chip:hover,.usrtag:hover{
+  transform:translateY(-2px) scale(1.03);
+  box-shadow:0 6px 18px rgba(61,127,224,.4),0 0 12px rgba(120,180,255,.3);
+  filter:brightness(1.12);
+}
+.nav button:active,.btn:active,.card:active,.chip:active,.usrtag:active{transform:scale(.95)}
+button{transition:transform .15s cubic-bezier(.34,1.56,.64,1),box-shadow .15s ease,filter .15s ease}
+button:hover{filter:brightness(1.1)}
+button:active{transform:scale(.94)}
+/* 首页卡片进入动画：依次淡入上浮 */
+@keyframes cardIn{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:translateY(0)}}
+#p-home .card{animation:cardIn .55s cubic-bezier(.22,.9,.32,1.18) backwards}
+#p-home .card:nth-child(1){animation-delay:.15s}
+#p-home .card:nth-child(2){animation-delay:.25s}
+#p-home .card:nth-child(3){animation-delay:.35s}
+#p-home .card:nth-child(4){animation-delay:.45s}
+#p-home .card:nth-child(5){animation-delay:.55s}
+#p-home .card:nth-child(6){animation-delay:.65s}
+#p-home .card:nth-child(7){animation-delay:.75s}
+#p-home .card:nth-child(8){animation-delay:.85s}
+#p-home .card:nth-child(9){animation-delay:.95s}
+/* 一键安装按钮：渐变底+呼吸光晕（button.install-btn 以覆盖全站 button 统一样式） */
+button.install-btn{display:inline-flex;align-items:center;gap:10px;font-size:18px;font-weight:700;padding:16px 34px;border-radius:14px;background:linear-gradient(135deg,#1266f1,#0b3d91) !important;color:#fff !important;border:1px solid #3d7fe0 !important;cursor:pointer;box-shadow:0 8px 24px rgba(18,102,241,.45);animation:installPulse 2.2s ease-in-out infinite;transition:transform .18s cubic-bezier(.34,1.56,.64,1)}
+button.install-btn:hover{transform:translateY(-3px) scale(1.04);filter:brightness(1.15)}
+button.install-btn:active{transform:scale(.95)}
+@keyframes installPulse{0%,100%{box-shadow:0 8px 24px rgba(18,102,241,.45)}50%{box-shadow:0 10px 38px rgba(90,170,255,.9)}}
+/* 双轨入口大卡：悬浮弹起+光晕，图标上下漂浮 */
+.track-card{transition:transform .2s cubic-bezier(.34,1.56,.64,1),box-shadow .2s ease,filter .2s ease}
+.track-card:hover{transform:translateY(-4px) scale(1.02);box-shadow:0 14px 32px rgba(61,127,224,.45),0 0 16px rgba(120,180,255,.35);filter:brightness(1.06)}
+.track-card:active{transform:scale(.97)}
+.track-card .ticon{display:inline-block;animation:iconFloat 2.6s ease-in-out infinite;filter:drop-shadow(0 4px 8px rgba(18,102,241,.4))}
+@keyframes iconFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+/* 其他页面通用进入动画：面板/卡片淡入上浮（切页时重播） */
+@keyframes riseIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+.page.active .lesson,.page.active .case,.page.active .dashcard,.page.active .bankcard,.page.active .fixstep,.page.active .qa,.page.active:not(#p-home) .card{animation:riseIn .4s cubic-bezier(.22,.9,.32,1.12) backwards}
+.page.active :is(.lesson,.case,.dashcard,.bankcard,.fixstep,.qa):nth-child(1),.page.active:not(#p-home) .card:nth-child(1){animation-delay:.04s}
+.page.active :is(.lesson,.case,.dashcard,.bankcard,.fixstep,.qa):nth-child(2),.page.active:not(#p-home) .card:nth-child(2){animation-delay:.1s}
+.page.active :is(.lesson,.case,.dashcard,.bankcard,.fixstep,.qa):nth-child(3),.page.active:not(#p-home) .card:nth-child(3){animation-delay:.16s}
+.page.active :is(.lesson,.case,.dashcard,.bankcard,.fixstep,.qa):nth-child(4),.page.active:not(#p-home) .card:nth-child(4){animation-delay:.22s}
+.page.active :is(.lesson,.case,.dashcard,.bankcard,.fixstep,.qa):nth-child(5),.page.active:not(#p-home) .card:nth-child(5){animation-delay:.28s}
+.page.active :is(.lesson,.case,.dashcard,.bankcard,.fixstep,.qa):nth-child(n+6){animation-delay:.34s}
+/* ===== 开屏欢迎动画 ===== */
+#splash{position:fixed;inset:0;z-index:9999;background:radial-gradient(1200px 800px at 50% 28%,#0d2f5e 0%,#070d1a 72%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;transition:opacity .6s ease}
+#splash.hide{opacity:0;pointer-events:none}
+#splash .sp-icon{width:122px;height:122px;border-radius:26px;box-shadow:0 12px 44px rgba(18,102,241,.55);animation:spIconIn 1s cubic-bezier(.22,.9,.32,1.18) both}
+#splash .sp-title{font-size:clamp(26px,5vw,46px);font-weight:800;color:#fff;letter-spacing:5px;animation:spFadeUp 1.1s .7s ease both;text-shadow:0 0 34px rgba(90,170,255,.65)}
+#splash .sp-sub{font-size:clamp(13px,2vw,16px);color:#9fc2ef;letter-spacing:3px;animation:spFadeUp 1s 1.5s ease both}
+#spEnter{margin-top:28px;font-size:19px;font-weight:700;padding:16px 56px;border-radius:16px;border:1px solid #3d7fe0;background:linear-gradient(135deg,#1266f1,#0b3d91);color:#fff;cursor:pointer;opacity:0;pointer-events:none;box-shadow:0 10px 30px rgba(18,102,241,.5);transition:transform .18s cubic-bezier(.34,1.56,.64,1),box-shadow .18s,filter .18s}
+#spEnter.show{animation:spFadeUp .8s ease both;pointer-events:auto}
+#spEnter:hover{transform:translateY(-3px) scale(1.05);filter:brightness(1.15);box-shadow:0 14px 40px rgba(90,170,255,.7)}
+#spEnter:active{transform:scale(.95)}
+@keyframes spIconIn{from{opacity:0;transform:scale(.4) rotate(-8deg)}to{opacity:1;transform:scale(1) rotate(0)}}
+@keyframes spFadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+
+<!-- ============ 开屏欢迎动画（约3秒） ============ -->
+<div id="splash">
+  <img class="sp-icon" src="/videos/app-icon-512.png" alt="智电汽修二班">
+  <div class="sp-title">欢迎来到智电汽修二班</div>
+  <div class="sp-sub">新能源汽车3D虚拟维修教学系统</div>
+  <button id="spEnter" onclick="enterSite()">进入网站（APP）</button>
+</div>
+
+<nav class="nav">
+  <button data-p="home" class="active">首页</button>
+  <button data-p="course">新手启航体系课</button>
+  <button data-p="wrong">错题集</button>
+  <button data-p="trainer">故障码带教</button>
+  <button data-p="cases">案例库</button>
+  <button data-p="exam">考证备考</button>
+  <button data-p="dash">学习看板</button>
+  <span class="usrtag" id="userChip" onclick="openAuth()">👤 登录/注册</span>
+</nav>
+
+<div class="mask" id="authMask">
+  <div class="modal">
+    <h3 id="authTitle">登录</h3>
+    <input id="aUser" placeholder="用户名（2-12位）" maxlength="12">
+    <input id="aPass" type="password" placeholder="密码（至少6位）">
+    <input id="aCode" placeholder="班级邀请码（选填，6位）" maxlength="6" style="display:none;letter-spacing:3px">
+    <div class="err" id="aErr"></div>
+    <button class="btn" style="width:100%" id="aSubmit" onclick="doAuth()">登录</button>
+    <div style="margin-top:12px;font-size:13px;text-align:center">
+      <a href="javascript:toggleMode()" id="aToggle" style="color:var(--blue2)">没有账号？注册</a>
+      &nbsp;·&nbsp;<a href="javascript:closeAuth()" style="color:var(--muted)">先逛逛（游客）</a>
+    </div>
+    <div style="margin-top:10px;font-size:11.5px;color:var(--muted)">演示级本地账号：数据保存在本设备浏览器，密码经加盐哈希存储，不会明文保存。跨设备同步见部署说明云端升级路径。</div>
+  </div>
+</div>
+
+<div class="mask" id="installMask" onclick="if(event.target===this)this.classList.remove('show')">
+  <div class="modal" style="max-width:430px">
+    <div id="installSteps"></div>
+    <div style="text-align:center;margin-top:6px"><button class="btn gray sm" onclick="document.getElementById('installMask').classList.remove('show')">我知道了</button></div>
+  </div>
+</div>
+
+<div class="bg3d" id="bg3d" style="display:none"><iframe src="/videos/nev3d.html?embed=1&v=bg10" title="背景3D车模" tabindex="-1"></iframe><div class="bg3d-dim"></div></div>
+
+<div class="wrap">
+
+<!-- ============ 首页：3D整车模型 + 底部功能模块 ============ -->
+<section class="page active" id="p-home">
+  <div style="border-radius:14px;overflow:hidden;border:1px solid var(--line);background:#070d1a;margin-bottom:16px">
+    <video class="promo" src="/videos/promo-15s.mp4" autoplay loop muted playsinline style="width:100%;height:min(72vh,660px);min-height:440px;object-fit:cover;display:block;background:#070d1a" title="智电汽修二班宣传片 · 循环播放"></video>
+  </div>
+  <div class="grid">
+    <div class="card" onclick="go('course')"><h3>🧊 四大车型 3D 拆解台</h3><p>纯电 / 插电混动 / 增程式 / 氢燃料电池：整车 3D 可旋转拆解，点击部件直达详解与实训游戏。</p></div>
+    <div class="card" onclick="go('trainer')"><h3>故障带教师傅</h3><p>读码→推断→排查→安全提示，四步对话式带教；支持上传图片/视频AI识别故障。</p></div>
+    <div class="card" onclick="go('course')"><h3>新手启航体系课</h3><p>15节部件课配套3D拆解+30个维修实训游戏；理论学习精简入口在体系课右侧栏。</p></div>
+    <div class="card" onclick="go('course');setTimeout(function(){var p=document.getElementById('placeBox');if(p)p.scrollIntoView({behavior:'smooth',block:'center'})},120)"><h3>🔧 油转电老师傅直通</h3><p>已有油车维修经验？先考40题定位，90分全免修直通、75分免修18节，不必从头学起。</p></div>
+    <div class="card" onclick="go('cases')"><h3>三电维修案例库</h3><p>故障现象→检测→根因→维修→复盘，结构化教学案例，可跳转3D模型对照零件。</p></div>
+    <div class="card" onclick="go('exam')"><h3>考证模拟练习</h3><p>按职业技能等级认定大纲自研题库，阶段/期中/期末考试穿插课程，错题自动归因。</p></div>
+    <div class="card" onclick="go('wrong')"><h3>我的错题集</h3><p>课程考核与考试答错的题自动收录；重练答对即移出，反复出错的题排在最前。</p></div>
+    <div class="card" onclick="go('app')"><h3>📲 APP 下载</h3><p>支持 Windows 电脑与安卓手机安装到桌面/主屏幕，独立窗口运行、带图标，像原生 APP 一样使用。</p></div>
+  </div>
+</section>
+
+<!-- ============ APP 下载（Windows / 安卓） ============ -->
+<section class="page" id="p-app">
+  <h2 class="sec">📲 APP 下载 · Windows / 安卓</h2>
+  <div class="notice">智电汽修二班以「网页应用」形式提供：安装后会在桌面/主屏幕生成独立图标，双击即<b>以独立窗口全屏运行</b>（无浏览器地址栏），体验和原生 APP 一致；内容每次打开自动为最新版，无需手动更新。电脑与手机进度各自保存在本设备。</div>
+  <div class="lesson" style="text-align:center;padding:26px 16px">
+    <img src="/videos/app-icon-192.png" alt="智电汽修二班 APP 图标" style="width:88px;height:88px;border-radius:20px;box-shadow:0 8px 24px rgba(18,102,241,.5);margin-bottom:14px">
+    <div style="font-size:15px;font-weight:700;margin-bottom:12px" id="devHint">正在检测您的设备…</div>
+    <button class="install-btn" onclick="tryInstall()">⬇️ 一键安装「智电汽修二班」到桌面</button>
+    <div class="meta" id="installHint" style="margin-top:12px;font-size:12.5px">点击按钮：支持的浏览器会直接弹出系统安装确认框，点「安装」即可；否则自动为您打开放大版分步指引。</div>
+  </div>
+  <div class="grid">
+    <div class="card" style="cursor:default">
+      <h3>🖥️ Windows 电脑版</h3>
+      <p style="line-height:2">
+        <b>方式一（推荐，Edge 浏览器）</b><br>
+        ① 用 Edge 打开 <b>dianengshifu.com.cn</b><br>
+        ② 点右上角 <b>⋯</b>（设置及其他）→ <b>应用</b><br>
+        ③ 选择 <b>「将此站点安装为应用」</b> → 命名"智电汽修二班" → 安装<br>
+        <b>方式二（Chrome 浏览器）</b><br>
+        ① 用 Chrome 打开网站<br>
+        ② 点右上角 <b>⋮</b> → <b>投射、保存和共享</b>（或"更多工具"）<br>
+        ③ 选择 <b>「安装页面为应用…」</b>（部分版本显示为"创建快捷方式"，勾选<b>「作为窗口打开」</b>效果相同）<br>
+        ✅ 安装后：桌面/开始菜单出现图标，独立窗口运行；任务栏可固定。
+      </p>
+    </div>
+    <div class="card" style="cursor:default">
+      <h3>📱 安卓手机版</h3>
+      <p style="line-height:2">
+        <b>方式一（手机浏览器直装）</b><br>
+        ① 用 Chrome 打开 <b>dianengshifu.com.cn</b><br>
+        ② 点右上角 <b>⋮</b> → <b>「添加到主屏幕」</b><br>
+        ③ 确认名称"智电汽修二班" → 添加<br>
+        ✅ 主屏幕出现图标，点开后全屏运行，与 APP 体验一致。<br>
+        <b>方式二（微信扫码直达）</b><br>
+        微信/相机扫描下方二维码 → 右上角「⋯」→ 在浏览器打开 → 同上添加。
+      </p>
+      <div style="text-align:center;margin-top:10px">
+        <div style="display:inline-flex;gap:14px;align-items:center">
+          <img src="/videos/app-icon-192.png" alt="智电汽修二班 APP 图标" style="width:96px;height:96px;border-radius:20px;box-shadow:0 6px 18px rgba(18,102,241,.5)">
+          <div style="background:#fff;padding:10px;border-radius:12px">
+            <img src="/videos/app-qr.png" alt="智电汽修二班 官网二维码" style="width:150px;height:150px;display:block">
+          </div>
+        </div>
+        <div class="meta" style="font-size:11.5px;margin-top:6px">左：安装后的 APP 图标 ｜ 右：扫码直达 dianengshifu.com.cn</div>
+      </div>
+    </div>
+  </div>
+  <div class="notice" style="margin-top:12px">📌 说明：iPhone/iPad 同样支持（Safari 打开 → 分享 → 「添加到主屏幕」）。若安装入口未出现，请先确认浏览器已更新至最新版本。</div>
+</section>
+
+<!-- ============ 课程：实操与部件学习为主体 ============ -->
+<section class="page" id="p-course">
+  <h2 class="sec">新手启航 · 体系课</h2>
+  <div id="placeBox"></div>
+  <div id="vehSwitch" style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;align-items:center">
+    <span style="font-size:12.5px;color:var(--muted)">车型切换：</span>
+    <button data-v="bev" class="vswitch on">纯电动 BEV</button>
+    <button data-v="phev" class="vswitch">插电混动 PHEV</button>
+    <button data-v="erev" class="vswitch">增程式 EREV</button>
+    <button data-v="fcev" class="vswitch">氢燃料 FCEV</button>
+  </div>
+  <style>
+    .vswitch{font-size:13px;padding:7px 15px;border-radius:20px;border:1px solid #2b4a7f;background:rgba(18,40,80,.5);color:#cfe3ff;cursor:pointer;transition:all .18s;font-family:inherit}
+    .vswitch:hover{background:rgba(30,64,120,.8);transform:translateY(-1px)}
+    .vswitch.on{background:linear-gradient(135deg,#1266f1,#0b3d91);border-color:#3d7fe0;color:#fff;font-weight:700;box-shadow:0 4px 14px rgba(18,102,241,.4)}
+  </style>
+  <div style="display:flex;gap:14px;align-items:stretch;flex-wrap:wrap">
+    <div style="flex:1 1 700px;min-width:340px">
+      <div id="courseMain" style="border:1px solid #274264;border-radius:16px;overflow:hidden;background:#070d1a;display:flex;height:min(74vh,680px);box-shadow:0 8px 28px rgba(3,10,24,.6)">
+        <div id="partCol" style="flex:0 0 300px;min-width:250px;overflow-y:auto;padding:14px;background:rgba(8,15,30,.92);border-right:1px solid #22375a;display:flex;flex-direction:column"></div>
+        <div style="flex:1;position:relative;min-width:260px">
+          <iframe id="vehFrame" src="/videos/nev3d.html?embed=1&labels=1&v=course1" style="width:100%;height:100%;border:0;display:block" title="体系课3D拆解台"></iframe>
+        </div>
+      </div>
+      <div id="lessonList" style="margin-top:14px"></div>
+    </div>
+    <div id="theoryCol" style="flex:0 1 250px;min-width:210px;display:flex;flex-direction:column"></div>
+  </div>
+  <div style="margin-top:20px;text-align:center;font-size:12px;color:var(--muted);line-height:2.1">
+    配套教材：《图解电动汽车结构原理》　《新能源汽车高压系统故障诊断与排除》　《新能源汽车故障诊断技巧彩色图解》　《新能源汽车故障诊断》　《新能源汽车动力电池及电池管理系统检修》
+  </div>
+  <script>
+  (function(){
+    var SRC={
+      bev:'/videos/nev3d.html?embed=1&labels=1&v=course1',
+      phev:'/models/phev.html?embed=1&labels=0',
+      erev:'/models/erev.html?embed=1&labels=0',
+      fcev:'/models/fcev.html?embed=1&labels=0'
+    };
+    var frame=document.getElementById('vehFrame');
+    document.querySelectorAll('#vehSwitch .vswitch').forEach(function(btn){
+      btn.addEventListener('click',function(){
+        document.querySelectorAll('#vehSwitch .vswitch').forEach(function(b){b.classList.remove('on')});
+        btn.classList.add('on');
+        frame.src=SRC[btn.dataset.v]+'&t='+Date.now();
+      });
+    });
+  })();
+  </script>
+</section>
+
+<!-- ============ 错题集 ============ -->
+<section class="page" id="p-wrong">
+  <h2 class="sec">📝 我的错题集</h2>
+  <div class="notice">课程考核中答错的题目自动收录于此；重练答对即移出，反复出错的题排在最前。错得越多，越是学习重点。</div>
+  <div id="wrongBox"></div>
+</section>
+
+<!-- ============ 故障码带教 ============ -->
+<section class="page" id="p-trainer">
+  <h2 class="sec">故障带教师傅</h2>
+  <div class="notice">选择或输入故障码/症状，师傅按<b>读码→推断→排查→安全提示</b>四步带教。代码含义因厂家而异，<b>以原厂维修手册为准</b>。</div>
+  <div class="controls">
+    <input id="fInput" placeholder="输入症状，如：无法充电 / 跳枪 / 续航骤降 / 托底后报警…">
+    <button class="btn" onclick="askWithMedia()">问师傅</button>
+    <button class="btn gray" type="button" onclick="pickMedia()">📷 传图/视频</button>
+    <input type="file" id="fFile" accept="image/*,video/*" multiple style="display:none" onchange="onMediaPicked(event)">
+  </div>
+  <div class="media-box" id="mediaBox"></div>
+  <div class="chips" id="codeChips"></div>
+  <div class="chatbox" id="chat"></div>
+  <div style="display:flex;gap:8px">
+    <button class="btn orange sm" onclick="randomCode()">随机抽一个故障</button>
+    <button class="btn gray sm" onclick="saveCase()">存入案例库</button>
+    <button class="btn gray sm" onclick="clearChat()">清空对话</button>
+  </div>
+</section>
+
+<!-- ============ 案例库 ============ -->
+<section class="page" id="p-cases">
+  <h2 class="sec">三电维修案例库</h2>
+  <div class="controls"><input id="caseSearch" placeholder="搜索关键词，如：绝缘 / 跳枪 / 托底 / SOC…" oninput="renderCases()"></div>
+  <div id="caseList"></div>
+</section>
+
+<!-- ============ 考证练习 ============ -->
+<section class="page" id="p-exam">
+  <h2 class="sec">考证备考 · 三证书体系</h2>
+  <div class="notice">低压电工题为公开模拟题原题整理（来源已逐题标注），交通部与维修工题为按公开评价标准/大纲自研。题目仅作备考练习，<b>不构成任何证书的承诺</b>，考试信息以官方发布为准。</div>
+  <div id="examBox"></div>
+</section>
+
+<!-- ============ 看板 ============ -->
+<section class="page" id="p-dash">
+  <h2 class="sec">学习看板（B端管理端）</h2>
+  <div class="dashrow" id="dashCards"></div>
+  <div class="lesson" style="margin-top:14px">
+    <h3>体系课完成度（15 节部件课 + 35 节理论课）</h3>
+    <div id="lessonBars"></div>
+  </div>
+<div class="lesson" style="margin-top:14px" id="stuPanel">
+    <h3>本机学员管理（B端）</h3>
+    <div id="stuHint" style="font-size:12.5px;color:var(--muted)"></div>
+    <div id="stuList"></div>
+  </div>
+  <div class="lesson" style="margin-top:14px" id="cloudPanel">
+    <h3>☁️ 云端学员（全部设备注册，实时同步）</h3>
+    <div id="cloudStu"></div>
+  </div>
+  <div class="lesson" style="margin-top:14px" id="myClassPanel">
+    <h3>🏫 我的班级 / 教师申请</h3>
+    <div id="myClassBox"></div>
+  </div>
+  <div class="lesson" style="margin-top:14px" id="teacherAdminPanel">
+    <h3>🛠️ 教师管理（需管理密钥）：教师申请审核与任命</h3>
+    <div id="teacherAdminBox"></div>
+  </div>
+  <button class="btn sm" onclick="exportData()">导出学习档案（JSON）</button>
+  <button class="btn gray sm" onclick="resetAll()">清空本机数据</button>
+</section>
+
+</div>
+
+<div class="foot">
+智电汽修二班 · 教学辅助与知识服务平台 | 内容均整理自公开资料，仅供学习参考<br>
+涉及高压操作须由持证人员在断电验电后执行 · 模拟练习不构成职业资格认证
+</div>
+
+<script src="data.js"></script>
+<script src="lessons.js"></script>
+<script src="cloud.js"></script>
+<script>
+/* ==================== 数据（内嵌为默认库，data.js 存在时自动覆盖） ==================== */
+var LESSONS=(window.DATA&&window.DATA.lessons&&window.DATA.lessons.length)?window.DATA.lessons:[];;
+
+var CODES_RAW=[];;
+
+var CASES_RAW=[];;
+var BANKS_RAW=[];;
+var PRACTICAL_RAW=[];;
+
+var EXAM_RAW=[];;
+
+var EXAM=(window.DATA&&window.DATA.exam&&window.DATA.exam.length)?window.DATA.exam:EXAM_RAW;
+var CODES=(window.DATA&&window.DATA.codes&&window.DATA.codes.length)?window.DATA.codes:CODES_RAW;
+var CASES=(window.DATA&&window.DATA.cases&&window.DATA.cases.length)?window.DATA.cases:CASES_RAW;
+var NEWS=(window.DATA&&window.DATA.news)?window.DATA.news:[];
+var BANKS=(window.DATA&&window.DATA.banks&&window.DATA.banks.length)?window.DATA.banks:BANKS_RAW;
+var PRACTICAL=(window.DATA&&window.DATA.practical)?window.DATA.practical:PRACTICAL_RAW;
+var DATA_UPDATED=(window.DATA&&window.DATA.updated)?window.DATA.updated:'内置版';
+
+/* ==================== 存储 ==================== */
+var LS=window.localStorage;
+function get(k,d){try{var v=LS.getItem(k);return v?JSON.parse(v):d}catch(e){return d}}
+function set(k,v){try{LS.setItem(k,JSON.stringify(v))}catch(e){}}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function qs(s){return "'"+String(s==null?'':s).replace(/\\/g,'\\\\').replace(/'/g,"\\'")+"'"}
+var PLESS='et_lessons',PEXAMB='et_exambest',PTRN='et_trainer_n',PANS='et_ans_n';
+function curUser(){return get('et_session',null)}
+function ukey(k){var u=curUser();return u?k+':'+u:k}
+async function sha256(str){
+  if(window.crypto&&crypto.subtle){try{
+    var b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(str));
+    return Array.prototype.map.call(new Uint8Array(b),function(x){return x.toString(16).padStart(2,'0')}).join('');
+  }catch(e){}}
+  var h=0;for(var i=0;i<str.length;i++){h=((h*31)+str.charCodeAt(i))>>>0}return 'fb'+h;
+}
+function users(){return get('et_users',{})}
+var authMode='login';
+function openAuth(){document.getElementById('authMask').classList.add('show');document.getElementById('aErr').textContent=''}
+function closeAuth(){document.getElementById('authMask').classList.remove('show')}
+function toggleMode(){authMode=authMode==='login'?'register':'login';
+  document.getElementById('authTitle').textContent=authMode==='login'?'登录':'注册';
+  document.getElementById('aSubmit').textContent=authMode==='login'?'登录':'注册并登录';
+  document.getElementById('aToggle').textContent=authMode==='login'?'没有账号？注册':'已有账号？登录';
+  document.getElementById('aCode').style.display=authMode==='login'?'none':'block';
+  document.getElementById('aErr').textContent='';}
+async function doAuth(){
+  var u=document.getElementById('aUser').value.trim(),p=document.getElementById('aPass').value,err=document.getElementById('aErr');
+  if(u.length<2||u.length>12){err.textContent='用户名需2-12位';return}
+  if(p.length<6){err.textContent='密码至少6位';return}
+  var us=users();
+  if(authMode==='register'){
+    if(us[u]){err.textContent='该用户名已存在，请直接登录';return}
+    var salt=Math.random().toString(36).slice(2,10);
+    us[u]={salt:salt,hash:await sha256(salt+p),created:new Date().toISOString().slice(0,10)};
+    set('et_users',us);
+  }else{
+    if(!us[u]||us[u].hash!==await sha256(us[u].salt+p)){err.textContent='用户名或密码不正确';return}
+  }
+  set('et_session',u);closeAuth();refreshUserUI();
+  if(authMode==='register'){var code=(document.getElementById('aCode').value||'').trim().toUpperCase();if(/^[A-Z0-9]{6}$/.test(code))window.__joinCode=code}
+  var p2=document.querySelector('.page.active');if(p2)go(p2.id.slice(2));
+  botSay?0:0;
+}
+function doLogout(){set('et_session',null);refreshUserUI();go('home')}
+function refreshUserUI(){
+  var chip=document.getElementById('userChip');
+  var u=curUser();
+  if(u){chip.textContent='👤 '+u+'（点击退出）';chip.onclick=function(){if(confirm('退出登录？'))doLogout()}}
+  else{chip.textContent='👤 登录/注册';chip.onclick=openAuth}
+}
+
+/* ==================== 导航 ==================== */
+function go(p){
+  document.querySelectorAll('.page').forEach(function(s){s.classList.remove('active')});
+  document.getElementById('p-'+p).classList.add('active');
+  document.querySelectorAll('.nav button').forEach(function(b){b.classList.toggle('active',b.dataset.p===p)});
+  window.scrollTo(0,0);
+  var ab=document.querySelector('.nav button.active');if(ab&&ab.scrollIntoView)setTimeout(function(){ab.scrollIntoView({block:'nearest',inline:'center'})},50);
+  var bg=document.getElementById('bg3d');if(bg)bg.style.display=(p==='home'||p==='dash'||p==='course')?'none':'block';
+  if(p==='course')renderLessons()
+  if(p==='wrong')renderWrong();
+  if(p==='cases')renderCases();
+  if(p==='exam')renderExamHome();
+  if(p==='dash')renderDash();
+}
+document.querySelectorAll('.nav button').forEach(function(b){b.onclick=function(){go(b.dataset.p)}});
+
+/* ==================== 开屏动画 ==================== */
+setTimeout(function(){var b=document.getElementById('spEnter');if(b)b.classList.add('show')},3000);
+function enterSite(){var s=document.getElementById('splash');if(!s)return;s.classList.add('hide');setTimeout(function(){if(s.parentNode)s.parentNode.removeChild(s)},650)}
+/* ==================== APP 一键安装 ==================== */
+var deferredPrompt=null;
+window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferredPrompt=e});
+function detectDev(){var u=navigator.userAgent;return /android/i.test(u)?'android':(/iphone|ipad|ipod/i.test(u)?'ios':'windows')}
+function initInstall(){
+  var dev=detectDev();
+  var el=document.getElementById('devHint');
+  if(el)el.textContent='检测到您正在使用：'+(dev==='android'?'📱 安卓手机':dev==='ios'?'📱 iPhone / iPad':'🖥️ Windows 电脑');
+}
+function tryInstall(){
+  /* 浏览器允许自动安装（HTTPS+PWA）时，直接弹系统确认框 */
+  if(deferredPrompt){
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(function(r){
+      var h=document.getElementById('installHint');
+      if(h)h.textContent=r.outcome==='accepted'?'✅ 安装成功！您的桌面/主屏幕已生成「智电汽修二班」图标。':'您取消了安装，可点击下方两张卡片的详细步骤手动安装。';
+      deferredPrompt=null;
+    });
+    return;
+  }
+  showInstallGuide();
+}
+function showInstallGuide(){
+  var dev=detectDev();
+  var steps=dev==='android'?[
+    ['打开手机浏览器，访问 dianengshifu.com.cn','没有 Chrome 就用手机自带浏览器，效果一样'],
+    ['点浏览器右上角「⋮」（菜单）',''],
+    ['选择「添加到主屏幕」','有的手机叫「添加至主屏幕/设为桌面快捷方式」'],
+    ['确认名称「智电汽修二班」→ 添加','主屏幕出现图标，点开全屏运行，与 APP 一致']
+  ]:(dev==='ios'?[
+    ['用 Safari 打开 dianengshifu.com.cn',''],
+    ['点底部的「分享」按钮（方框向上箭头）',''],
+    ['上滑找到「添加到主屏幕」',''],
+    ['确认名称后点「添加」','主屏幕出现图标']
+  ]:[
+    ['用 Edge 或 Chrome 打开 dianengshifu.com.cn','Windows 自带 Edge，无需下载任何东西'],
+    ['点浏览器右上角「⋯」（Edge）或「⋮」（Chrome）',''],
+    ['选择「应用 → 将此站点安装为应用」','Chrome 叫「安装页面为应用…」；没有该选项就选「创建快捷方式」并勾选「作为窗口打开」'],
+    ['命名「智电汽修二班」→ 安装','桌面和开始菜单出现图标，独立窗口运行，无地址栏']
+  ]);
+  var m=document.getElementById('installMask');
+  document.getElementById('installSteps').innerHTML='<h3 style="margin-bottom:12px">📲 安装步骤 · '+(dev==='android'?'安卓手机':dev==='ios'?'iPhone / iPad':'Windows 电脑')+'</h3>'
+   +steps.map(function(s,i){return '<div style="display:flex;gap:10px;margin-bottom:13px;align-items:flex-start"><div style="flex:none;width:26px;height:26px;border-radius:50%;background:#1266f1;text-align:center;line-height:26px;font-weight:700;font-size:14px;color:#fff">'+(i+1)+'</div><div style="font-size:14px;line-height:1.6;text-align:left"><b>'+s[0]+'</b>'+(s[1]?'<br><span style="font-size:12.5px;color:#9fc2ef">'+s[1]+'</span>':'')+'</div></div>'}).join('')
+   +'<div style="font-size:12px;color:#9fc2ef;border-top:1px solid #274264;padding-top:10px;margin-top:2px">💡 提示：浏览器出于安全限制不允许网站静默自动安装，按上面 4 步约 30 秒即可完成。</div>';
+  m.classList.add('show');
+}
+/* ==================== 课程 ==================== */
+function passed(){return get(ukey(PLESS),[])}
+var PATHS=[
+ {no:'一',name:'整车结构原理',from:1,to:8,book:'图解电动汽车结构原理',c:'#0ea5e9'},
+ {no:'二',name:'高压安全作业',from:9,to:18,book:'高压系统故障诊断与排除',c:'#ef4444'},
+ {no:'三',name:'核心部件精讲',from:19,to:28,book:'五书部件章节综合',c:'#8b5cf6'},
+ {no:'四',name:'故障诊断技巧',from:29,to:40,book:'故障诊断技巧彩色图解',c:'#f59e0b'},
+ {no:'五',name:'诊断体系与电池检修',from:41,to:50,book:'故障诊断+动力电池及BMS检修',c:'#10b981'}];
+function renderPathMap(){
+  var el=document.getElementById('pathMap');if(!el)return;
+  var ps=passed();
+  el.innerHTML='<div style="font-size:13.5px;font-weight:700;margin-bottom:8px">🗺️ 五篇学习路径 <span style="font-weight:400;color:var(--muted);font-size:12px">按教材体系递进，完成前一篇建议再进下一篇</span></div>'
+   +'<div style="display:flex;flex-direction:column;gap:8px">'+PATHS.map(function(p,idx){
+     var done=0;for(var i=p.from;i<=p.to;i++)if(ps.indexOf(i)>=0)done++;
+     var full=done>=(p.to-p.from+1),some=done>0;
+     return '<div style="border:2px solid '+(full?'var(--ok)':p.c)+';border-radius:10px;padding:10px 12px;background:'+(full?'#f0fdf4':(some?'#fffbeb':'#f8fafc'))+'">'
+      +'<div style="font-size:13px;font-weight:700;color:'+p.c+'">第'+p.no+'篇 · '+p.name+'</div>'
+      +'<div style="font-size:11.5px;color:var(--muted);margin:3px 0">第'+p.from+'–'+p.to+'节 · '+p.book+'</div>'
+      +'<div style="font-size:12px">'+(full?'✅ 本篇完成':(some?'🔥 学习中 '+done+'/'+(p.to-p.from+1):'⬜ 未开始 '+ (p.to-p.from+1)+'节'))+'</div></div>'
+      +(idx<PATHS.length-1?'':'');
+   }).join('')+'</div>';
+}
+/* ---------- 体系课：左栏部件实操 + 中间3D + 右栏理论精简入口 ---------- */
+var CN='①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳';
+function isPartL(L){return L.title.indexOf('部件课')>=0}
+function partOrder(L){var m=L.title.match(/部件课([①-⑳])/);return m?CN.indexOf(m[1]):99}
+/* 每个部件课挂的维修实训游戏关卡（18关全覆盖） */
+var GAMES={2:['battery','module'],4:['motor','resolver'],6:['chargeport','elock'],8:['obc','dcdc'],25:['vcu','canbus'],13:['pdu','msd'],19:['bms','relay'],17:['imd','hvil'],22:['compressor','ptc'],23:['wheel','brake'],21:['reducer','gearoil'],24:['cabin','lvbat'],20:['thermal','pump'],26:['body','wiper'],36:['chargeport','fastgun']};
+var GAME_NAMES={battery:'动力电池包',motor:'驱动电机',resolver:'旋变传感器',bms:'电池管理系统',reducer:'减速器',inverter:'电机控制器',obc:'车载充电机',dcdc:'DC-DC',pdu:'高压配电盒',vcu:'整车控制器',compressor:'电动压缩机',thermal:'热管理系统',chargeport:'充电口',cabin:'座舱电气',wheel:'车轮制动',body:'车身壳体',hvil:'高压互锁',imd:'绝缘监测',module:'电池模组',elock:'充电电子锁',canbus:'CAN总线',msd:'维修开关',relay:'主继电器',ptc:'PTC加热器',brake:'制动回收',gearoil:'减速器油',lvbat:'12V蓄电池',pump:'电子水泵',wiper:'雨刮电机',fastgun:'快充握手',
+engine_oil:'发动机 · 机油保养',engine_ign:'发动机 · 点火失火',dht_oil:'DHT · 油液更换',dht_clutch:'DHT · 离合器打滑',tank_leak:'油箱 · 渗油检修',tank_pump:'油箱 · 燃油泵更换',exhaust_rust:'排气 · 锈蚀补焊',exhaust_hanger:'排气 · 吊耳消音器',rex_maint:'增程器 · 例行保养',rex_gen:'增程器 · 发电机检修',stack_leak:'燃料电池堆 · 氢泄漏',stack_maint:'电堆 · 单片电压巡检',h2line_leak:'供氢管路 · 检漏',h2pump:'氢循环泵 · 检修',airmotor:'空压机 · 供气检修',humid:'加湿器 · 排水除垢',h2tank_check:'储氢罐 · 定期安检',h2valve:'储氢罐 · 瓶阀更换',h2fill_cap:'加氢口 · 密封检修',h2vent:'氢系统 · 安全泄压'};
+/* 案例库 → 维修游戏关卡映射：默认按部件，个别案例按剧情覆盖 */
+var CASE_GAME_PART={thermal:'thermal',battery:'battery',bms:'bms',pdu:'pdu',inverter:'inverter',chargeport:'chargeport'};
+var CASE_GAME_OVR={0:'ptc',3:'pump',6:'msd',7:'hvil',8:'module',10:'relay',12:'fastgun',13:'relay',14:'imd',17:'dht_clutch',18:'rex_gen',19:'stack_leak'};
+function caseGame(idx,c){return CASE_GAME_OVR[idx]||(c.part?CASE_GAME_PART[c.part]:null)}
+function partSkipByIdx(t,k){return t>=3||(t>=2&&k<9)||(t>=1&&k<4)}
+function renderLessons(){
+  renderPlacement();
+  var box=document.getElementById('lessonList');if(!box)return;box.innerHTML='';
+  var ps=passed();
+  var parts=LESSONS.map(function(L,i){return{L:L,i:i}}).filter(function(x){return isPartL(x.L)}).sort(function(a,b){return partOrder(a.L)-partOrder(b.L)});
+  var theories=LESSONS.map(function(L,i){return{L:L,i:i}}).filter(function(x){return !isPartL(x.L)});
+  /* 左栏：部件学习课入口（点击进二级界面：四大车型三选一...四选一） */
+  var pc=document.getElementById('partCol');
+  var pDone=0;parts.forEach(function(x){if(ps.indexOf(x.L.id)>=0)pDone++});
+  pc.innerHTML='<div style="font-size:18px;font-weight:800;margin-bottom:4px;color:var(--text)">🔧 部件学习课</div>'
+   +'<div style="font-size:12px;color:var(--muted);margin-bottom:12px">实操优先 · 四大车型 3D 拆解台 · 每部件配维修实训游戏</div>'
+   +'<div id="partEntry" style="border:2px solid #3d8bff;border-radius:14px;background:rgba(13,24,44,.94);padding:24px 16px;text-align:center;cursor:pointer;flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center">'
+    +'<div style="font-size:42px;line-height:1.2">🚗</div>'
+    +'<div style="font-size:17px;font-weight:800;margin:10px 0 6px;color:#fff">部件学习课</div>'
+    +'<div style="font-size:12px;color:var(--muted);line-height:1.8">纯电 / 插电混动 / 增程式 / 氢燃料电池<br>整车 3D 拆解 · 点部件看详解做实训<br>已通过 <b style="color:#1266f1">'+pDone+'/'+parts.length+'</b></div>'
+    +'<div style="margin-top:12px"><span style="display:inline-block;padding:8px 22px;border-radius:10px;background:linear-gradient(135deg,#0d2f5e,#1a5db1);border:1px solid #3d7fe0;color:#dbe9f8;font-size:14px;font-weight:700">选择车型开始学习 →</span></div>'
+   +'</div>';
+  document.getElementById('partEntry').onclick=renderPartsVehicle;
+  /* 右栏：理论学习入口（单个按键，点进二级页面看课程列表） */
+  var tc=document.getElementById('theoryCol');
+  var tDone=0;theories.forEach(function(x){if(ps.indexOf(x.L.id)>=0)tDone++});
+  tc.innerHTML='<div style="font-size:15px;font-weight:800;margin-bottom:4px;color:var(--text)">📖 理论学习</div>'
+   +'<div style="font-size:11.5px;color:var(--muted);margin-bottom:12px">基础概念 · 精简版</div>'
+   +'<div id="theoryEntry" style="border:2px solid #3d8bff;border-radius:14px;background:rgba(13,24,44,.94);padding:22px 16px;text-align:center;cursor:pointer;flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center">'
+    +'<div style="font-size:42px;line-height:1.2">📖</div>'
+    +'<div style="font-size:17px;font-weight:800;margin:10px 0 6px;color:#fff">理论学习课</div>'
+    +'<div style="font-size:12px;color:var(--muted);line-height:1.7">'+theories.length+' 节精简概念课<br>已通过 <b style="color:#1266f1">'+tDone+'/'+theories.length+'</b></div>'
+    +'<div style="margin-top:12px"><span style="display:inline-block;padding:8px 22px;border-radius:10px;background:linear-gradient(135deg,#0d2f5e,#1a5db1);border:1px solid #3d7fe0;color:#dbe9f8;font-size:14px;font-weight:700">进入课程列表 →</span></div>'
+   +'</div>';
+  document.getElementById('theoryEntry').onclick=renderTheoryList;
+  /* 中间欢迎面板 */
+  box.innerHTML='<div class="lesson" style="text-align:center;color:var(--muted);font-size:13.5px;line-height:2"><b style="color:var(--text);font-size:15px">👋 欢迎来到新手启航体系课</b><br>左侧「部件学习课」按键：选择纯电/插混/增程/氢燃料四大车型进入 3D 拆解<br>右侧「理论学习课」按键：进入二级页面选择概念课<br>中间 3D 整车可自由拖拽、缩放，点备注直达部件</div>';
+}
+/* 部件学习课二级界面：四大车型四选一 */
+function renderPartsVehicle(){
+  var box=document.getElementById('lessonList');box.innerHTML='';
+  var ps=passed();
+  var parts=LESSONS.filter(isPartL);
+  var pDone=parts.filter(function(L){return ps.indexOf(L.id)>=0}).length;
+  var head=document.createElement('div');
+  head.style.cssText='display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap';
+  head.innerHTML='<button class="btn gray sm" onclick="renderLessons()">← 返回体系课</button><b style="font-size:15px">🔧 部件学习课 · 选择车型</b><span style="font-size:12px;color:var(--muted)">四大车型 3D 拆解台 · 部件课已通过 '+pDone+'/'+parts.length+'</span>';
+  box.appendChild(head);
+  var VEHICLES=[
+    {icon:'🔋',name:'纯电动 BEV',color:'#1266f1',url:'/videos/nev3d.html',desc:'电池+电机驱动。15 大高压部件半透明 3D 拆解，整车/底盘/品牌差异三视角。',meta:'🧊 15 个部件 · 🎮 30 个实训关卡'},
+    {icon:'⛽',name:'插电混动 PHEV',color:'#f97316',url:'/models/phev.html',desc:'发动机+电机双动力，可充电可加油。混动专用发动机/DHT/高压油箱/排气全拆解。',meta:'🧊 14 个部件 · 🎮 含 DHT/油箱/排气专项关卡'},
+    {icon:'⚡',name:'增程式 EREV',color:'#0ea5e9',url:'/models/erev.html',desc:'发动机只发电、不驱动车轮。增程器总成/发电机/大容积油箱专项教学。',meta:'🧊 13 个部件 · 🎮 含增程器/油箱/排气专项关卡'},
+    {icon:'🧪',name:'氢燃料电池 FCEV',color:'#10b981',url:'/models/fcev.html',desc:'氢气发电驱动。70MPa 储氢/燃料电池堆/供氢管路/空压机全系统拆解。',meta:'🧊 13 个部件 · 🎮 含电堆/供氢/储氢/加氢专项关卡'}
+  ];
+  var grid=document.createElement('div');
+  grid.style.cssText='display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:14px';
+  VEHICLES.forEach(function(v){
+    var d=document.createElement('div');
+    d.style.cssText='border:2px solid '+v.color+';border-radius:16px;background:rgba(13,24,44,.94);padding:20px 18px;cursor:pointer;transition:all .18s';
+    d.innerHTML='<div style="font-size:34px">'+v.icon+'</div>'
+     +'<div style="font-size:17px;font-weight:800;margin:8px 0 6px;color:#fff">'+v.name+'</div>'
+     +'<div style="font-size:12.5px;color:var(--muted);line-height:1.8">'+v.desc+'</div>'
+     +'<div style="font-size:12px;color:#7db4ff;margin-top:8px">'+v.meta+'</div>'
+     +'<div style="margin-top:12px"><span style="display:inline-block;padding:7px 18px;border-radius:9px;background:'+v.color+'22;border:1px solid '+v.color+';color:#fff;font-size:13px;font-weight:700">进入 3D 部件学习 →</span></div>';
+    d.onmouseenter=function(){d.style.transform='translateY(-4px)';d.style.boxShadow='0 10px 26px rgba(18,102,241,.28)'};
+    d.onmouseleave=function(){d.style.transform='none';d.style.boxShadow='none'};
+    d.onclick=function(){window.open(v.url,'_blank')};
+    grid.appendChild(d);
+  });
+  box.appendChild(grid);
+  var tip=document.createElement('div');
+  tip.style.cssText='font-size:12.5px;color:var(--muted);margin-top:14px;line-height:1.9';
+  tip.innerHTML='💡 每个部件点开都有：<b style="color:var(--text)">部件课（知识点+随堂考核）</b>与 <b style="color:var(--text)">2 个维修实训游戏</b>；三电部件课与网站课程体系完全同版，混动/增程/氢燃料专属部件课为同格式自编课程。';
+  box.appendChild(tip);
+  box.scrollIntoView({behavior:'auto',block:'start'});
+}
+/* 理论学习二级页面：课程列表（全部开放） */
+function renderTheoryList(){
+  var box=document.getElementById('lessonList');box.innerHTML='';
+  var ps=passed();
+  var theories=LESSONS.map(function(L,i){return{L:L,i:i}}).filter(function(x){return !isPartL(x.L)});
+  var tDone=0;theories.forEach(function(x){if(ps.indexOf(x.L.id)>=0)tDone++});
+  var head=document.createElement('div');
+  head.style.cssText='display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap';
+  head.innerHTML='<button class="btn gray sm" onclick="renderLessons()">← 返回体系课</button><b style="font-size:15px">📖 理论学习课 · '+theories.length+' 节精简概念课（全部开放）</b><span style="font-size:12px;color:var(--muted)">已通过 '+tDone+'/'+theories.length+'</span>';
+  box.appendChild(head);
+  theories.forEach(function(x){
+    var done=ps.indexOf(x.L.id)>=0;
+    var d=document.createElement('div');d.className='lesson';d.style.cursor='pointer';
+    d.innerHTML='<h3 style="font-size:15px">'+x.L.title+(done?' <span class="donetag">✔ 已通过</span>':'')+'</h3>'
+     +'<div class="meta">精简版 · '+x.L.mins+'分钟 · '+x.L.quiz.length+'道考核题</div>';
+    d.onclick=function(){openTheoryLesson(x.i)};
+    box.appendChild(d);
+  });
+  box.scrollIntoView({behavior:'auto',block:'start'});
+}
+/* ==================== 老师傅直通·定位考核（理论30题 + 游戏实操3关） ==================== */
+var plcTheory=0;
+var PLACE_GAMES=[{lv:'motor',why:'驱动电机 · 绝缘故障维修'},{lv:'pdu',why:'高压配电盒 · 预充故障'},{lv:'hvil',why:'高压互锁 · 回路故障'}];
+function gameDone(lv){try{return +(localStorage.getItem('rg_star_'+lv)||0)>0}catch(e){return false}}
+function gameStar(lv){try{return +(localStorage.getItem('rg_star_'+lv)||0)}catch(e){return 0}}
+function placeTier(s){return s>=36?3:(s>=30?2:(s>=24?1:0))}
+function placeCoversLesson(t,id){return t>=3||(t>=2&&(id<=8||(id>=19&&id<=28)))||(t>=1&&id<=8)}
+function placeCoversExam(t,ei){if(t>=3)return true;if(ei===0)return t>=1;if(ei<=3)return t>=2;return false}
+function renderPlacement(){
+ var el=document.getElementById('placeBox');if(!el)return;
+ var s=get(ukey('et_place'),0),t=placeTier(s);
+ el.innerHTML='<div class="lesson" style="border:2px dashed #0ea5e9;margin-bottom:10px">'
+  +'<h3>🔧 油转电老师傅直通 <span style="font-size:12px;color:var(--muted);font-weight:400">已有油车维修经验？理论 30 题 + 3D 实训 3 关综合定位</span></h3>'
+  +'<div class="meta" style="line-height:1.8">第一部分：理论定位 30 题（覆盖全部课程核心考点）<br>第二部分：游戏实操 3 关——驱动电机绝缘、高压配电盒预充、高压互锁，在 3D 维修实训台亲手修好<br><b>定级规则：</b>理论≥27 且 3 关全过 → 全部免修 ｜ 理论≥23 且 过≥2关 → 免修18节 ｜ 理论≥18 且 过≥1关 → 免修8节 ｜ 未达线从头学——高压安全必须扎实<br><b style="color:#ef4444">提示：直通后「高压安全作业」涉及法规与人身安全，仍建议逐节复习。</b>'
+  +(s?('<br>我的最好成绩：<b>'+(t>=3?'全部免修':t>=2?'免修18节':t>=1?'免修8节':'未达免修线')+'</b>'):'')+'</div>'
+  +'<button class="btn sm" style="background:#0ea5e9" onclick="startPlacement()">'+(s?'重新定位':'参加定位考核（理论30题+实训3关）')+'</button></div>';
+}
+function startPlacement(){
+ stopStudyTimer(false);
+ var qs=pick(examPool({from:1,to:50}),30);
+  var box=document.getElementById('lessonList');box.innerHTML='';
+ var h=document.createElement('div');h.className='lesson';
+ h.innerHTML='<h3>🔧 油转电老师傅直通 · 定位考核 <span style="font-size:12px;color:var(--muted);font-weight:400">第一部分 理论定位（30题）→ 第二部分 游戏实操（3关）</span></h3><div id="plcZone"></div><div id="plcResult" style="margin-top:12px"></div>';
+ box.appendChild(h);box.scrollIntoView({behavior:'auto',block:'start'});
+ var z=document.getElementById('plcZone');
+ qs.forEach(function(Q,qi){
+   var qa=document.createElement('div');qa.className='qa';
+   qa.innerHTML='<div class="q">Q'+(qi+1)+'. '+Q.q+' <span style="font-size:11px;color:var(--muted)">（'+Q.from+'）</span></div>';
+   Q.opts.forEach(function(op,k){qa.innerHTML+='<label class="opt" style="cursor:pointer"><input type="radio" name="pq'+qi+'" value="'+k+'" style="margin-right:6px">'+op+'</label>'});
+   z.appendChild(qa);
+ });
+ var btn=document.createElement('button');btn.className='btn orange';btn.style.marginTop='10px';btn.textContent='交卷 · 进入实操考核';
+ btn.onclick=function(){
+   btn.disabled=true;
+   plcTheory=0;
+   qs.forEach(function(Q,qi){
+     var sel=z.querySelector('input[name="pq'+qi+'"]:checked');
+     var v=sel?parseInt(sel.value):-1;
+     var qa=z.children[qi],labels=qa.querySelectorAll('label');
+     labels[Q.ans].classList.add('right');
+     if(v===Q.ans){plcTheory++}else{if(v>=0)labels[v].classList.add('wrong');
+       var ex=document.createElement('div');ex.className='exp';ex.style.display='block';ex.textContent='解析：'+Q.exp;qa.appendChild(ex);}
+   });
+   showGameStage();
+ };
+ z.appendChild(btn);
+}
+/* 第二部分：游戏实操 3 关 */
+function showGameStage(){
+ var z=document.getElementById('plcZone');
+ z.innerHTML='<div class="qa"><div class="q">第一部分完成：理论 <b style="font-size:17px">'+plcTheory+'/30</b></div><div class="exp" style="display:block">第二部分：请依次进入 3D 维修实训台完成 3 关维修（新窗口打开，修好关闭即可，回来点「刷新完成状态」）</div></div>'
+  +'<div id="plcGames"></div>';
+ renderPlcGames();
+ var rb=document.createElement('button');rb.className='btn sm';rb.style.marginTop='10px';rb.textContent='刷新完成状态';
+ rb.onclick=function(){renderPlcGames()};
+ z.appendChild(rb);
+ var fb=document.createElement('button');fb.className='btn orange';fb.style.marginTop='10px';fb.style.marginLeft='8px';fb.textContent='查看定位结果';
+ fb.onclick=function(){finishPlacement()};
+ z.appendChild(fb);
+ document.getElementById('plcResult').innerHTML='';
+ boxScroll();
+}
+function boxScroll(){var b=document.getElementById('lessonList');if(b)b.scrollIntoView({behavior:'auto',block:'start'})}
+function renderPlcGames(){
+ var g=document.getElementById('plcGames');if(!g)return;
+ g.innerHTML=PLACE_GAMES.map(function(G,i){
+   var st=gameStar(G.lv),done=st>0;
+   return '<div class="lesson" style="margin-top:10px;padding:12px 14px"><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">'
+    +'<b style="font-size:14.5px">实训第'+(i+1)+'关 · '+GAME_NAMES[G.lv]+'</b>'
+    +(done?'<span class="donetag">已通关 · '+('★'.repeat(st))+'</span>':'<span class="locktag">未完成</span>')
+    +'<span style="flex:1"></span>'
+    +'<a class="btn sm" target="_blank" href="/videos/repair-game.html?level='+G.lv+'" style="text-decoration:none">'+(done?'再修一次':'进入实训')+'</a></div>'
+    +'<div class="meta" style="margin-top:6px">'+G.why+'</div></div>';
+ }).join('');
+}
+function finishPlacement(){
+ var gc=PLACE_GAMES.filter(function(G){return gameDone(G.lv)}).length;
+ var t=(plcTheory>=27&&gc>=3)?3:(plcTheory>=23&&gc>=2)?2:(plcTheory>=18&&gc>=1)?1:0;
+ var virtual=[0,24,30,40][t];
+ var prev=get(ukey('et_place'),0);
+ if(virtual>prev)set(ukey('et_place'),virtual);
+ var msg=t>=3?'🏆 全部免修！理论扎实、三关全过，直接去「故障码带教」和「案例库」练兵吧':t>=2?'🎉 免修18节！高压部件基本功扎实，建议从高压安全与诊断课查漏补缺':t>=1?'👍 免修8节！有一定基础，从高压安全课开始扎实学起':'📚 未达免修线（理论 '+plcTheory+'/30 · 实训 '+gc+'/3关），从第1课开始学起不亏——高压安全没有捷径';
+ document.getElementById('plcResult').innerHTML='<div class="qa"><div class="q">定位结果：<b style="font-size:18px">理论 '+plcTheory+'/30 · 实训 '+gc+'/3关</b> → '+(t>=3?'全部免修':t>=2?'免修18节':t>=1?'免修8节':'未达免修线')+(virtual>prev?'（新纪录！':'')+'</div><div class="exp" style="display:block">'+msg+'</div>'
+  +'<div style="margin-top:8px"><button class="btn sm" onclick="startPlacement()">再考一次</button> <button class="btn gray sm" onclick="renderLessons()">返回体系课</button></div></div>';
+ boxScroll();renderPlacement();renderPathMap();renderDash();
+}
+var EXAM_AFTER={8:[0],18:[1],28:[2,3],40:[4],50:[5,6]};
+/* ==================== 期中/期末/阶段性考试 ==================== */
+var EXAMS=[
+ {id:'s1',name:'阶段考试一',desc:'第一篇 整车结构原理（第1–8节）',from:1,to:8,n:10,pass:6},
+ {id:'s2',name:'阶段考试二',desc:'第二篇 高压安全作业（第9–18节）',from:9,to:18,n:10,pass:6},
+ {id:'s3',name:'阶段考试三',desc:'第三篇 核心部件精讲（第19–28节）',from:19,to:28,n:10,pass:6},
+ {id:'mid',name:'期中考试',desc:'第一~三篇综合（第1–28节）',from:1,to:28,n:20,pass:12},
+ {id:'s4',name:'阶段考试四',desc:'第四篇 故障诊断技巧（第29–40节）',from:29,to:40,n:10,pass:6},
+ {id:'s5',name:'阶段考试五',desc:'第五篇 诊断体系与电池检修（第41–50节）',from:41,to:50,n:10,pass:6},
+ {id:'fin',name:'期末考试',desc:'全课程综合（第1–50节）',from:1,to:50,n:25,pass:15}];
+function examPool(e){var out=[];LESSONS.forEach(function(L){if(L.id>=e.from&&L.id<=e.to)L.quiz.forEach(function(q){out.push({q:q.q,opts:q.opts,ans:q.ans,exp:q.exp,from:L.title})})});return out}
+function pick(arr,n){var a=arr.slice(),o=[];while(o.length<n&&a.length)o.push(a.splice(Math.floor(Math.random()*a.length),1)[0]);return o}
+function examBest(e){return get(ukey('et_exam:'+e.id),0)}
+function examUnlocked(e){var ps=passed();for(var i=e.from;i<=e.to;i++)if(ps.indexOf(i)<0)return false;return true}
+function startCourseExam(idx){
+ stopStudyTimer(false);
+ var e=EXAMS[idx];
+ var qs=pick(examPool(e),e.n);
+ var box=document.getElementById('lessonList');box.innerHTML='';
+ var h=document.createElement('div');h.className='lesson';
+ h.innerHTML='<h3>'+e.name+' <span style="font-size:12px;color:var(--muted);font-weight:400">'+e.desc+' · 共'+e.n+'题，答完统一交卷判分</span></h3><div id="examZone"></div><div id="examResult" style="margin-top:12px"></div>';
+ box.appendChild(h);box.scrollIntoView({behavior:'auto',block:'start'});
+ var z=document.getElementById('examZone');
+ qs.forEach(function(Q,qi){
+   var qa=document.createElement('div');qa.className='qa';
+   qa.innerHTML='<div class="q">Q'+(qi+1)+'. '+Q.q+' <span style="font-size:11px;color:var(--muted)">（'+Q.from+'）</span></div>';
+   Q.opts.forEach(function(op,k){
+     qa.innerHTML+='<label class="opt" style="cursor:pointer"><input type="radio" name="eq'+qi+'" value="'+k+'" style="margin-right:6px">'+op+'</label>';
+   });
+   z.appendChild(qa);
+ });
+ var btn=document.createElement('button');btn.className='btn orange';btn.style.marginTop='10px';btn.textContent='交卷判分';
+ btn.onclick=function(){
+   btn.disabled=true;
+   var score=0;
+   qs.forEach(function(Q,qi){
+     var sel=z.querySelector('input[name="eq'+qi+'"]:checked');
+     var v=sel?parseInt(sel.value):-1;
+     var qa=z.children[qi];
+     var labels=qa.querySelectorAll('label');
+     labels[Q.ans].classList.add('right');
+     if(v===Q.ans){score++}else{
+       addWrong({q:Q.q,opts:Q.opts,ans:Q.ans,exp:Q.exp,from:Q.from});
+       if(v>=0)labels[v].classList.add('wrong');
+       var ex=document.createElement('div');ex.className='exp';ex.style.display='block';ex.textContent='解析：'+Q.exp;qa.appendChild(ex);
+     }
+   });
+   var pass=score>=e.pass,prev=examBest(e);
+   if(score>prev)set(ukey('et_exam:'+e.id),score);
+   document.getElementById('examResult').innerHTML='<div class="qa"><div class="q">得分：<b style="font-size:18px">'+score+'/'+e.n+'</b>（'+(pass?'<b style="color:var(--ok)">合格 🎉</b>':'<b style="color:var(--bad)">不合格，需 '+e.pass+' 题以上</b>）')+(score>prev?' · 新纪录！':'')+'</div>'
+    +'<div style="margin-top:8px"><button class="btn sm" onclick="startCourseExam('+idx+')">再考一次</button> <button class="btn gray sm" onclick="renderLessons()">返回课程列表</button></div></div>';
+   window.scrollTo(0,0);
+   renderDash();
+ };
+ z.appendChild(btn);
+}
+/* ==================== 错题集 ==================== */
+function getWrong(){return get(ukey('et_wrong'),{})}
+function addWrong(Q){var w=getWrong();if(!w[Q.q])w[Q.q]={q:Q.q,opts:Q.opts,ans:Q.ans,exp:Q.exp,from:Q.from||'',n:0};w[Q.q].n++;w[Q.q].last=Date.now();set(ukey('et_wrong'),w)}
+function delWrong(q){var w=getWrong();delete w[q];set(ukey('et_wrong'),w)}
+function renderWrong(){
+ var box=document.getElementById('wrongBox');if(!box)return;
+ var w=getWrong(),keys=Object.keys(w).sort(function(a,b){return w[b].n-w[a].n||w[b].last-w[a].last});
+ if(!keys.length){box.innerHTML='<div class="lesson" style="text-align:center;color:var(--muted);padding:26px">🎉 错题集是空的——去课程考核、🧊 3D 实操练习或考试中练兵吧，答错的题会自动收录到这里。</div>';return}
+ box.innerHTML='<div style="margin:10px 0"><button class="btn orange sm" onclick="startWrongPractice()">🔁 开始重练（'+keys.length+'道）</button> <span style="font-size:12px;color:var(--muted)">重练答对自动移出；下方按错误次数排序</span></div>'
+ +keys.map(function(k){
+   var it=w[k];
+   return '<div class="lesson"><div class="q" style="font-weight:600">'+it.q+' <span style="font-size:11px;color:var(--bad)">✖ 错'+it.n+'次</span> <span style="font-size:11px;color:var(--muted)">'+(it.from?'（'+it.from+'）':'')+'</span></div>'
+    +'<div style="font-size:13px;margin-top:4px">正确答案：<b style="color:var(--ok)">'+it.opts[it.ans]+'</b></div>'
+    +'<div class="exp" style="display:block;margin-top:4px">解析：'+it.exp+'</div>'
+    +'<div style="margin-top:6px"><button class="btn gray sm" onclick="delWrong('+JSON.stringify(k).replace(/"/g,'&quot;')+');renderWrong()">已掌握，移出</button></div></div>';
+ }).join('');
+}
+function startWrongPractice(){
+ var w=getWrong(),keys=Object.keys(w);
+ if(!keys.length)return;
+ var qs=keys.map(function(k){return w[k]}).slice(0,30);
+ var box=document.getElementById('wrongBox');box.innerHTML='';
+ var h=document.createElement('div');h.className='lesson';
+ h.innerHTML='<h3>🔁 错题重练 <span style="font-size:12px;color:var(--muted);font-weight:400">共'+qs.length+'道，答对的题自动移出错题集</span></h3><div id="wpZone"></div><div id="wpResult" style="margin-top:12px"></div>';
+ box.appendChild(h);window.scrollTo(0,0);
+ var z=document.getElementById('wpZone');
+ qs.forEach(function(Q,qi){
+   var qa=document.createElement('div');qa.className='qa';
+   qa.innerHTML='<div class="q">Q'+(qi+1)+'. '+Q.q+' <span style="font-size:11px;color:var(--muted)">（错'+Q.n+'次'+(Q.from?' · '+Q.from:'')+'）</span></div>';
+   Q.opts.forEach(function(op,k){qa.innerHTML+='<label class="opt" style="cursor:pointer"><input type="radio" name="wq'+qi+'" value="'+k+'" style="margin-right:6px">'+op+'</label>'});
+   z.appendChild(qa);
+ });
+ var btn=document.createElement('button');btn.className='btn orange';btn.style.marginTop='10px';btn.textContent='交卷判分';
+ btn.onclick=function(){
+   btn.disabled=true;
+   var score=0,cleared=0;
+   qs.forEach(function(Q,qi){
+     var sel=z.querySelector('input[name="wq'+qi+'"]:checked');
+     var v=sel?parseInt(sel.value):-1;
+     var qa=z.children[qi],labels=qa.querySelectorAll('label');
+     labels[Q.ans].classList.add('right');
+     if(v===Q.ans){score++;delWrong(Q.q);cleared++}
+     else{if(v>=0)labels[v].classList.add('wrong');
+       var ex=document.createElement('div');ex.className='exp';ex.style.display='block';ex.textContent='解析：'+Q.exp;qa.appendChild(ex);}
+   });
+   document.getElementById('wpResult').innerHTML='<div class="qa"><div class="q">重练结果：<b style="font-size:18px">'+score+'/'+qs.length+'</b> · 已掌握移出 <b style="color:var(--ok)">'+cleared+'</b> 道，错题集剩余 <b>'+Object.keys(getWrong()).length+'</b> 道</div>'
+    +'<div style="margin-top:8px"><button class="btn sm" onclick="startWrongPractice()">继续重练</button> <button class="btn gray sm" onclick="renderWrong()">返回错题列表</button></div></div>';
+   window.scrollTo(0,0);renderDash();
+ };
+ z.appendChild(btn);
+}
+var curLesson=-1;
+/* 理论课精简版：只保留核心概念段落（约400字），考核与计时不变 */
+function openTheoryLesson(i){
+  curLesson=i;var L=LESSONS[i];
+  var box=document.getElementById('lessonList');box.innerHTML='';
+  var h=document.createElement('div');h.className='lesson';
+  var txt=L.body.replace(/<[^>]+>/g,'').replace(/\s+/g,' ');
+  var short=txt.length>400?txt.slice(0,400)+'……':txt;
+  var d3btn=(L.d3!==undefined&&L.d3)?('<div style="margin-top:14px"><a class="btn sm" target="_blank" href="'+L.d3+'" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#0d2f5e,#1a5db1);color:#cfe6ff;border:1px solid #3d7fe0">🧊 3D 拆解台 · 配套视角（新窗口打开，可旋转放大）</a></div>'):'';
+  h.innerHTML='<h3>'+L.title+' <span style="font-size:12px;color:var(--muted);font-weight:400">理论精简版 · 标准学时 '+L.mins+' 分钟</span></h3>'
+    +'<div class="lesson-body"><p style="line-height:1.9">'+short+'</p><div style="font-size:12px;color:var(--muted);background:#f0f6ff;border-radius:8px;padding:8px 12px;margin-top:6px">📌 精简版仅保留核心概念；深入讲解见左侧「部件学习课」3D 拆解与配套教材。</div></div>'+d3btn
+    +'<div class="notice" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">⏱ 学时计时：<b id="studyClock" style="font-size:16px">0:00</b> / '+L.mins+':00<span id="studyHint" style="font-size:12.5px"></span></div>'
+    +'<div style="margin-top:12px"><button class="btn orange sm" id="quizBtn" disabled onclick="startQuiz('+i+')">学习中…</button> '
+    +'<button class="btn gray sm" onclick="renderLessons()">返回体系课</button></div>';
+  box.appendChild(h);box.scrollIntoView({behavior:'auto',block:'start'});
+  startStudyTimer(i);
+}
+function openLesson(i){
+  curLesson=i;var L=LESSONS[i];
+  var box=document.getElementById('lessonList');box.innerHTML='';
+  var h=document.createElement('div');h.className='lesson';
+  var gallery=(L.imgs&&L.imgs.length)?('<div class="caseimgs" style="margin:10px 0">'+L.imgs.map(function(s){return '<img src="images/'+s+'" loading="lazy" alt="知识点配图" onclick="window.open(this.src)">'}).join('')+'</div><div style="font-size:11px;color:var(--muted);margin:-4px 0 8px">▲ 知识点配图（公开资料示意图）</div>'):'';
+  var d3btn=(L.d3!==undefined)?('<div style="margin-top:14px"><a class="btn sm" target="_blank" href="'+L.d3+'" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#0d2f5e,#1a5db1);color:#cfe6ff;border:1px solid #3d7fe0">🧊 3D 拆解台 · '+(L.title.indexOf('部件课')>=0?'本课配套部件':'配套视角')+'（新窗口打开，可旋转放大）</a></div>'):'';
+  h.innerHTML='<h3>'+L.title+' <span style="font-size:12px;color:var(--muted);font-weight:400">标准学时 '+L.mins+' 分钟</span></h3><div class="lesson-body">'+L.body+'</div>'+gallery+d3btn
+    +'<div class="notice" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">⏱ 学时计时：<b id="studyClock" style="font-size:16px">0:00</b> / '+L.mins+':00<span id="studyHint" style="font-size:12.5px"></span></div>'
+    +'<div style="margin-top:12px"><button class="btn orange sm" id="quizBtn" disabled onclick="startQuiz('+i+')">学习中…</button> '
+    +'<button class="btn gray sm" onclick="renderLessons()">返回课程列表</button></div>';
+  box.appendChild(h);box.scrollIntoView({behavior:'auto',block:'start'});
+  startStudyTimer(i);
+}
+var studyTimer=null,studyStart=0,curLessonIdx=-1;
+function startStudyTimer(i){
+  curLessonIdx=i;studyStart=Date.now();
+  clearInterval(studyTimer);
+  studyTimer=setInterval(function(){
+    var el=Math.floor((Date.now()-studyStart)/1000);
+    var need=LESSONS[i].mins*60;
+    var m=Math.floor(el/60),s=el%60;
+    var ck=document.getElementById('studyClock');
+    if(ck)ck.textContent=m+':'+(s<10?'0':'')+s;
+    if(el>=need){
+      clearInterval(studyTimer);
+      var btn=document.getElementById('quizBtn');
+      if(btn){btn.disabled=false;btn.textContent='开始考核'}
+      var hint=document.getElementById('studyHint');
+      if(hint)hint.textContent='✅ 学时已满，可以考核';
+    }else{
+      var rem=need-el,rm=Math.floor(rem/60),rs=rem%60;
+      var hint2=document.getElementById('studyHint');
+      if(hint2)hint2.textContent='（再学习 '+rm+':'+(rs<10?'0':'')+rs+' 解锁考核）';
+    }
+  },1000);
+}
+function stopStudyTimer(save){
+  clearInterval(studyTimer);
+  if(save&&curLessonIdx>=0){
+    var el=Math.floor((Date.now()-studyStart)/1000);
+    if(el>0)set(ukey('et_study'),get(ukey('et_study'),0)+el);
+  }
+}
+function fmtDur(sec){var h=Math.floor(sec/3600),m=Math.floor(sec%3600/60);return h>0?h+'小时'+m+'分':m+'分'}
+
+function startQuiz(i){
+  stopStudyTimer(true);
+  var L=LESSONS[i];var box=document.getElementById('lessonList');
+  box.innerHTML='<div class="lesson"><h3>'+L.title+' · 考核</h3><div id="quizZone"></div></div>';
+  var score=0,qi=0;
+  function next(){
+    if(qi>=L.quiz.length){
+      var pass=score>=Math.ceil(L.quiz.length*0.8);
+      var done=passed();if(pass&&done.indexOf(L.id)<0){done.push(L.id);set(ukey(PLESS),done)}
+      document.getElementById('quizZone').innerHTML='<div class="qa"><div class="q">考核结束：'+score+'/'+L.quiz.length+(pass?'，<b style="color:var(--ok)">通过！</b>'+(i+1<LESSONS.length?'已解锁下一课。':'全部课程完成！'):'，<b style="color:var(--bad)">未通过</b>，请复习后重考。')+'</div>'
+        +'<button class="btn sm" onclick="openLesson('+i+')">复习本课</button> <button class="btn gray sm" onclick="renderLessons()">返回课程列表</button></div>';
+      return;
+    }
+    var Q=L.quiz[qi];var z=document.getElementById('quizZone');z.innerHTML='';
+    var qa=document.createElement('div');qa.className='qa';
+    qa.innerHTML='<div class="q">Q'+(qi+1)+'. '+Q.q+'</div>';
+    Q.opts.forEach(function(op,k){
+      var b=document.createElement('button');b.className='opt';b.textContent=op;
+      b.onclick=function(){
+        var opts=qa.querySelectorAll('.opt');
+        opts[Q.ans].classList.add('right');
+        if(k===Q.ans){score++}else{b.classList.add('wrong');addWrong({q:Q.q,opts:Q.opts,ans:Q.ans,exp:Q.exp,from:L.title})}
+        opts.forEach(function(x){x.onclick=null;x.style.cursor='default'});
+        var ex=qa.querySelector('.exp');if(ex)ex.style.display='block';
+        setTimeout(next,1600);
+      };
+      qa.appendChild(b);
+    });
+    var ex=document.createElement('div');ex.className='exp';ex.textContent='解析：'+Q.exp;qa.appendChild(ex);
+    z.appendChild(qa);
+  }
+  next();
+}
+
+/* ==================== 故障码带教 ==================== */
+var PART_NAMES={battery:'动力电池包',bms:'电池管理系统BMS',motor:'驱动电机',inverter:'电机控制器',reducer:'减速器',obc:'车载充电机OBC',dcdc:'DC-DC转换器',pdu:'高压配电盒（含接触器/预充）',vcu:'整车控制器VCU',compressor:'电动压缩机',thermal:'热管理系统',chargeport:'充电口（快慢充）',cabin:'车身电气',wheel:'车轮与制动',body:'车身'};
+function d3LinkBtn(part){
+  return '<a href="/videos/nev3d.html?part='+part+'" target="_blank" style="display:inline-block;margin-top:8px;padding:8px 14px;background:#0b3d91;color:#fff;border-radius:8px;text-decoration:none;font-size:13px;font-weight:600">🧊 在 3D 模型中定位「'+PART_NAMES[part]+'」看详解 →</a>';
+}
+function botSayHTML(html,cb){
+  var chat=document.getElementById('chat');
+  var t=document.createElement('div');t.className='typing';t.textContent='师傅正在思考…';chat.appendChild(t);chat.scrollTop=chat.scrollHeight;
+  setTimeout(function(){
+    t.remove();
+    var m=document.createElement('div');m.className='msg bot';
+    m.innerHTML='<div class="bub">'+html+'</div>';
+    chat.appendChild(m);chat.scrollTop=chat.scrollHeight;
+    if(cb)cb();
+  },500+Math.random()*500);
+}
+function botSay(text,cb){
+  var chat=document.getElementById('chat');
+  var t=document.createElement('div');t.className='typing';t.textContent='师傅正在思考…';chat.appendChild(t);chat.scrollTop=chat.scrollHeight;
+  setTimeout(function(){
+    t.remove();
+    var m=document.createElement('div');m.className='msg bot';
+    m.innerHTML='<div class="bub"></div>';m.querySelector('.bub').textContent=text;
+    chat.appendChild(m);chat.scrollTop=chat.scrollHeight;
+    if(cb)cb();
+  },500+Math.random()*500);
+}
+function meSay(text){var chat=document.getElementById('chat');var m=document.createElement('div');m.className='msg me';m.innerHTML='<div class="bub"></div>';m.querySelector('.bub').textContent=text;chat.appendChild(m);chat.scrollTop=chat.scrollHeight}
+function diagnose(c){
+  var msgs=[
+    '收到，咱们按四步走：读码 → 推断 → 排查 → 安全提示。\n\n【第1步·读码】\n'+c.name+'（'+c.code+'）\n典型现象：'+c.pheno,
+    '【第2步·推断】常见原因：\n'+c.causes.map(function(x,i){return (i+1)+'. '+x}).join('\n'),
+    '【第3步·排查】\n'+c.steps.map(function(x,i){return (i+1)+'. '+x}).join('\n')+'\n\n💡 师傅经验：'+c.note,
+    '【第4步·安全提示】\n以上任何涉及高压母线、接触器、电池包的操作，必须先完成断电→验电→挂牌上锁，由持证人员执行。修完后请做绝缘复测并路试验证。\n\n修好了记得回来把结果告诉我，帮你回填案例库。'
+  ];
+  var i=0;(function next(){if(i<msgs.length){botSay(msgs[i],function(){i++;next()})}})();
+  if(c.part){
+    botSayHTML('🧊 <b>3D 精准定位</b>：这个故障重点怀疑「'+PART_NAMES[c.part]+'」。已在 3D 拆解台中高亮该部件，点开可自由旋转查看实物结构，对照上面第3步逐步排查。'+d3LinkBtn(c.part));
+  }
+  set(ukey(PTRN),get(ukey(PTRN),0)+1);
+}
+function askCode(idx){var c=CODES[idx];meSay('师傅，报这个码：'+c.name+'（'+c.code+'）');diagnose(c)}
+function randomCode(){var i=Math.floor(Math.random()*CODES.length);askCode(i)}
+function clearChat(){document.getElementById('chat').innerHTML='';botSay('你好，我是智电汽修二班。选个故障码，或者直接描述症状（比如"快充跳枪"），我带你一步步排查。')}
+/* ---------- 带教对话存入案例库 ---------- */
+function escH(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function getUserCases(){try{var a=JSON.parse(LS.getItem('userCases')||'[]');return Array.isArray(a)?a:[]}catch(e){return[]}}
+function saveCase(){
+  var items=[];
+  document.querySelectorAll('#chat .msg').forEach(function(m){
+    var b=m.querySelector('.bub');if(!b||!b.textContent.trim())return;
+    items.push({me:m.className.indexOf(' me')>=0||m.className.indexOf('me ')>=0,txt:b.textContent.trim()});
+  });
+  if(!items.length){alert('当前对话为空，先向师傅提问再存入案例库。');return}
+  var firstQ=(items.filter(function(i){return i.me})[0]||{txt:'故障带教对话'}).txt;
+  var title=firstQ.length>22?firstQ.slice(0,22)+'…':firstQ;
+  var detail=items.map(function(i){return (i.me?'【提问】':'【师傅】')+i.txt}).join('\n\n');
+  var arr=getUserCases();
+  arr.unshift({id:Date.now(),t:title,sym:firstQ,fix:detail,ts:new Date().toLocaleString('zh-CN',{hour12:false})});
+  LS.setItem('userCases',JSON.stringify(arr));
+  alert('已存入案例库「我的带教案例」，可到案例库查看。');
+}
+function delUserCase(id){
+  if(!confirm('确定删除这条我的带教案例？'))return;
+  LS.setItem('userCases',JSON.stringify(getUserCases().filter(function(c){return c.id!==id})));
+  renderCases();
+}
+function openUserCase(id){
+  var c=getUserCases().filter(function(x){return x.id===id})[0];if(!c)return;
+  var box=document.getElementById('caseList');
+  box.innerHTML='<button class="btn gray sm" onclick="renderCases()">← 返回案例列表</button>'
+    +'<div class="case" style="margin-top:12px"><h3>'+escH(c.t)+' <span style="float:right;font-size:12.5px;color:var(--muted);font-weight:400">'+escH(c.ts)+' · 我的带教案例</span></h3>'
+    +'<div class="row"><b>具体问题</b>'+escH(c.sym)+'</div>'
+    +'<div class="fixstep"><div class="fshead">🧰 师傅带教记录（读码→推断→排查→安全提示）</div>'
+    +'<div style="white-space:pre-wrap;font-size:13.5px;line-height:2;color:#222">'+escH(c.fix)+'</div></div>'
+    +'<div class="tagrow"><span class="tag">我的带教案例</span><span class="tag">故障带教师傅</span></div></div>';
+  window.scrollTo(0,0);
+}
+/* ==================== 图片/视频上传AI分析 ==================== */
+var pendingMedia=[];
+function pickMedia(){document.getElementById('fFile').click()}
+function onMediaPicked(ev){
+  var files=Array.prototype.slice.call(ev.target.files||[]);ev.target.value='';
+  files.forEach(function(f){
+    if(f.type.indexOf('video/')===0){procVideo(f)}
+    else if(f.type.indexOf('image/')===0){procImage(f)}
+    else{botSay('「'+f.name+'」不是图片或视频，只支持这两种格式。')}
+  });
+}
+function shrinkCanvas(src,maxW,q){
+  var w=src.width||src.videoWidth,h=src.height||src.videoHeight;
+  if(!w||!h)return null;
+  var s=Math.min(1,maxW/w);
+  var c=document.createElement('canvas');c.width=Math.max(1,Math.round(w*s));c.height=Math.max(1,Math.round(h*s));
+  c.getContext('2d').drawImage(src,0,0,c.width,c.height);
+  return c.toDataURL('image/jpeg',q||0.82);
+}
+function procImage(f){
+  var rd=new FileReader();
+  rd.onload=function(){var img=new Image();img.onload=function(){
+    var big=shrinkCanvas(img,1280,0.82),thumb=shrinkCanvas(img,160,0.7);
+    if(!big){botSay('「'+f.name+'」读取失败，换一张试试。');return}
+    pendingMedia.push({kind:'image',name:f.name,frames:[big],thumb:thumb});
+    renderMedia();
+  };img.src=rd.result};
+  rd.readAsDataURL(f);
+}
+function procVideo(f){
+  var url=URL.createObjectURL(f),v=document.createElement('video'),done=false;
+  v.muted=true;v.playsInline=true;v.preload='auto';v.src=url;
+  function fail(){if(done)return;done=true;try{URL.revokeObjectURL(url)}catch(e){}botSay('视频「'+f.name+'」读取失败，可以改用截图上传。')}
+  v.onloadedmetadata=function(){
+    var dur=v.duration||0;
+    if(!dur){fail();return}
+    var frames=[],pts=dur>4?[0.1,0.5,0.9]:[0.1,0.6],i=0;
+    function finish(){
+      if(done)return;done=true;try{URL.revokeObjectURL(url)}catch(e){}
+      if(!frames.length){fail();return}
+      pendingMedia.push({kind:'video',name:f.name,frames:frames,thumb:frames[Math.min(1,frames.length-1)],duration:Math.round(dur),size:f.size});
+      renderMedia();
+    }
+    function grab(){if(i>=pts.length){finish();return}v.currentTime=Math.min(dur*pts[i],Math.max(dur-0.05,0));i++}
+    v.onseeked=function(){var d=shrinkCanvas(v,960,0.8);if(d)frames.push(d);grab()};
+    setTimeout(function(){if(!done&&frames.length===0)fail()},8000);
+    grab();
+  };
+  v.onerror=fail;
+}
+function renderMedia(){
+  var box=document.getElementById('mediaBox');if(!box)return;
+  box.innerHTML='';
+  pendingMedia.forEach(function(m,idx){
+    var d=document.createElement('div');d.className='mitem';
+    d.innerHTML='<img src="'+m.thumb+'"><span class="mtag">'+(m.kind==='video'?'视频':'图片')+'</span><button type="button" class="mx" aria-label="移除">×</button>';
+    d.querySelector('.mx').onclick=function(){pendingMedia.splice(idx,1);renderMedia()};
+    box.appendChild(d);
+  });
+  box.style.display=pendingMedia.length?'flex':'none';
+}
+function mediaTyping(txt){
+  var chat=document.getElementById('chat');
+  var t=document.createElement('div');t.className='typing';t.textContent=txt;
+  chat.appendChild(t);chat.scrollTop=chat.scrollHeight;
+}
+function askWithMedia(){
+  if(!pendingMedia.length){askByText();return}
+  var v=document.getElementById('fInput').value.trim();
+  var imgs=0,vids=0,frames=[];
+  pendingMedia.forEach(function(m){if(m.kind==='video')vids++;else imgs++;frames=frames.concat(m.frames)});
+  if(frames.length>8){botSay('一次最多分析8张图（含视频抽帧），请先移除一部分。');return}
+  meSay((v?v+' ':'')+'（附 '+imgs+' 张图片'+(vids?' + '+vids+' 个视频（自动抽帧'+(frames.length-imgs)+'张）':'')+'）');
+  document.getElementById('fInput').value='';
+  pendingMedia=[];renderMedia();
+  mediaTyping(vids?'师傅正在看视频分析…（约需10-30秒）':'师傅正在看图分析…（约需10-30秒）');
+  fetch('/api/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:v,images:frames,video:vids?{count:vids}:null})})
+  .then(function(r){return r.json().then(function(j){return{body:j}})})
+  .then(function(o){
+    var tp=document.querySelector('#chat .typing');if(tp)tp.remove();
+    if(o.body&&o.body.reply){botSay(o.body.reply,function(){
+      var best=null,bs=0;
+      CODES.forEach(function(c,idx){var s=0;c.kw.split(',').forEach(function(k){if(v.indexOf(k)>=0)s++});if(s>bs){bs=s;best=idx}});
+      if(best!==null&&bs>0){
+        var c=CODES[best];
+        var thumbs=frames.slice(0,3).map(function(f){return '<img src="'+f+'" style="width:88px;height:66px;object-fit:cover;border-radius:6px;border:1px solid var(--line);margin:4px 6px 0 0">'}).join('');
+        botSayHTML('🧊 <b>结合你上传的图/视频，故障已定位到「'+PART_NAMES[c.part]+'」</b><br>'+thumbs+'<br>3D 模型中该部件已高亮，点进去对照你拍的实物，逐帧核对结构再动手。'+d3LinkBtn(c.part));
+      }
+    })}
+    else{botSay('这次分析没成功：'+((o.body&&o.body.err)||'未知错误')+'\n可以先改用文字描述症状，或到【案例库】找相似案例。')}
+  })
+  .catch(function(){var tp=document.querySelector('#chat .typing');if(tp)tp.remove();botSay('网络异常，分析失败，请稍后再试。')});
+}
+function askByText(){
+  var v=document.getElementById('fInput').value.trim();if(!v)return;
+  meSay(v);document.getElementById('fInput').value='';
+  var best=null,bs=0;
+  CODES.forEach(function(c,idx){
+    var s=0;c.kw.split(',').forEach(function(k){if(v.indexOf(k)>=0)s++});
+    if(s>bs){bs=s;best=idx}
+  });
+  if(best!==null&&bs>0){diagnose(CODES[best])}
+  else{botSay('这个症状我暂时没匹配到标准流程。可以先从三步做起：\n1. 读故障码并记录冻结帧\n2. 查该车型维修手册对应章节\n3. 涉及高压先断电验电\n建议到【案例库】看看相似案例，或换个关键词（如"绝缘""跳枪""READY"）。')}
+}
+(function initTrainer(){
+  var chips=document.getElementById('codeChips');
+  CODES.forEach(function(c,i){var b=document.createElement('button');b.className='chip';b.textContent=c.name;b.onclick=function(){askCode(i)};chips.appendChild(b)});
+  document.getElementById('fInput').addEventListener('keydown',function(e){if(e.key==='Enter')askWithMedia()});
+['aUser','aPass'].forEach(function(id){document.getElementById(id).addEventListener('keydown',function(e){if(e.key==='Enter')doAuth()})});
+refreshUserUI();
+  initInstall();
+  clearChat();
+})();
+
+/* ==================== 案例库 ==================== */
+/* ==================== 案例库：实训实拍视频映射 ==================== */
+window.VIDEO_MAP=[
+ ['v_powerdown','v_ptc','v_charge_test'],
+ ['v_harness','v_shell','v_hvil'],
+ ['v_diag','v_module','v_balance'],
+ ['v_heatloop','v_connector','v_charge_test'],
+ ['v_preres','v_prerelay','v_loop'],
+ ['v_connector','v_harness','v_road'],
+ ['v_pdu','v_prerelay','v_charge_test'],
+ ['v_hvil','v_mcu','v_loop'],
+ ['v_module','v_shell','v_megger'],
+ ['v_diag','v_prerelay','v_preres'],
+ ['v_diag','v_pdu','v_charge_test'],
+ ['v_diag','v_balance','v_road'],
+ ['v_charge_test','v_pdu','v_connector'],
+ ['v_bms','v_diag','v_diag'],
+ ['v_megger','v_megger','v_megger'],
+ ['v_powerdown','v_pdu','v_preres'],
+ ['v_fire','v_fire','v_module'],
+ ['v_diag','v_loop','v_charge_test'],
+ ['v_mcu','v_diag','v_road'],
+ ['v_megger','v_hvil','v_loop']
+];
+function renderCases(){
+  var kw=(document.getElementById('caseSearch').value||'').trim();
+  var box=document.getElementById('caseList');box.innerHTML='';
+  var uc=getUserCases().filter(function(c){return !kw||c.t.indexOf(kw)>=0||c.sym.indexOf(kw)>=0});
+  if(uc.length){
+    var hd=document.createElement('div');
+    hd.innerHTML='<h3 style="font-size:15px;color:var(--blue);margin:4px 0 10px">📁 我的带教案例（'+uc.length+'）——来自故障带教师傅对话</h3>';
+    box.appendChild(hd);
+    uc.forEach(function(c){
+      var d=document.createElement('div');d.className='case';d.style.cursor='pointer';
+      d.innerHTML='<h3>'+escH(c.t)+' <span style="float:right;font-size:12.5px;color:var(--blue2);font-weight:400">查看详情 →</span></h3>'
+        +'<div class="row"><b>具体问题</b>'+escH(c.sym)+'</div>'
+        +'<div class="tagrow"><span class="tag">我的带教案例</span><span class="tag">'+escH(c.ts)+'</span>'
+        +'<span class="tag" style="cursor:pointer;border-color:#f0a5a5;color:#c0392b" onclick="event.stopPropagation();delUserCase('+c.id+')">✕ 删除</span></div>';
+      d.onclick=function(){openUserCase(c.id)};
+      box.appendChild(d);
+    });
+  }
+  CASES.forEach(function(c,idx){
+    if(kw&&c.t.indexOf(kw)<0&&c.tags.join('').indexOf(kw)<0&&c.root.indexOf(kw)<0&&c.sym.indexOf(kw)<0)return;
+    var d=document.createElement('div');d.className='case';d.style.cursor='pointer';
+    d.innerHTML='<h3>'+c.t+' <span style="float:right;font-size:12.5px;color:var(--blue2);font-weight:400">查看详情 →</span></h3>'
+      +'<div class="row"><b>具体问题</b>'+c.sym+'</div>'
+      +'<div class="tagrow">'+c.tags.map(function(t){return '<span class="tag">'+t+'</span>'}).join('')+(caseGame(idx,c)?'<span class="tag">🎮 可游戏练习</span>':'')+'</div>';
+    d.onclick=function(){openCase(idx)};
+    box.appendChild(d);
+  });
+  if(!box.children.length)box.innerHTML='<div class="notice">没有匹配的案例，换个关键词试试。</div>';
+}
+function openCase(idx){
+  var c=CASES[idx];var box=document.getElementById('caseList');
+  var steps=(c.fixSteps&&c.fixSteps.length)?c.fixSteps:[{txt:c.fix}];
+  var vids=(window.VIDEO_MAP&&window.VIDEO_MAP[idx])||[];
+  var partBlock=c.part?('<div class="fixstep" style="background:#f0f9ff"><div class="fshead">🧊 3D 零部件讲解 · '+PART_NAMES[c.part]+'</div>'
+    +(c.imgs||[]).map(function(im){return '<img src="images/'+im+'" style="width:150px;aspect-ratio:4/3;object-fit:cover;border-radius:8px;border:1px solid #bae6fd;margin:0 8px 4px 0;cursor:zoom-in" onclick="window.open(this.src)" alt="案例实拍">'}).join('')
+    +'<div class="fsnote">▲ 本案例实拍照片 —— 点开下方 3D 模型，高亮部件即为照片中的零件，对照实物位置与结构精讲</div>'
+    +d3LinkBtn(c.part)+'</div>'):'';
+  var gl=caseGame(idx,c);
+  var gameBlock=gl?('<div class="fixstep" style="border:2px solid #3d7fe0"><div class="fshead">🎮 游戏化练习 · '+GAME_NAMES[gl]+'</div>'
+    +'<div style="font-size:12.5px;color:var(--muted);line-height:1.8;margin-bottom:10px">把本案例的故障搬到 3D 维修实训台：同款零件、同款故障现象，道具栏自己选工具、按安全工序亲手修一遍；卡壳时点「师傅帮助」看老师傅实操示范。</div>'
+    +'<a class="btn sm" target="_blank" href="/videos/repair-game.html?level='+gl+'" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px">▶ 开始维修实训 · '+GAME_NAMES[gl]+'</a></div>'):'';
+  var intro=vids.length?('<div class="fixstep" style="background:#f8fbff"><div class="fshead">🎬 案例实训实拍</div>'
+    +'<video class="fsvid" controls preload="metadata" playsinline src="videos/'+vids[0]+'.mp4" onerror="this.parentNode.innerHTML=\'<div class=&quot;fsnote&quot;>视频加载中，请稍候…</div>\'"></video>'
+    +'<div class="fsnote">▶ 实训车间实拍演示（对应步骤1）</div></div>'):'';
+  box.innerHTML='<button class="btn gray sm" onclick="renderCases()">← 返回案例列表</button>'
+    +'<div class="case" style="margin-top:12px"><h3>'+c.t+'</h3>'
+    +'<div class="row"><b>车型</b>'+c.car+'</div>'
+    +'<div class="row"><b>具体问题</b>'+c.sym+'</div>'
+    +'<div class="row"><b>检测过程</b><ol>'+c.proc.map(function(x){return '<li>'+x+'</li>'}).join('')+'</ol></div>'
+    +'<div class="row"><b>根因</b>'+c.root+'</div>'
+    +partBlock
+    +gameBlock
+    +intro
+    +'<h3 style="margin:16px 0 10px;font-size:15.5px;color:var(--blue)">🔧 维修方案（分步演示·实训实拍）</h3>'
+    +steps.map(function(s,i){
+       var vid=vids[i]||vids[vids.length-1];
+       var gv=vid?('<video class="fsvid" controls preload="metadata" playsinline src="videos/'+vid+'.mp4" onerror="this.style.display=\'none\'"></video><div class="fsnote">▶ 实训实拍：'+s.txt+'</div>'):'';
+       return '<div class="fixstep"><div class="fshead">步骤 '+(i+1)+'/'+steps.length+'：'+s.txt+'</div>'+gv+'</div>';
+     }).join('')
+    +'<div class="row" style="margin-top:14px"><b>复盘要点</b>'+c.review+'</div>'
+    +'<div class="tagrow">'+c.tags.map(function(t){return '<span class="tag">'+t+'</span>'}).join('')+'</div></div>';
+  window.scrollTo(0,0);
+}
+
+/* ==================== 考证备考 ==================== */
+var CURB=null;
+function qType(Q){return Q.t||'single'}
+function qOpts(Q){return qType(Q)==='judge'?['正确','错误']:Q.o}
+function isRight(Q,ans){
+  if(qType(Q)==='multi'){return Array.isArray(ans)&&ans.length===Q.a.length&&Q.a.every(function(x){return ans.indexOf(x)>=0})}
+  return ans===Q.a;
+}
+function qTag(Q){
+  var m=qType(Q)==='judge'?'判断题':(qType(Q)==='multi'?'多选题':'单选题');
+  return ' <span class="tag">'+m+'</span>'+(Q.m?' <span class="tag">'+Q.m+'</span>':(Q.src?' <span class="tag">'+Q.src+'</span>':''));
+}
+function typeCount(b,t){return b.qs.filter(function(q){return qType(q)===t}).length}
+function renderExamHome(){
+  var box=document.getElementById('examBox');
+  box.innerHTML='<p style="font-size:13.5px;color:var(--muted);margin-bottom:12px">三个证书对应三种职业路径：法定准入（低压电工）、行业专项（交通部）、等级晋升（维修工）。全真模拟按<b>标准试卷结构</b>组卷（含判断题与多选题）。</p><div class="grid">'
+   +BANKS.map(function(b){
+     var best=get(ukey(PEXAMB+':'+b.id),0);
+     return '<div class="card" onclick="openBank(\''+b.id+'\')"><h3>'+b.name+'</h3><p><b>颁证：</b>'+b.issuer+'</p><p><b>试卷：</b>'+b.examcfg.paper.rule+'</p>'
+      +(b.modules?'<p><b>模块：</b>'+b.modules.join('、')+'</p>':'')
+      +(b.levels?'<p><b>等级：</b>'+b.levels+'</p>':'')
+      +'<p style="margin-top:6px">题库：判断'+typeCount(b,'judge')+' / 单选'+typeCount(b,'single')+(typeCount(b,'multi')?' / 多选'+typeCount(b,'multi'):'')+'</p>'
+      +'<p style="color:var(--blue2)">我的最高分 '+(best||'—')+'</p></div>';
+   }).join('')+'</div>';
+}
+function openBank(id){
+  CURB=BANKS.filter(function(b){return b.id===id})[0];
+  var wrong=get(ukey('et_wrong:'+id),[]);
+  var p=CURB.examcfg.paper;
+  var box=document.getElementById('examBox');
+  box.innerHTML='<button class="btn gray sm" onclick="renderExamHome()">← 返回证书列表</button>'
+   +'<div class="case" style="margin-top:12px"><h3>'+CURB.name+'</h3>'
+   +'<div class="row"><b>颁证单位</b>'+CURB.issuer+'</div>'
+   +'<div class="row"><b>考试形式</b>'+CURB.exam+'</div>'
+   +(CURB.modules?'<div class="row"><b>考核模块</b>'+CURB.modules.join(' / ')+'</div>':'')
+   +(CURB.levels?'<div class="row"><b>等级序列</b>'+CURB.levels+'</div>':'')
+   +'<div class="row"><b>备考价值</b>'+CURB.desc+'</div>'
+   +'<div class="row"><b>全真规则</b>'+p.note+'<br><span style="color:var(--muted)">全程倒计时 · 交卷后统一出分解析 · 多选题全对才得分</span></div>'
+   +'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;align-items:center">'
+   +'<button class="btn sm" onclick="startMock()">▶ 全真模拟（标准试卷）</button>'
+   +'<span style="font-size:12.5px;color:var(--muted)">🧊 实操看图练习（选车型）：</span>'
+   +'<button class="btn orange sm" onclick="window.open(\'/videos/nev3d.html?mode=quiz\',\'_blank\')">纯电动 BEV · 3D 拆解台 15 部件 × 每部件 10 题</button>'
+   +'<button class="btn orange sm" onclick="window.open(\'/models/quiz.html?m=phev\',\'_blank\')">插电混动 PHEV</button>'
+   +'<button class="btn orange sm" onclick="window.open(\'/models/quiz.html?m=erev\',\'_blank\')">增程式 EREV</button>'
+   +'<button class="btn orange sm" onclick="window.open(\'/models/quiz.html?m=fcev\',\'_blank\')">氢燃料 FCEV</button>'
+   +'<button class="btn orange sm" onclick="startGameQuiz()">🎮 游戏实操试题（每个证书 20 题 · 覆盖四大车型 · 可进实训台操作后作答）</button>'
+   +'<button class="btn gray sm" onclick="startExam()">快速抽考（10题·即时解析）</button>'
+   +'<button class="btn gray sm" onclick="drill(0)">顺序刷题（共'+CURB.qs.length+'题）</button>'
+   +'<button class="btn gray sm" onclick="drillWrong()">错题重练（'+wrong.length+'题）</button>'
+   +'</div></div>';
+  window.scrollTo(0,0);
+}
+/* ---- 游戏实操试题：先进 3D 实训台练，再回答安全工序题（每个证书 20 题） ---- */
+var GAME_QUIZ_BY_CERT={
+dg:[
+ {lv:'motor',q:'驱动电机绝缘故障实训：上手维修前的第一步必须是？',o:['直接拆卸高压连接器','断电并验电确认无电','先测绝缘阻值','戴好手套直接拆'],a:1,e:'高压作业铁律：先断电、验电、挂牌，确认无电后才能触碰高压部件。'},
+ {lv:'pdu',q:'高压配电盒预充失败实训：预充回路的核心作用是？',o:['限制上电瞬间冲击电流，保护接触器与母线电容','加快充电速度','给电池包加热','无关紧要可短接'],a:0,e:'预充回路先以小电流给母线电容充电，避免主接触器直接接通产生大电流拉弧。'},
+ {lv:'hvil',q:'高压互锁断开实训：高压互锁（HVIL）回路的作用是？',o:['监测高压连接器/护盖是否可靠接妥，异常时切断高压','提高整车续航','加快快充速度','只是装饰'],a:0,e:'互锁回路串联各高压接插件的短接针，任一处断开都会触发下高压保护。'},
+ {lv:'imd',q:'绝缘监测实训：高压系统绝缘阻值的合格参考线是？',o:['≥0.1MΩ','≥1MΩ','≥5MΩ（常按 500Ω/V 折算）','阻值越低越好'],a:2,e:'主流要求绝缘阻值不小于 500Ω/V；教学关卡按 ≥5MΩ 判定，低于此值必须排查绝缘故障。'},
+ {lv:'msd',q:'维修开关 MSD 更换实训：更换熔芯前必须确认？',o:['车辆已高压下电且验电无电','熔芯颜色一致','环境温度合适','轮胎气压正常'],a:0,e:'MSD 是电池包高压总闸，更换前必须完成高压下电、验电、挂牌上锁。'},
+ {lv:'fastgun',q:'快充握手失败实训：快充开始前，车与桩之间首先要完成？',o:['CC/CP 连接确认与绝缘检测等握手流程','打开车内空调','升起车窗','车辆落锁'],a:0,e:'快充启动前桩端与车辆完成充电连接确认、绝缘检测等握手流程，任一步异常都会拒绝输出。'},
+ {lv:'battery',q:'电池包冷却液渗漏实训：开包检修的首要前提是？',o:['直接拆包晾干','整车高压下电、验电并做绝缘复测','把冷却液放光即可','抬升车辆即可'],a:1,e:'冷却液导电，渗漏入电池舱已造成绝缘下降——必须下电验电、确认绝缘状态后再开包。'},
+ {lv:'inverter',q:'电机控制器拆装实训：断电后为何仍需等待 5~10 分钟再拆？',o:['让控制器降温','等待母线电容残余电压泄放完毕','等故障码自动清除','无必要，立即可拆'],a:1,e:'母线电容断电后仍存高压残余电荷，须等待泄放（或主动放电）并复测确认后再触碰。'},
+ {lv:'obc',q:'车载充电机（OBC）维修后首次上电的正确顺序是？',o:['直接插枪快充','先低压上电自检，确认无故障后再高压上电','先路试再检测','无所谓顺序'],a:1,e:'先低压自检可提前暴露接线错误，避免带故障直接上高压扩大损坏。'},
+ {lv:'dcdc',q:'DC-DC 转换器实训：其正常输出电压范围是？',o:['约 13.8~14.4V','300~400V','220V 交流','0~5V'],a:0,e:'DC-DC 把高压直流降到 14V 平台，为 12V 蓄电池充电并供低压电器，输出 13.8~14.4V。'},
+ {lv:'chargeport',q:'充电口总成检修实训：动手前的确认事项是？',o:['充电枪已拔下且整车已下高压','打开口盖即可','车辆正在充电','轮胎已固定'],a:0,e:'带电插拔充电枪存在拉弧风险，检修充电口前必须确认未连接充电且整车已下高压。'},
+ {lv:'relay',q:'主继电器粘连实训：如何判断主继电器已粘连？',o:['听声音清脆','测其输出端在下电后仍有电池端电压','看外观颜色','量线圈电阻无穷大'],a:1,e:'下电后输出端仍带电池电压即粘连，必须更换，否则车辆始终带高压。'},
+ {lv:'module',q:'电池模组更换实训：拆装连接片时必须？',o:['用力插到底','对每个裸露端子做绝缘遮盖防护','湿手操作','先拆掉 BMS 再说'],a:1,e:'模组间串联电压高，裸露端子必须逐一绝缘防护，防止工具搭接短路打火。'},
+ {lv:'reducer',q:'减速器检查实训：检查油位/更换减速器油的时机是？',o:['随时可检查','车辆静置水平且油温回落后','高速行驶后立即','充电过程中'],a:1,e:'油温影响体积读数且热态放油易烫伤，须静置水平、油温回落后检查更换。'},
+ {lv:'thermal',q:'热管理系统实训：更换冷却液后首要操作是？',o:['直接路试','电子水泵循环排气，确认无气阻','加满即可','先快充一次'],a:1,e:'冷却回路残留气体会造成水泵空转、局部过热，更换后必须循环排气。'},
+ {lv:'vcu',q:'整车控制器拆装实训：如何防止维修中被远程唤醒或误上高压？',o:['关闭车门即可','断开 12V 蓄电池负极','拔掉天线','打开双闪'],a:1,e:'断开低压负极可切断控制器供电，防止远程唤醒/误动作，是高压作业的基础步骤。'},
+ {lv:'canbus',q:'CAN 总线测量实训：断电后 CAN-H 与 CAN-L 之间电阻应约为？',o:['0Ω','60Ω 左右（两个 120Ω 终端电阻并联）','无穷大','1200Ω'],a:1,e:'整车 CAN 两端各 120Ω 终端电阻，断电测 H-L 间电阻约 60Ω；异常说明终端或线束故障。'},
+ {lv:'compressor',q:'电动压缩机检修实训：其驱动方式是？',o:['发动机皮带驱动','高压电驱动独立电机','12V 驱动','脚踏驱动'],a:1,e:'电动压缩机由高压电驱动，熄火/纯电模式空调照开——检修属高压作业，必须下电。'},
+ {lv:'ptc',q:'PTC 加热器实训：高压 PTC 绝缘故障的典型表现是？',o:['空调制冷更好','绝缘报警/漏电保护跳闸','续航增加','无影响'],a:1,e:'PTC 直接接入高压，绝缘下降会触发绝缘监测报警甚至整车下高压保护。'},
+ {lv:'resolver',q:'旋变传感器实训：旋变（旋转变压器）的作用是？',o:['检测电机转子位置与转速，供控制器换相','加热电机','测量胎压','给电池均衡'],a:0,e:'旋变实时反馈转子角度，控制器据此精确换相；旋变异常会导致动力受限或无法行车。'}
+],
+jty:[
+ {lv:'bms',q:'BMS 报「单体压差过大」实训：首要排查步骤是？',o:['直接更换电池包','读取单体电压数据流，先排除采样线束问题','更换 BMS 主板','忽略继续行驶'],a:1,e:'数据流先行：区分真实压差（电芯问题）与采样故障（线束/采样板问题），避免误换件。'},
+ {lv:'module',q:'电池模组更换实训：新模组装入后必须？',o:['直接装车交车','做容量/电压一致性校验与均衡','快充一次即可','清掉故障码就行'],a:1,e:'新旧模组一致性差会导致充放电不均衡、压差报警，必须校验并均衡后再闭环。'},
+ {lv:'dht_clutch',q:'插混 DHT 离合器打滑实训：DHT 变速箱换油必须使用？',o:['普通 ATF 自动变速器油','DHT 专用油（部分与电机冷却油共用规格）','发动机机油','齿轮油即可'],a:1,e:'DHT 油品规格特殊，加错油会导致离合器打滑与电机绝缘下降。'},
+ {lv:'tank_leak',q:'混动高压油箱检修实训：拆装油箱前必须？',o:['直接拆下放油','断开油泵电源并泄放残压，远离火源','打开油箱盖等待即可','用水冲洗油箱'],a:1,e:'高压油箱带压且燃油易燃，拆装前必须断电泄压、禁火作业。'},
+ {lv:'rex_maint',q:'增程器保养实训：增程器的保养周期应按？',o:['行驶里程','发动机运行小时数（发电小时数）','车龄','随便'],a:1,e:'增程器按固定转速发电运行，磨损与机油劣化按运行小时计，不看里程。'},
+ {lv:'stack_leak',q:'燃料电池堆氢泄漏实训：氢气泄漏的定位手段是？',o:['凭气味寻找','肥皂水涂抹','氢检仪检测','肉眼观察'],a:2,e:'氢气无色无味且极易燃，只能靠氢检仪定量检测，报警阈通常 100ppm。'},
+ {lv:'dht_oil',q:'DHT 油液更换实训：换油周期的参考是？',o:['1 万公里','4~6 万公里','10 年','不用换'],a:1,e:'DHT 油兼润滑/液压/冷却功能，普遍 4~6 万公里更换，工况恶劣适当缩短。'},
+ {lv:'engine_oil',q:'混动发动机机油乳化实训：乳化、燃油稀释更突出的原因是？',o:['机油质量差','长期间歇运行、冷启动频繁','发动机温度太高','变速箱漏油'],a:1,e:'短途用电多，发动机常冷态短时运行，水分与燃油混入机油，应按运行小时+里程双标准保养。'},
+ {lv:'engine_ign',q:'混动发动机失火实训：诊断点火失火首先读取？',o:['胎压数据','各缸缺火计数（misfire counter）数据流','空调温度','导航记录'],a:1,e:'缺火计数直接定位到缸，再结合火花塞/点火线圈/缸压逐项排查。'},
+ {lv:'tank_pump',q:'燃油泵更换实训：低压燃油泵线圈电阻一般约为？',o:['1~5Ω','100~500Ω','无穷大','0.1Ω'],a:0,e:'直流燃油泵电机电阻普遍 1~5Ω，阻值异常说明泵内电机或换向器故障。'},
+ {lv:'exhaust_rust',q:'排气锈蚀补焊实训：补焊修复的前提是？',o:['直接在车上焊','确认排气已冷却、拆下后由专业焊工评估作业','越热越好焊','用胶带包扎即可'],a:1,e:'带温作业易变形且残留燃油蒸汽有爆燃风险；托底变形超标必须换总成。'},
+ {lv:'exhaust_hanger',q:'排气吊耳老化实训：吊耳断裂会导致？',o:['动力提升','消音器下垂托底、拉裂接口并产生巨响','油耗降低','没有影响'],a:1,e:'吊耳失效引发整套排气位移，接口撕裂并伴随异响，需成对更换。'},
+ {lv:'rex_gen',q:'增程发电机不发电实训：首先读取的数据流是？',o:['发电机输出电压与发动机转速','胎压','空调风量','座椅位置'],a:0,e:'先区分「拖不起」（机械/转速问题）还是「发不出」（励磁/绕组问题），再定故障树。'},
+ {lv:'stack_maint',q:'电堆单片电压巡检实训：巡检的目的是？',o:['清洁外壳','找出单片电压异常（偏低/反极）的故障单片','提高氢压','给空压机润滑'],a:1,e:'单片电压异常预示膜电极衰减或缺氢，单片巡检是电堆健康管理的核心手段。'},
+ {lv:'h2line_leak',q:'供氢管路检漏实训：安全有效的检漏方法是？',o:['明火试漏','氢检仪检测（辅以肥皂水验证）','凭嘶嘶声','用手捂'],a:1,e:'氢气易燃易爆，必须用氢检仪定量检漏；肥皂水仅作漏点验证，严禁明火。'},
+ {lv:'h2pump',q:'氢循环泵检修实训：氢循环泵的作用是？',o:['给车厢供暖','把电堆出口未反应的氢气循环回入口，提高利用率','压缩空气','给储氢罐加压'],a:1,e:'循环泵回收未反应氢气，减少排放浪费并改善电堆水平衡，是氢系统关键附件。'},
+ {lv:'airmotor',q:'空压机（空压机组）实训：其为电堆供应？',o:['高压氢气','过滤加压后的洁净空气（氧气侧反应气）','冷却液','机油'],a:1,e:'空压机为电堆阴极供应压缩空气，效率与洁净度直接影响发电功率与电堆寿命。'},
+ {lv:'humid',q:'加湿器维护实训：加湿器的作用是？',o:['给乘客加湿','湿润进入电堆的反应空气，防止质子交换膜干裂','给氢气加热','除霜'],a:1,e:'膜电极需保持湿润才导电，加湿器利用电堆尾气回湿进气，失效会导致内阻上升、性能衰减。'},
+ {lv:'h2valve',q:'储氢罐瓶阀实训：瓶阀上 TPRD 热熔泄压装置的作用是？',o:['日常排气','火灾时定向泄放瓶内氢气，防止爆瓶','加压','过滤'],a:1,e:'TPRD 是法定安全件：温度异常时定向泄压，保护气瓶本体，到期必须随瓶阀整体更换。'},
+ {lv:'h2fill_cap',q:'加氢口密封检修实训：加氢口轻微泄漏的处理是？',o:['涂点胶水继续用','更换密封圈/接口并按 70MPa 标准复测密封','敲紧即可','拆下不用'],a:1,e:'加氢口承受 70MPa 高压，密封件老化必须更换专用密封并做气密复测。'}
+],
+wx:[
+ {lv:'h2tank_check',q:'储氢罐安检实训：TPRD 热熔泄压装置寿命到期应？',o:['继续使用','整体更换瓶阀（属法定安全件）','涂胶封堵','拆下来不用'],a:1,e:'TPRD 是火灾时定向泄压的法定安全件，到期必须随瓶阀整体更换。'},
+ {lv:'h2vent',q:'氢系统维修泄压实训：允许拆装的表压标准是？',o:['压力表看起来没压','表压读数 0.0MPa 并抽真空置换','低于 5MPa 即可','凭经验估计'],a:1,e:'高压氢系统只认表压 0.0MPa，泄压后还需抽真空置换，严禁凭感觉。'},
+ {lv:'motor',q:'驱动电机绕组绝缘 0.18MΩ 实训：修复工艺是？',o:['直接涂胶','低温烘干受潮绕组后涂刷绝缘漆并复测','太阳下暴晒','换轮胎'],a:1,e:'烘干驱潮+绝缘漆修复是绕组受潮的标准工艺，修复后必须摇表复测合格。'},
+ {lv:'battery',q:'电池包渗漏修复实训：修复冷却回路后的收尾工序是？',o:['直接交车','真空加注冷却液、循环排气并做绝缘复测','洗车','删除故障记录'],a:1,e:'恢复冷却功能后须验证绝缘合格、无气阻，并清码路试，三步缺一不可。'},
+ {lv:'gearoil',q:'减速器油更换实训：加油的标准是？',o:['加满溢出为止','加到观察孔中线（或按油尺上下刻线之间）','加一半','不用换油'],a:1,e:'油量过多搅油发热，过少润滑不良，以观察孔/油尺刻线为准。'},
+ {lv:'pump',q:'电子水泵异响实训：更换新泵后仍异响，首先怀疑？',o:['泵是坏的','冷却回路未排气，气阻导致水泵空转','电压太高','机油不足'],a:1,e:'气阻是换泵后异响最常见原因，先执行循环排气再判定泵体好坏。'},
+ {lv:'lvbat',q:'12V 蓄电池亏电实训：换新蓄电池后必须？',o:['直接交车','验证 DC-DC 充电电压 13.8~14.4V 正常','断开 DC-DC','再充一晚'],a:1,e:'若 DC-DC 不充电，新电瓶会很快再次亏电——必须验证充电链路。'},
+ {lv:'wiper',q:'雨刮电机更换实训：装复后的验证项目是？',o:['只试高速档','各档位试运行并确认停机自动回位','喷水即可','不用验证'],a:1,e:'回位功能失效会停在挡风玻璃中间，各档位+回位是必检项。'},
+ {lv:'brake',q:'制动能量回收异常实训：首先检查的传感器是？',o:['雨量传感器','制动踏板位置/轮速传感器信号','胎压传感器','光照传感器'],a:1,e:'回收强度由踏板开度与轮速决定，信号异常时回收退出并点亮故障灯。'},
+ {lv:'wheel',q:'制动片更换实训：装复后的首要操作是？',o:['直接路试','未发动状态多次踩刹车恢复踏板行程并检查制动液位','猛踩一脚','打方向'],a:1,e:'分泵活塞回位后首脚无制动，必须预压建立行程，否则首脚刹车失灵。'},
+ {lv:'elock',q:'充电电子锁卡滞实训：修复后的验证标准是？',o:['能插上枪即可','锁止/解锁动作顺畅且充电中无法拔枪','声音大就行','拆掉锁'],a:1,e:'电子锁失效会导致行驶中或充电中拔枪，必须验证锁止逻辑完整。'},
+ {lv:'cabin',q:'座舱低压电气故障实训：排查的第一步是？',o:['直接换模块','查对应保险丝与搭铁点','拆仪表','换电瓶'],a:1,e:'低压电气故障六成以上出在保险/搭铁，先易后难逐级排查。'},
+ {lv:'dht_clutch',q:'DHT 离合器更换实训：摩擦片安装要点是？',o:['方向随便','按标记方向安装，并在专用油中浸泡后装配','干装','涂黄油'],a:1,e:'摩擦片方向错误会烧蚀，干装损伤摩擦材料；必须按规定方向并在专用油中浸泡。'},
+ {lv:'engine_ign',q:'火花塞更换实训：正确操作是？',o:['热车立即拆','冷车状态按规定力矩拆装，检查电极间隙','越紧越好','互换缸位即可'],a:1,e:'热车拆装易咬死螺纹，力矩过紧拉断、过松漏气，间隙不符影响点火。'},
+ {lv:'rex_maint',q:'增程器例行保养实训：除机油外还须检查？',o:['轮胎','驱动皮带张紧度与裂纹（按运行小时判定）','玻璃水','车漆'],a:1,e:'增程器定转速运行，皮带磨损按小时计，张紧失效会打滑发电不足。'},
+ {lv:'rex_gen',q:'增程发电机检修实训：励磁机碳刷/滑环磨损超限应？',o:['继续使用','成对更换碳刷并检查滑环表面','涂油','打磨后不换'],a:1,e:'碳刷磨超限会导致励磁不稳、发电电压波动，必须成对更换并检查滑环。'},
+ {lv:'stack_maint',q:'电堆巡检实训：巡检周期的制定依据是？',o:['按心情','按运行小时/行驶里程的定期保养计划','按车龄颜色','从不巡检'],a:1,e:'电堆健康度随运行时间衰减，须纳入定期保养计划，发现单片异常提前干预。'},
+ {lv:'body',q:'车身壳体检修实训：托底事故后必须检查的项目是？',o:['只洗外观','电池包壳体变形、冷却管路破损与高压线束损伤','换个尾标','打蜡'],a:1,e:'托底最先伤及底部电池包与高压线束，变形+渗漏+绝缘三项必查。'},
+ {lv:'humid',q:'加湿器排水除垢实训：长期不维护的后果是？',o:['空调更冷','进气加湿失效、质子交换膜干裂、电堆性能衰减','氢耗降低','没有影响'],a:1,e:'水垢堵塞与积水滋生细菌会破坏加湿功能，膜干裂后内阻上升、功率下降。'},
+ {lv:'fastgun',q:'快充握手失败排查实训：应重点检查的环节是？',o:['轮胎','CC/CP 连接确认与绝缘检测等握手流程','雨刮','座椅'],a:0,e:'快充启动前须完成连接确认与绝缘检测，任一步异常都会拒绝输出，按握手流程逐段排查。'}
+]};
+function startGameQuiz(){
+  var BANK=(GAME_QUIZ_BY_CERT[CURB.id]||GAME_QUIZ_BY_CERT.dg);
+  var box=document.getElementById('examBox');
+  box.innerHTML='<button class="btn gray sm" onclick="openBank(CURB.id)">← 返回'+(CURB?CURB.name:'证书')+'</button>'
+   +'<div class="lesson" style="margin-top:12px"><h3>🎮 游戏实操试题 <span style="font-size:12px;color:var(--muted);font-weight:400">共'+BANK.length+'题 · 覆盖纯电/插混/增程/氢燃料四类实训关卡 · 每题都可先「进入实训台」亲手操作，再回来作答</span></h3><div id="gqZone"></div></div>';
+  box.scrollIntoView({behavior:'auto',block:'start'});
+  var score=0,qi=0;
+  function next(){
+    var z=document.getElementById('gqZone');
+    if(qi>=BANK.length){
+      var best=get(ukey('et_gamequiz:'+CURB.id),0);
+      if(score>best)set(ukey('et_gamequiz:'+CURB.id),score);
+      z.innerHTML='<div class="qa"><div class="q">游戏实操考核结束：'+score+'/'+BANK.length+(score>=16?'，<b style="color:var(--ok)">实操规程过关！</b>':(score>=10?'，<b style="color:#b45309">基本掌握</b>，建议回实训台再练一遍':'，<b style="color:var(--bad)">安全规程不熟</b>，务必先到体系课把高压安全课补齐'))+(score>best?'（新纪录！':'')+'</div>'
+       +'<button class="btn sm" onclick="startGameQuiz()">再考一次</button> <button class="btn gray sm" onclick="openBank(CURB.id)">返回证书页</button></div>';
+      return;
+    }
+    var Q=BANK[qi];
+    z.innerHTML='<div class="qa"><div class="q">实操题 '+(qi+1)+'/'+BANK.length+'　'+Q.q+'</div>'
+     +'<div style="margin:6px 0 10px"><button class="btn sm" onclick="window.open(\'/videos/repair-game.html?level='+Q.lv+'\',\'_blank\')">🎮 进入实训台 · '+GAME_NAMES[Q.lv]+'（新窗口练完回到本题）</button></div></div>';
+    var qa=document.createElement('div');qa.className='qa';
+    Q.o.forEach(function(op,k){
+      var b=document.createElement('button');b.className='opt';b.textContent=op;
+      b.onclick=function(){
+        var opts=qa.querySelectorAll('.opt');
+        opts[Q.a].classList.add('right');
+        if(k===Q.a){score++}else{b.classList.add('wrong');addWrong({q:'[游戏实操] '+Q.q,opts:Q.o,ans:Q.a,exp:Q.e,from:'游戏实操试题'})}
+        opts.forEach(function(x){x.onclick=null;x.style.cursor='default'});
+        var ex=qa.querySelector('.exp');if(ex)ex.style.display='block';
+        var nb=document.createElement('button');nb.className='btn sm';nb.style.marginTop='8px';nb.textContent=(qi+1<BANK.length?'下一题':'交卷看成绩');nb.onclick=function(){qi++;next()};
+        qa.appendChild(nb);
+      };
+      qa.appendChild(b);
+    });
+    var ex=document.createElement('div');ex.className='exp';ex.textContent='解析：'+Q.e;qa.appendChild(ex);
+    z.appendChild(qa);
+  }
+  next();
+}
+/* ---- 全真模拟：标准试卷 ---- */
+var mock=null,mockTimer=null;
+function startMock(){
+  var p=CURB.examcfg.paper;
+  mock={items:[],labels:{},ans:{},cur:0,sec:p.time*60,p:p};
+  p.sections.forEach(function(s){
+    var pool=CURB.qs.map(function(x,i){return i}).filter(function(i){return qType(CURB.qs[i])===s.t}).sort(function(){return Math.random()-.5}).slice(0,s.n);
+    pool.forEach(function(i){mock.items.push(i);mock.labels[i]=s.label});
+  });
+  clearInterval(mockTimer);
+  mockTimer=setInterval(function(){
+    mock.sec--;
+    var tb=document.getElementById('mockTimer');
+    if(tb){var m=Math.floor(mock.sec/60),s=mock.sec%60;tb.textContent='⏱ '+m+':'+(s<10?'0':'')+s;
+      tb.style.color=mock.sec<300?'var(--bad)':'inherit'}
+    if(mock.sec<=0){submitMock(true)}
+  },1000);
+  renderMock();
+}
+function renderMock(){
+  var box=document.getElementById('examBox');
+  var i=mock.items[mock.cur],Q=CURB.qs[i];
+  var done=Object.keys(mock.ans).length;
+  var bar='<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap">'
+    +'<button class="btn gray sm" onclick="quitMock()">退出（成绩作废）</button>'
+    +'<span id="mockTimer" style="font-weight:700;font-size:16px">⏱ --:--</span>'
+    +'<span style="font-size:13px;color:var(--muted)">已答 '+done+'/'+mock.items.length+' · 合格线 '+mock.p.pass+' 分</span>'
+    +'<button class="btn orange sm" style="margin-left:auto" onclick="submitMock(false)">交卷</button></div>'
+    +'<div style="font-size:12.5px;color:var(--blue);margin-bottom:6px">'+mock.labels[i]+'</div>'
+    +'<div class="bar" style="margin-bottom:14px"><i style="width:'+(done/mock.items.length*100)+'%"></i></div>';
+  var qa='<div class="qa"><div class="q">Q'+(mock.cur+1)+'/'+mock.items.length+qTag(Q)+'<br>'+Q.q+'</div><div id="optZone"></div></div>';
+  var nav='<div style="display:flex;gap:8px;justify-content:center;margin-top:10px">'
+    +(mock.cur>0?'<button class="btn gray sm" onclick="mock.cur--;renderMock()">上一题</button>':'')
+    +(mock.cur<mock.items.length-1?'<button class="btn sm" onclick="mockNext()">下一题</button>':'<button class="btn orange" onclick="submitMock(false)">交卷</button>')
+    +'</div>';
+  box.innerHTML=bar+qa+nav;
+  renderOpts(Q,i,true);
+  var tb=document.getElementById('mockTimer');
+  var m=Math.floor(mock.sec/60),s=mock.sec%60;tb.textContent='⏱ '+m+':'+(s<10?'0':'')+s;
+  window.scrollTo(0,0);
+}
+function renderOpts(Q,qi,inMock){
+  var zone=document.getElementById('optZone');zone.innerHTML='';
+  var tp=qType(Q),sel=mock?mock.ans[qi]:null;
+  if(tp==='multi'){
+    var chosen=Array.isArray(sel)?sel:[];
+    qOpts(Q).forEach(function(op,k){
+      var b=document.createElement('button');b.className='opt';b.textContent=op;
+      if(chosen.indexOf(k)>=0){b.style.borderColor='var(--blue2)';b.style.background='#dbe9ff'}
+      b.onclick=function(){
+        var i2=chosen.indexOf(k);
+        if(i2>=0){chosen.splice(i2,1)}else{chosen.push(k)}
+        mock.ans[qi]=chosen.slice();renderMock();
+      };
+      zone.appendChild(b);
+    });
+    var c=document.createElement('button');c.className='btn orange sm';c.style.marginTop='6px';
+    c.textContent='确认本题（已选'+chosen.length+'项）';
+    c.onclick=function(){mockNext()};
+    zone.appendChild(c);
+  }else{
+    qOpts(Q).forEach(function(op,k){
+      var b=document.createElement('button');b.className='opt';b.textContent=op;
+      if(sel===k){b.style.borderColor='var(--blue2)';b.style.background='#dbe9ff'}
+      b.onclick=function(){mock.ans[qi]=k;renderMock()};
+      zone.appendChild(b);
+    });
+  }
+}
+function mockNext(){mock.cur=Math.min(mock.cur+1,mock.items.length-1);renderMock()}
+function quitMock(){if(confirm('退出全真模拟？成绩将作废。')){clearInterval(mockTimer);mock=null;openBank(CURB.id)}}
+function submitMock(timeout){
+  if(!mock)return;
+  clearInterval(mockTimer);
+  var total=mock.items.length,correct=0,wrong=[];
+  mock.items.forEach(function(qi){if(isRight(CURB.qs[qi],mock.ans[qi])){correct++}else{wrong.push(qi)}});
+  var score=Math.round(correct/total*100);
+  var passed=score>=mock.p.pass;
+  var bk=PEXAMB+':'+CURB.id;if(score>get(ukey(bk),0))set(ukey(bk),score);
+  var wl=get(ukey('et_wrong:'+CURB.id),[]);
+  wrong.forEach(function(qi){if(wl.indexOf(qi)<0)wl.push(qi)});
+  set(ukey('et_wrong:'+CURB.id),wl);
+  var box=document.getElementById('examBox');
+  box.innerHTML='<div class="qa"><div class="q">'+(timeout?'⏰ 时间到，系统自动交卷！':'交卷完成！')+' 得分 <b style="font-size:22px;color:'+(passed?'var(--ok)':'var(--bad)')+'">'+score+'</b> / '+mock.p.pass+'分合格线 —— <b>'+(passed?'✅ 合格！':'❌ 未合格，错题已收入错题本')+'</b></div>'
+   +(wrong.length?('<div class="exp" style="display:block"><b>错题复盘：</b>'+wrong.map(function(qi){var Q=CURB.qs[qi];var your=qType(Q)==='multi'?(mock.ans[qi]||[]).map(function(x){return Q.o[x]}).join('、'):(mock.ans[qi]!==undefined?qOpts(Q)[mock.ans[qi]]:'未作答');return '<br><br>· '+Q.q+'<br>&nbsp;&nbsp;你的答案：'+your+' ｜ 正确答案：'+(qType(Q)==='multi'?Q.a.map(function(x){return Q.o[x]}).join('、'):qOpts(Q)[Q.a])+(Q.e?'<br>&nbsp;&nbsp;解析：'+Q.e:'')}).join('')+'</div>'):'<div class="exp" style="display:block">满分通过，零失误！</div>')
+   +'<div style="margin-top:12px"><button class="btn sm" onclick="startMock()">再考一次</button> <button class="btn gray sm" onclick="openBank(\''+CURB.id+'\')">返回证书页</button></div></div>';
+  mock=null;window.scrollTo(0,0);
+}
+/* ---- 练习模式（抽考/刷题/错题：即时解析） ---- */
+function runSet(indices,mode){
+  var score=0,idx=0,wrongNew=[];
+  function next(){
+    var box=document.getElementById('examBox');
+    if(idx>=indices.length){
+      if(mode==='exam'){
+        var bk=PEXAMB+':'+CURB.id;var prev=get(ukey(bk),0);
+        var sc=Math.round(score/indices.length*100);if(sc>prev)set(ukey(bk),sc);
+        var wl=get(ukey('et_wrong:'+CURB.id),[]);
+        wrongNew.forEach(function(i){if(wl.indexOf(i)<0)wl.push(i)});
+        set(ukey('et_wrong:'+CURB.id),wl);
+        box.innerHTML='<div class="qa"><div class="q">交卷！得分 <b>'+sc+' / 100</b>（答对'+score+'/'+indices.length+'题）</div>'
+         +(wrongNew.length?('<div class="exp" style="display:block">本次错题：'+wrongNew.map(function(i){var Q=CURB.qs[i];return '<br>· '+Q.q+'（正确答案：'+(qType(Q)==='multi'?Q.a.map(function(x){return Q.o[x]}).join('、'):qOpts(Q)[Q.a])+'）'}).join('')+'</div>'):'')
+         +'<div style="margin-top:10px"><button class="btn sm" onclick="startExam()">再考一次</button> <button class="btn gray sm" onclick="openBank(\''+CURB.id+'\')">返回证书页</button></div></div>';
+      }else{
+        var wl2=get(ukey('et_wrong:'+CURB.id),[]);
+        var add=mode==='wrong'?[]:wrongNew;
+        add.forEach(function(i){if(wl2.indexOf(i)<0)wl2.push(i)});
+        if(mode==='wrong'){wrongNew.forEach(function(i){var p2=wl2.indexOf(i);if(p2>=0)wl2.splice(p2,1)})}
+        set(ukey('et_wrong:'+CURB.id),wl2);
+        box.innerHTML='<div class="qa"><div class="q">'+(mode==='wrong'?'错题重练完成！答错'+wrongNew.length+'题，已自动移出错题本。':'刷题完成！共'+indices.length+'题，答错'+wrongNew.length+'题（已收录错题本）。')+'</div><button class="btn sm" onclick="drill(0)">再刷一遍</button> <button class="btn gray sm" onclick="openBank(\''+CURB.id+'\')">返回证书页</button></div>';
+      }
+      return;
+    }
+    var Q=CURB.qs[indices[idx]];var qa=document.createElement('div');qa.className='qa';
+    qa.innerHTML='<div class="q">Q'+(idx+1)+'/'+indices.length+qTag(Q)+'<br>'+Q.q+'</div>';
+    var tp=qType(Q);
+    if(tp==='multi'){
+      var chosen=[];
+      qOpts(Q).forEach(function(op,k){
+        var b=document.createElement('button');b.className='opt';b.textContent=op;
+        b.onclick=function(){
+          var i3=chosen.indexOf(k);if(i3>=0){chosen.splice(i3,1);b.style.borderColor='';b.style.background=''}else{chosen.push(k);b.style.borderColor='var(--blue2)';b.style.background='#dbe9ff'}
+        };
+        qa.appendChild(b);
+      });
+      var cf=document.createElement('button');cf.className='btn orange sm';cf.style.marginTop='6px';cf.textContent='确认答案';
+      cf.onclick=function(){
+        var opts=qa.querySelectorAll('.opt');
+        Q.a.forEach(function(x){opts[x].classList.add('right')});
+        var ok=isRight(Q,chosen);
+        if(ok){score++}else{wrongNew.push(indices[idx]);chosen.forEach(function(x){if(Q.a.indexOf(x)<0)opts[x].classList.add('wrong')})}
+        Array.prototype.forEach.call(opts,function(x){x.onclick=null;x.style.cursor='default'});
+        cf.disabled=true;
+        var ex=qa.querySelector('.exp');ex.textContent='解析：'+Q.e;ex.style.display='block';
+        setTimeout(function(){idx++;next()},2200);
+      };
+      qa.appendChild(cf);
+    }else{
+      qOpts(Q).forEach(function(op,k){
+        var b=document.createElement('button');b.className='opt';b.textContent=op;
+        b.onclick=function(){
+          var opts=qa.querySelectorAll('.opt');opts[Q.a].classList.add('right');
+          if(k===Q.a){score++}else{b.classList.add('wrong');wrongNew.push(indices[idx])}
+          opts.forEach(function(x){x.onclick=null;x.style.cursor='default'});
+          var ex=qa.querySelector('.exp');ex.textContent='解析：'+Q.e;ex.style.display='block';
+          setTimeout(function(){idx++;next()},1800);
+        };
+        qa.appendChild(b);
+      });
+    }
+    var ex=document.createElement('div');ex.className='exp';qa.appendChild(ex);
+    box.innerHTML='';
+    if(mode!=='exam'){var back=document.createElement('button');back.className='btn gray sm';back.style.marginBottom='10px';back.textContent='← 返回证书页';back.onclick=function(){openBank(CURB.id)};box.appendChild(back)}
+    box.appendChild(qa);window.scrollTo(0,0);
+  }
+  next();
+}
+function startExam(){
+  var n=Math.min(10,CURB.qs.length);
+  var idx=CURB.qs.map(function(x,i){return i}).sort(function(){return Math.random()-.5}).slice(0,n);
+  runSet(idx,'exam');
+}
+function drill(i){ runSet(CURB.qs.map(function(x,j){return j}),'drill') }
+function drillWrong(){
+  var wl=get(ukey('et_wrong:'+CURB.id),[]);
+  if(!wl.length){document.getElementById('examBox').innerHTML='<div class="qa"><div class="q">错题本为空，先去刷题吧！</div><button class="btn gray sm" onclick="openBank(\''+CURB.id+'\')">返回证书页</button></div>';return}
+  runSet(wl,'wrong');
+}
+/* ---- 实操看图练习 ---- */
+function startPractical(){
+  var list=PRACTICAL.filter(function(p){return p.cert===CURB.id});
+  if(!list.length){document.getElementById('examBox').innerHTML='<div class="qa"><div class="q">该证书暂无实操题。</div><button class="btn gray sm" onclick="openBank(\''+CURB.id+'\')">返回</button></div>';return}
+  var idx=0,score=0,wrong=[];
+  function next(){
+    var box=document.getElementById('examBox');
+    if(idx>=list.length){
+      box.innerHTML='<div class="qa"><div class="q">实操练习完成！答对 '+score+'/'+list.length+' 题。'+(wrong.length?'（解析见下）':'全部正确，操作要点已掌握。')+'</div>'
+       +(wrong.length?('<div class="exp" style="display:block">'+wrong.map(function(qi){var P=list[qi];return '<br>· '+P.q+'<br>&nbsp;&nbsp;正确答案：'+P.o[P.a]+'<br>&nbsp;&nbsp;解析：'+P.e}).join('')+'</div>'):'')
+       +'<div style="margin-top:10px"><button class="btn sm" onclick="startPractical()">再练一轮</button> <button class="btn gray sm" onclick="openBank(\''+CURB.id+'\')">返回证书页</button></div></div>';
+      return;
+    }
+    var P=list[idx];var qa=document.createElement('div');qa.className='qa';
+    qa.innerHTML='<div class="q">实操题 '+(idx+1)+'/'+list.length+'（根据图片判断操作要点）<br>'+P.q+'</div>'
+      +'<img src="images/'+P.img+'" style="width:100%;max-width:420px;border-radius:10px;border:1px solid var(--line);margin-bottom:10px" alt="实操示意图" onclick="window.open(this.src)">';
+    P.o.forEach(function(op,k){
+      var b=document.createElement('button');b.className='opt';b.textContent=op;
+      b.onclick=function(){
+        var opts=qa.querySelectorAll('.opt');opts[P.a].classList.add('right');
+        if(k===P.a){score++}else{b.classList.add('wrong');wrong.push(idx)}
+        opts.forEach(function(x){x.onclick=null;x.style.cursor='default'});
+        var ex=qa.querySelector('.exp');ex.textContent='解析：'+P.e;ex.style.display='block';
+        setTimeout(function(){idx++;next()},1900);
+      };
+      qa.appendChild(b);
+    });
+    var ex=document.createElement('div');ex.className='exp';qa.appendChild(ex);
+    box.innerHTML='<button class="btn gray sm" style="margin-bottom:10px" onclick="openBank(\''+CURB.id+'\')">← 返回证书页</button>';
+    box.appendChild(qa);
+  }
+  next();
+}
+
+/* ==================== 看板 ==================== */
+/* 新能源车型部件课清单（插混/增程/氢燃料 3D 详解页，与学习看板进度对应） */
+var VPARTS=[
+ {m:'phev',name:'插电混动 PHEV',color:'#f97316',parts:['发动机（混动专用）','DHT混动专用变速箱','驱动电机（P3）','动力电池包（8~30kWh）','油箱','排气系统','车载充电机 OBC','高压配电盒 PDU','DC-DC 转换器','电动压缩机','PTC 加热器','整车控制器 VCU','双充电口（快+慢）']},
+ {m:'erev',name:'增程式 EREV',color:'#0ea5e9',parts:['增程器总成（发动机+发电机）','驱动电机（后桥）','电机控制器（逆变器）','大容量电池包（30~50kWh）','油箱（大容积）','排气系统','车载充电机 OBC','高压配电盒 PDU','DC-DC 转换器','电动压缩机','PTC 加热器','整车控制器 VCU','充电口']},
+ {m:'fcev',name:'氢燃料电池 FCEV',color:'#10b981',parts:['燃料电池堆','供氢管路+氢循环泵','空压机+加湿器（辅助系统）','储氢罐组 ×3（70MPa）','加氢口','驱动电机（后桥）','电机控制器（逆变器）','功率缓冲电池（1~3kWh）','高压配电盒 PDU','DC-DC 转换器','电动压缩机','整车控制器 VCU']}
+];
+function vpartDone(){var n=0;VPARTS.forEach(function(v){v.parts.forEach(function(_,i){if(get('et_vpart:'+v.m+':'+i,0)===1)n++})});return n;}
+function renderDash(){
+  renderStuPanel();
+  renderCloudStu();
+  renderMyClass();
+  renderTeacherAdmin();
+  var ps=passed();
+  var trn=get(ukey(PTRN),0);
+  var best=0;
+  BANKS.forEach(function(b){best=Math.max(best,get(PEXAMB+':'+b.id,0))});
+  var html='<div class="dashcard"><b>'+ps.length+'/'+LESSONS.length+'</b><span>体系课通过</span></div>'
+    +'<div class="dashcard"><b>'+gameDone()+'/'+GLEVELS.length+'</b><span>游戏通关</span></div>'
+    +'<div class="dashcard"><b>'+(best*10)+'</b><span>考证练习最高分</span></div>'
+    +'<div class="dashcard"><b>'+trn+'</b><span>带教对话次数</span></div>'
+    +'<div class="dashcard"><b>'+CASES.length+'</b><span>案例库在库案例</span></div>'
+    +'<div class="dashcard"><b>4</b><span>车型 3D 拆解台<br>纯电/插混/增程/氢燃料</span></div>'
+    +'<div class="dashcard"><b>'+vpartDone()+'/'+VPARTS.reduce(function(n,v){return n+v.parts.length},0)+'</b><span>插混/增程/氢燃料<br>部件课通过</span></div>'
+    +'<div class="dashcard"><b>'+fmtDur(get(ukey('et_study'),0))+'</b><span>累计学习时长</span></div>';
+  document.getElementById('dashCards').innerHTML=html;
+  var lb=document.getElementById('lessonBars');lb.innerHTML='';
+  var groups=[{name:'部件课（配 3D 拆解 + 维修实训游戏）',list:LESSONS.filter(function(L){return L.title.indexOf('部件课')===0})},
+              {name:'理论课',list:LESSONS.filter(function(L){return L.title.indexOf('部件课')!==0})}];
+  groups.forEach(function(g){
+    var gdone=g.list.filter(function(L){return ps.indexOf(L.id)>=0}).length;
+    var h=document.createElement('div');
+    h.style.cssText='font-size:13.5px;font-weight:700;margin:14px 0 2px';
+    h.textContent=g.name+' · '+gdone+'/'+g.list.length;
+    lb.appendChild(h);
+    g.list.forEach(function(L){
+      var done=ps.indexOf(L.id)>=0;
+      var row=document.createElement('div');row.style.margin='10px 0';
+      row.innerHTML='<div style="font-size:13px">'+L.title+(done?' <span style="color:var(--ok)">✔</span>':'')+'</div><div class="bar"><i style="width:'+(done?100:0)+'%"></i></div>';
+      lb.appendChild(row);
+    });
+  });
+  /* 新能源车型部件课（插混/增程/氢燃料 3D 详解页进度） */
+  var vdone=vpartDone(), vtotal=VPARTS.reduce(function(n,v){return n+v.parts.length},0);
+  var vh=document.createElement('div');
+  vh.style.cssText='font-size:13.5px;font-weight:700;margin:16px 0 2px';
+  vh.textContent='新能源车型部件课（3D 详解 + 实训游戏） · '+vdone+'/'+vtotal;
+  lb.appendChild(vh);
+  var vsub=document.createElement('div');
+  vsub.style.cssText='font-size:12px;color:var(--muted);margin:2px 0 4px';
+  vsub.textContent='在插电混动/增程式/氢燃料 3D 拆解台中点部件进入详解页，随堂考核全对即记通过';
+  lb.appendChild(vsub);
+  VPARTS.forEach(function(v){
+    var dcnt=v.parts.filter(function(_,i){return get('et_vpart:'+v.m+':'+i,0)===1}).length;
+    var hh=document.createElement('div');
+    hh.style.cssText='font-size:13px;font-weight:700;margin:12px 0 2px;color:'+v.color;
+    hh.textContent=v.name+' · '+dcnt+'/'+v.parts.length;
+    lb.appendChild(hh);
+    v.parts.forEach(function(nm,i){
+      var done=get('et_vpart:'+v.m+':'+i,0)===1;
+      var row=document.createElement('div');row.style.margin='8px 0';
+      row.innerHTML='<div style="font-size:12.5px"><a href="/models/part.html?m='+v.m+'&p='+i+'" target="_blank" style="color:var(--text);text-decoration:none;border-bottom:1px dashed var(--line)">'+nm+'</a>'+(done?' <span style="color:var(--ok)">✔</span>':'')+'</div><div class="bar"><i style="width:'+(done?100:0)+'%;background:'+v.color+'"></i></div>';
+      lb.appendChild(row);
+    });
+  });
+}
+/* 3D 维修实训游戏 30 关（与 repair-game.html 的 rg_star_* 进度键对应） */
+var GLEVELS=['motor','battery','bms','reducer','inverter','obc','dcdc','pdu','vcu','compressor','thermal','chargeport','cabin','wheel','body','resolver','hvil','imd','module','elock','canbus','msd','relay','ptc','brake','gearoil','lvbat','pump','wiper','fastgun','engine_oil','engine_ign','dht_oil','dht_clutch','tank_leak','tank_pump','exhaust_rust','exhaust_hanger','rex_maint','rex_gen','stack_leak','stack_maint','h2line_leak','h2pump','airmotor','humid','h2tank_check','h2valve','h2fill_cap','h2vent'];
+function gameDone(){var n=0;GLEVELS.forEach(function(id){if(+(localStorage.getItem('rg_star_'+id)||0)>0)n++});return n;}
+function allStudents(){
+  var out=[],us=users();
+  Object.keys(us).forEach(function(u){
+    var pls=get(PLESS+':'+u,[]),pj=0,pl=0;
+    pls.forEach(function(id){for(var i=0;i<LESSONS.length;i++){if(LESSONS[i].id===id){if(LESSONS[i].title.indexOf('部件课')===0)pj++;else pl++;break}}});
+    out.push({name:u,lessons:pls.length,pj:pj,pl:pl,wrong:Object.keys(get('et_wrong:'+u,{})).length,exam:(function(){var m=0;BANKS.forEach(function(b){m=Math.max(m,get(PEXAMB+':'+b.id+':'+u,0))});return m*10})(),trainer:get(PTRN+':'+u,0),created:us[u].created});
+  });
+  return out.sort(function(a,b){return b.lessons-a.lessons});
+}
+function renderStuPanel(){
+  var h=document.getElementById('stuHint'),l=document.getElementById('stuList');
+  if(!h)return;
+  if(!curUser()){h.textContent='当前为游客模式，数据仅保存在本设备。登录后进度将绑定账号，便于B端统一管理。';}
+  else{h.textContent='当前登录：'+curUser()+'。以下为在本设备登录过的学员账号（跨设备统计需云端升级，见部署说明）。';}
+  var stu=allStudents();
+  if(!stu.length){l.innerHTML='<div style="font-size:13px;color:var(--muted);margin-top:6px">暂无学员账号，注册登录后自动出现在此处。</div>';return}
+  l.innerHTML='<table class="stu"><tr><th>学员</th><th>体系课</th><th>部件课</th><th>理论课</th><th>错题</th><th>考证最高</th><th>带教次数</th><th>注册日期</th></tr>'
+    +stu.map(function(s){return '<tr><td>'+s.name+(curUser()===s.name?'（当前）':'')+'</td><td>'+s.lessons+'/'+LESSONS.length+'</td><td>'+s.pj+'/15</td><td>'+s.pl+'/35</td><td>'+s.wrong+'</td><td>'+s.exam+'</td><td>'+s.trainer+'</td><td>'+(s.created||'-')+'</td></tr>'}).join('')+'</table>';
+}
+/* ==================== 云端学员（管理端） ==================== */
+function renderCloudStu(){
+ var el=document.getElementById('cloudStu');if(!el)return;
+ var key=get('et_admin_key','');
+ el.innerHTML='<div style="font-size:12.5px;color:var(--muted);margin-bottom:6px">输入管理密钥，查看在服务器注册过的全部学员（不限设备），数据每20秒自动同步。密钥只保存在本机浏览器。</div>'
+  +'<input id="admKey" type="password" placeholder="管理密钥" value="'+key+'" style="padding:8px 10px;border:1px solid var(--line);border-radius:8px;margin-right:6px;width:180px">'
+  +'<button class="btn sm" onclick="loadCloudStu()">查询云端学员</button>'
+  +'<button class="btn gray sm" onclick="set(\'et_admin_key\',\'\');renderCloudStu()">清除密钥</button>'
+  +'<div id="cloudStuList" style="margin-top:8px;font-size:13px"></div>';
+ if(key)loadCloudStu();
+}
+async function loadCloudStu(){
+ var key=(document.getElementById('admKey')?document.getElementById('admKey').value:'').trim();
+ if(!key)return;
+ set('et_admin_key',key);
+ var box=document.getElementById('cloudStuList');
+ box.innerHTML='<span style="color:var(--muted)">查询中…</span>';
+ try{
+  var r=await fetch('/api/admin/students',{method:'POST',cache:'no-store',headers:{'Content-Type':'application/json'},body:JSON.stringify({key:key})});
+  var j=await r.json();
+  if(!r.ok){box.innerHTML='<span style="color:var(--bad)">查询失败：'+(j.err||('HTTP '+r.status))+'（检查管理密钥）</span>';return}
+  var list=j.students||[];
+  if(!list.length){box.innerHTML='<div style="color:var(--muted)">暂无云端注册学员。学员在任意设备登录后即出现在这里。</div>';return}
+  list.sort(function(a,b){return (b.progress['et_lessons:'+b.name]||[]).length-(a.progress['et_lessons:'+a.name]||[]).length});
+  box.innerHTML='<table class="stu"><tr><th>学员</th><th>体系课</th><th>考试通过</th><th>错题</th><th>学习时长</th><th>注册日期</th><th>最近同步</th><th>管理</th></tr>'
+   +list.map(function(s){
+     var p=s.progress||{};
+     var ls=(p['et_lessons:'+s.name]||[]).length;
+     var ex=(typeof EXAMS!=='undefined'?EXAMS.filter(function(e){return (p['et_exam:'+e.id+':'+s.name]||0)>=e.pass}).length:0);
+     var wr=Object.keys(p['et_wrong:'+s.name]||{}).length;
+     var st=p['et_study:'+s.name]||0;
+     var last=s.last?new Date(s.last).toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}):'-';
+     return '<tr><td>'+s.name+'</td><td>'+ls+'/'+LESSONS.length+'</td><td>'+ex+'/7</td><td>'+wr+'</td><td>'+fmtDur(st)+'</td><td>'+(s.created||'-')+'</td><td>'+last+'</td><td><button class="btn gray sm" style="padding:3px 8px;font-size:12px" onclick="delCloudStu('+qs(s.name)+')">删除</button></td></tr>';
+   }).join('')+'</table>'
+   +'<div style="font-size:12px;color:var(--muted);margin-top:6px">共 '+list.length+' 名云端学员 · 查询时间 '+new Date(j.now).toLocaleString('zh-CN')+'</div>';
+ }catch(e){box.innerHTML='<span style="color:var(--bad)">查询失败：'+e.message+'</span>'}
+}
+async function delCloudStu(name){
+ if(!confirm('确定删除云端学员「'+name+'」？其账号与全部云端进度将被清除，不可恢复。'))return;
+ var key=get('et_admin_key','');
+ try{
+  var r=await fetch('/api/admin/delstudent',{method:'POST',cache:'no-store',headers:{'Content-Type':'application/json'},body:JSON.stringify({key:key,name:name})});
+  var j=await r.json();
+  if(!r.ok){alert('删除失败：'+(j.err||r.status));return}
+  loadCloudStu();
+ }catch(e){alert('删除失败：'+e.message)}
+}
+/* ==================== 我的班级 / 教师申请 / 教师管理 ==================== */
+function cloudTok(){return get('et_cloud_token',null)}
+function apiMe(){return fetch('/api/me',{headers:{'x-token':cloudTok()}}).then(function(r){if(!r.ok)throw new Error('401');return r.json()})}
+function renderMyClass(){
+  var box=document.getElementById('myClassBox');if(!box)return;
+  if(!cloudTok()){box.innerHTML='<div style="font-size:13px;color:var(--muted)">登录云端账号后，可凭班级邀请码加入班级、申请成为教师。<a href="javascript:openAuth()" style="color:var(--blue2)">去登录/注册</a></div>';return}
+  box.innerHTML='<span style="color:var(--muted);font-size:13px">加载中…</span>';
+  apiMe().then(function(me){
+    var h='';
+    if(me.role==='teacher'){
+      h+='<div style="font-size:13px;margin-bottom:8px">🎓 你已是<b>教师</b>。'+(me.cls?'当前班级：'+esc(me.cls.name)+'（'+me.cls.students+'人）':'')+'</div>'
+       +'<a class="btn sm" href="/teacher.html" target="_blank">进入教师后台（建班/看进度）</a>';
+    }else{
+      if(me.app){
+        var stTxt={pending:'⏳ 审核中',approved:'✅ 已通过',rejected:'❌ 未通过'}[me.app.status]||me.app.status;
+        h+='<div style="font-size:13px;margin-bottom:8px">教师申请状态：<b>'+stTxt+'</b>'+(me.app.reply?'（回复：'+esc(me.app.reply)+'）':'')+'</div>';
+      }
+      if(me.app&&me.app.status!=='pending'){
+        h+='<details style="font-size:13px;margin-bottom:8px"><summary style="color:var(--blue2);cursor:pointer">重新提交教师申请</summary>'
+         +'<input id="tOrg" placeholder="所在单位/学校（如：XX职校汽修教研室）" maxlength="50" style="margin-top:6px">'
+         +'<textarea id="tReason" rows="3" placeholder="申请理由：教学经验、带班需求等" style="width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:#0a1526;color:var(--txt);font-size:13px;margin-bottom:8px"></textarea>'
+         +'<button class="btn sm" onclick="applyTeacher()">提交申请</button></details>';
+      }else if(!me.app){
+        h+='<details style="font-size:13px;margin-bottom:8px"><summary style="color:var(--blue2);cursor:pointer">✍️ 申请成为教师（可创建班级、查看学生进度）</summary>'
+         +'<input id="tOrg" placeholder="所在单位/学校（如：XX职校汽修教研室）" maxlength="50" style="margin-top:6px">'
+         +'<textarea id="tReason" rows="3" placeholder="申请理由：教学经验、带班需求等" style="width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:#0a1526;color:var(--txt);font-size:13px;margin-bottom:8px"></textarea>'
+         +'<button class="btn sm" onclick="applyTeacher()">提交申请</button></details>';
+      }
+    }
+    h+='<hr style="border:none;border-top:1px dashed var(--line);margin:12px 0">';
+    if(me.cls){
+      h+='<div style="font-size:13px">🏫 我的班级：<b>'+esc(me.cls.name)+'</b>（教师：'+esc(me.cls.teacher)+'，'+me.cls.students+'名同学）　邀请码：<b style="color:var(--blue2);letter-spacing:2px">'+esc(me.cls.code)+'</b></div>'
+       +'<button class="btn gray sm" style="margin-top:8px" onclick="leaveClass()">退出该班级</button>';
+    }else{
+      h+='<div style="font-size:13px;color:var(--muted);margin-bottom:6px">还没有加入班级。向老师索取 6 位邀请码：</div>'
+       +'<div style="display:flex;gap:8px;flex-wrap:wrap"><input id="joinCode" placeholder="输入6位邀请码" maxlength="6" style="width:170px;letter-spacing:3px;margin-bottom:0">'
+       +'<button class="btn sm" onclick="joinClass()">加入班级</button></div>'
+       +'<div id="joinErr" style="font-size:12.5px;color:var(--bad);min-height:16px;margin-top:4px"></div>';
+    }
+    box.innerHTML=h;
+  }).catch(function(){box.innerHTML='<div style="font-size:13px;color:var(--muted)">云端账号状态失效，请重新登录。</div>'});
+}
+function joinClass(code){
+  var c=(code||document.getElementById('joinCode').value||'').trim().toUpperCase();
+  var err=document.getElementById('joinErr');
+  fetch('/api/class/join',{method:'POST',headers:{'Content-Type':'application/json','x-token':cloudTok()},body:JSON.stringify({code:c})})
+   .then(function(r){return r.json().then(function(j){if(!r.ok)throw new Error(j.err||r.status);return j})})
+   .then(function(){renderMyClass()})
+   .catch(function(e){if(err)err.textContent=e.message});
+}
+function leaveClass(){
+  if(!confirm('确定退出当前班级？'))return;
+  fetch('/api/class/leave',{method:'POST',headers:{'Content-Type':'application/json','x-token':cloudTok()},body:'{}'})
+   .then(function(){renderMyClass()});
+}
+function applyTeacher(){
+  var org=(document.getElementById('tOrg').value||'').trim(),reason=(document.getElementById('tReason').value||'').trim();
+  if(!reason){alert('请填写申请理由');return}
+  fetch('/api/teacher/apply',{method:'POST',headers:{'Content-Type':'application/json','x-token':cloudTok()},body:JSON.stringify({name:curUser()||'',org:org,reason:reason})})
+   .then(function(r){return r.json().then(function(j){if(!r.ok)throw new Error(j.err||r.status);return j})})
+   .then(function(){alert('申请已提交，请等待管理员审核');renderMyClass()})
+   .catch(function(e){alert('提交失败：'+e.message)});
+}
+/* ---------- 教师管理（管理密钥） ---------- */
+function renderTeacherAdmin(){
+  var box=document.getElementById('teacherAdminBox');if(!box)return;
+  var key=get('et_admin_key','');
+  if(!key){box.innerHTML='<div style="font-size:12.5px;color:var(--muted)">输入上方「云端学员」区的管理密钥后，此处自动加载教师申请与任命管理。</div>';return}
+  box.innerHTML='<span style="color:var(--muted);font-size:13px">加载中…</span>';
+  Promise.all([
+    fetch('/api/teacher/apps',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({key:key})}).then(function(r){return r.json()}),
+    fetch('/api/admin/students',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({key:key})}).then(function(r){return r.json()})
+  ]).then(function(rs){
+    var apps=(rs[0]&&rs[0].apps)||[],stus=(rs[1]&&rs[1].students)||[];
+    var pend=apps.filter(function(a){return a.status==='pending'});
+    var h='<div style="font-size:13px;margin-bottom:6px"><b>待审核申请（'+pend.length+'）</b></div>';
+    if(!pend.length)h+='<div style="font-size:12.5px;color:var(--muted);margin-bottom:10px">暂无待审核申请。</div>';
+    h+=pend.map(function(a){
+      return '<div style="border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:8px;font-size:13px">'
+       +'<b>'+esc(a.name||a.user)+'</b>（'+esc(a.user)+'）· '+esc(a.org||'未填单位')+' · '+esc(a.time||'').slice(0,10)
+       +'<div style="color:var(--muted);margin:4px 0">'+esc(a.reason)+'</div>'
+       +'<button class="btn sm" onclick="approveT('+qs(a.user)+',true)">✅ 通过并开通教师</button> '
+       +'<button class="btn gray sm" onclick="approveT('+qs(a.user)+',false)">拒绝</button></div>';
+    }).join('');
+    var doneApps=apps.filter(function(a){return a.status!=='pending'});
+    if(doneApps.length)h+='<div style="font-size:12px;color:var(--muted);margin:6px 0 10px">历史申请：'+doneApps.slice(0,5).map(function(a){return esc(a.user)+({approved:'✅',rejected:'❌'}[a.status]||a.status)}).join('　')+'</div>';
+    var teachers=stus.filter(function(s){return s.role==='teacher'});
+    h+='<div style="font-size:13px;margin:10px 0 6px"><b>现任教师（'+teachers.length+'）</b>：'+(teachers.map(function(s){return esc(s.name)}).join('、')||'无')+'</div>'
+     +'<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><input id="setRoleU" placeholder="用户名" maxlength="12" style="width:130px;margin-bottom:0">'
+     +'<button class="btn sm" onclick="setRoleT(\'teacher\')">任命为教师</button>'
+     +'<button class="btn gray sm" onclick="setRoleT(\'student\')">取消教师</button></div>'
+     +'<div id="roleErr" style="font-size:12.5px;color:var(--bad);min-height:16px;margin-top:4px"></div>';
+    box.innerHTML=h;
+  }).catch(function(e){box.innerHTML='<span style="color:var(--bad);font-size:13px">加载失败：'+e.message+'</span>'});
+}
+function approveT(user,ok){
+  var key=get('et_admin_key','');
+  fetch('/api/teacher/approve',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({key:key,user:user,ok:ok})})
+   .then(function(r){return r.json().then(function(j){if(!r.ok)throw new Error(j.err||r.status);return j})})
+   .then(function(){renderTeacherAdmin();loadCloudStu()})
+   .catch(function(e){alert('操作失败：'+e.message)});
+}
+function setRoleT(role){
+  var key=get('et_admin_key',''),u=(document.getElementById('setRoleU').value||'').trim();
+  if(!u)return;
+  fetch('/api/admin/setrole',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({key:key,user:u,role:role})})
+   .then(function(r){return r.json().then(function(j){if(!r.ok)throw new Error(j.err||r.status);return j})})
+   .then(function(){renderTeacherAdmin();loadCloudStu()})
+   .catch(function(e){document.getElementById('roleErr').textContent=e.message});
+}
+function exportData(){
+  var data={export_time:new Date().toISOString(),lessons_passed:passed(),exam_best:best*10,trainer_sessions:get(PTRN,0)};
+  var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='学习档案.json';a.click();
+}
+function resetAll(){if(confirm('确定清空本机全部学习数据？')){LS.clear();location.reload()}}
+
+function renderNews(){
+  var s=document.getElementById('updStamp');if(s)s.textContent=DATA_UPDATED;
+  var box=document.getElementById('newsBox');if(!box)return;
+  if(!NEWS.length){box.innerHTML='<span style="color:var(--muted)">暂无动态。自动更新流水线每周抓取行业新闻并生成新题。</span>';return}
+  box.innerHTML=NEWS.slice(0,5).map(function(n){return '<div style="padding:6px 0;border-bottom:1px dashed var(--line)">🔹 <b>'+n.title+'</b><br><span style="color:var(--muted);font-size:12px">'+n.date+' · '+(n.point||'')+'</span></div>'}).join('');
+}
+renderNews();
+
+/* ==================== PWA ==================== */
+if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){r.unregister()})});if(window.caches){caches.keys().then(function(ks){ks.forEach(function(k){caches.delete(k)})})}}
+</script>
+<script src="study.js"></script>
+</body>
+</html>

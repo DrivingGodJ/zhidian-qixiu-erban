@@ -1,0 +1,2691 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>智电维修工坊 · 3D维修实训游戏</title>
+<style>
+:root{--blue:#0b3d91;--blue2:#1266f1;--orange:#ff8a14;--bg:#070d1a;--panel:rgba(13,24,44,.94);--line:#274264;--txt:#e8f2ff;--sub:#9fc2ef}
+*{margin:0;padding:0;box-sizing:border-box;user-select:none;-webkit-user-select:none}
+body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;background:radial-gradient(1200px 700px at 50% 0%,#0d2140 0%,var(--bg) 70%);color:var(--txt);height:100vh;display:flex;flex-direction:column;overflow:hidden}
+button{font:inherit;cursor:pointer}
+.topbar{display:flex;align-items:center;gap:14px;padding:10px 18px;background:rgba(9,16,32,.9);border-bottom:1px solid var(--line);flex-wrap:wrap}
+.topbar .logo{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--blue2),var(--blue));display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(18,102,241,.5)}
+.topbar .logo svg{width:22px;height:22px}
+.topbar h1{font-size:17px;letter-spacing:1px}
+.topbar h1 small{font-size:11px;color:var(--sub);font-weight:400;margin-left:8px;letter-spacing:2px}
+.chip{font-size:12px;padding:4px 12px;border-radius:20px;border:1px solid var(--line);background:var(--panel);color:var(--sub)}
+.chip.bad{color:#ff6b5e;border-color:#5a2b26}
+#backBtn{padding:5px 14px;border-radius:18px;border:1px solid var(--line);background:var(--panel);color:var(--sub);font-size:12.5px;transition:.15s}
+#backBtn:hover{color:#fff;border-color:#3d7fe0}
+.steps{display:flex;gap:5px;margin-left:auto;align-items:center}
+.dot{width:11px;height:11px;border-radius:50%;background:#1a3050;border:1px solid #2c4a77;transition:.3s}
+.dot.on{background:var(--orange);box-shadow:0 0 10px rgba(255,138,20,.8);border-color:var(--orange)}
+.dot.cur{transform:scale(1.35);border-color:#fff}
+.stat{font-size:12.5px;color:var(--sub);font-variant-numeric:tabular-nums}
+.stat b{color:#fff}
+.main{flex:1;display:flex;min-height:0}
+.stage{flex:1;position:relative;min-width:0}
+.stage canvas{display:block}
+.objective{position:absolute;left:50%;top:12px;transform:translateX(-50%);font-size:14px;font-weight:600;color:#ffe9cf;background:rgba(40,24,6,.88);border:1px solid #7a4a12;padding:8px 22px;border-radius:22px;box-shadow:0 4px 14px rgba(0,0,0,.4);white-space:nowrap;max-width:92%;overflow:hidden;text-overflow:ellipsis}
+.objective b{color:var(--orange)}
+.hud{width:290px;border-left:1px solid var(--line);background:rgba(9,16,32,.75);padding:14px;display:flex;flex-direction:column;gap:12px;overflow-y:auto}
+.hud h3{font-size:14px;color:#fff;border-left:3px solid var(--orange);padding-left:8px}
+.order{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px;font-size:12.5px;line-height:1.8;color:var(--sub)}
+.order b{color:#ffb35e}
+.order .done-step{color:#35d07f}
+.meter{background:#0a1424;border:1px solid var(--line);border-radius:12px;padding:12px;display:none}
+.meter.show{display:block;animation:pop .3s}
+.meter .val{font-size:26px;font-weight:800;color:#ff6b5e;font-variant-numeric:tabular-nums}
+.meter .val.ok{color:#35d07f}
+.meter .lbl{font-size:12px;color:var(--sub);margin-top:4px}
+.hintbox{font-size:12.5px;line-height:1.7;color:#cfe6ff;background:rgba(21,34,58,.8);border:1px solid var(--line);border-radius:12px;padding:10px 12px;min-height:58px}
+.hintbox b{color:var(--orange)}
+@keyframes pop{from{transform:scale(.92);opacity:0}to{transform:scale(1);opacity:1}}
+.tray{display:flex;gap:10px;padding:12px 14px;background:rgba(9,16,32,.92);border-top:1px solid var(--line);overflow-x:auto;align-items:stretch}
+.tool{flex:none;width:104px;background:var(--panel);border:2px solid var(--line);border-radius:14px;padding:8px 6px 7px;text-align:center;cursor:grab;transition:transform .15s,box-shadow .15s,border-color .15s;position:relative}
+.tool:hover{transform:translateY(-4px);box-shadow:0 8px 20px rgba(61,127,224,.4);border-color:#3d7fe0}
+.tool.sel{border-color:var(--orange);box-shadow:0 0 16px rgba(255,138,20,.55);transform:translateY(-4px)}
+.tool img{width:76px;height:56px;display:block;margin:0 auto;pointer-events:none}
+.tool .nm{font-size:12px;color:var(--txt);margin-top:4px;font-weight:600}
+.tray-title{flex:none;align-self:center;font-size:12px;color:var(--sub);padding-right:4px}
+.tray-title b{display:block;color:#fff;font-size:13px}
+#helpBtn{flex:none;align-self:center;margin-left:auto;padding:12px 18px;border-radius:14px;border:2px solid #7a4a12;background:linear-gradient(135deg,#a35a10,#7a3d08);color:#ffe9cf;font-weight:700;font-size:14px;white-space:nowrap;transition:transform .15s,filter .15s}
+#helpBtn:hover{transform:translateY(-3px);filter:brightness(1.2)}
+#helpBtn:disabled{opacity:.5;pointer-events:none}
+.overlay{position:fixed;inset:0;z-index:50;background:rgba(4,8,18,.82);display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);overflow-y:auto}
+.overlay.hide{display:none}
+.panel{background:linear-gradient(160deg,#0e1c36,#0a1424);border:1px solid #2c4a77;border-radius:18px;padding:30px 34px;max-width:520px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.6);animation:pop .35s}
+.panel h2{font-size:22px;color:#fff;margin-bottom:14px}
+.panel h2 .em{color:var(--orange)}
+.panel p{font-size:14px;line-height:2;color:var(--sub)}
+.panel p b{color:#ffd9a8}
+.bigbtn{margin-top:20px;width:100%;padding:14px;border-radius:12px;border:1px solid #3d7fe0;background:linear-gradient(135deg,var(--blue2),var(--blue));color:#fff;font-size:16px;font-weight:700;letter-spacing:2px;transition:transform .15s,filter .15s}
+.bigbtn:hover{transform:translateY(-2px);filter:brightness(1.15)}
+.bigbtn.ghost{background:var(--panel);border-color:var(--line);color:var(--sub);margin-top:10px}
+.stars{font-size:44px;text-align:center;letter-spacing:10px;margin:8px 0}
+.stars .s{color:#3a4f74}.stars .s.on{color:#ffc531;text-shadow:0 0 22px rgba(255,197,49,.8)}
+.result-row{display:flex;justify-content:space-around;font-size:13px;color:var(--sub);margin:12px 0;text-align:center}
+.result-row b{display:block;font-size:20px;color:#fff}
+.toast{position:fixed;left:50%;bottom:118px;transform:translateX(-50%) translateY(20px);background:rgba(50,16,10,.95);border:1px solid #a03d2c;color:#ffd3c9;padding:10px 22px;border-radius:12px;font-size:13.5px;opacity:0;transition:.3s;z-index:60;pointer-events:none;max-width:80%}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.good{background:rgba(8,44,28,.95);border-color:#1d7a4c;color:#b9f4d4}
+/* 关卡选择 */
+.hub-panel{max-width:860px}
+.hub-sub{font-size:13px;color:var(--sub);margin-bottom:16px;line-height:1.8}
+.lv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.lv-card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 12px;cursor:pointer;transition:.18s;position:relative;overflow:hidden}
+.lv-card:hover{transform:translateY(-4px);border-color:#3d7fe0;box-shadow:0 10px 24px rgba(18,102,241,.35)}
+.lv-card .bar{height:4px;border-radius:2px;margin-bottom:10px}
+.lv-card h4{font-size:14.5px;color:#fff;margin-bottom:6px}
+.lv-card p{font-size:11.5px;color:var(--sub);line-height:1.6;min-height:36px}
+.lv-card .rec{position:absolute;top:10px;right:10px;font-size:12px;color:#ffc531;letter-spacing:1px}
+@media(max-width:760px){
+  .hud{display:none}
+  .tool{width:88px}.tool img{width:64px;height:48px}
+  .topbar h1 small{display:none}
+  #helpBtn{padding:10px 12px;font-size:12px}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo"><svg viewBox="0 0 24 24" fill="none"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z" fill="#ffd166"/></svg></div>
+  <h1>智电维修工坊<small id="lvLabel">3D 维修实训</small></h1>
+  <button id="backBtn" onclick="showHub()" style="display:none">返回关卡列表</button>
+  <span class="chip bad" id="statusChip">故障待修</span>
+  <div class="steps" id="stepDots"></div>
+  <span class="stat">失误 <b id="mist">0</b></span>
+  <span class="stat">用时 <b id="timer">00:00</b></span>
+</div>
+
+<div class="main">
+  <div class="stage" id="stage">
+    <div class="objective" id="objective">选择一个关卡开始维修</div>
+  </div>
+  <div class="hud">
+    <h3>故障工单</h3>
+    <div class="order" id="orderBox">
+      <div id="orderBody"></div>
+      <div id="orderDone" style="margin-top:6px"></div>
+    </div>
+    <h3>测量读数</h3>
+    <div class="meter" id="meter"><div class="val" id="meterVal">--</div><div class="lbl" id="meterLbl"></div></div>
+    <h3>师傅提示</h3>
+    <div class="hintbox" id="hint">高压作业讲规程：从道具栏挑工具，拖到零件上使用。卡住就点「师傅帮助」，师傅亲手演示。</div>
+  </div>
+</div>
+
+<div class="tray" id="tray">
+  <div class="tray-title"><b>道具栏</b>乱序摆放 · 拖拽或点选</div>
+</div>
+
+<div class="overlay" id="hub">
+  <div class="panel hub-panel">
+    <h2>选择维修关卡 <span class="em">整车 15 大部件</span></h2>
+    <p class="hub-sub">每个关卡对应整车 3D 模型中的一个真实部件：一件待修零件、一组乱序工具、一条标准维修工艺。选错工具记失误，修好按失误数评星。</p>
+    <div class="lv-grid" id="lvGrid"></div>
+  </div>
+</div>
+
+<div class="overlay hide" id="intro">
+  <div class="panel">
+    <h2 id="introTitle"></h2>
+    <p id="introBody"></p>
+    <button class="bigbtn" id="startBtn">开始维修</button>
+    <button class="bigbtn ghost" onclick="showHub()">换个关卡</button>
+  </div>
+</div>
+
+<div class="overlay hide" id="result">
+  <div class="panel">
+    <h2 id="resultTitle">维修完成</h2>
+    <div class="stars" id="stars"><span class="s">★</span><span class="s">★</span><span class="s">★</span></div>
+    <div class="result-row">
+      <div><b id="rTime">--</b>用时</div>
+      <div><b id="rMist">0</b>失误</div>
+      <div><b id="rSteps">--</b>工序</div>
+    </div>
+    <p id="resultText" style="text-align:center"></p>
+    <button class="bigbtn" id="retryBtn">再修一次</button>
+    <button class="bigbtn ghost" onclick="showHub()">返回关卡列表</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="importmap">{"imports":{"three":"./three.module.js"}}</script>
+<script type="module">
+import * as THREE from 'three';
+
+/* ================= 基础场景 ================= */
+const stage=document.getElementById('stage');
+const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+stage.appendChild(renderer.domElement);
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(42,1,0.1,100);
+camera.position.set(3.4,2.1,4.6);
+camera.lookAt(0,0.35,0);
+scene.add(new THREE.HemisphereLight(0xbcd7ff,0x1a2436,1.0));
+const keyL=new THREE.DirectionalLight(0xffffff,1.6);keyL.position.set(4,6,5);scene.add(keyL);
+const rim=new THREE.DirectionalLight(0x3d8bff,1.1);rim.position.set(-5,3,-4);scene.add(rim);
+function resize(){const w=stage.clientWidth,h=stage.clientHeight;renderer.setSize(w,h);camera.aspect=w/h;camera.updateProjectionMatrix()}
+addEventListener('resize',resize);resize();
+const grid=new THREE.GridHelper(14,28,0x1d3a66,0x12233f);scene.add(grid);
+const bench=new THREE.Mesh(new THREE.CylinderGeometry(2.5,2.6,0.12,48),new THREE.MeshStandardMaterial({color:0x12264a,metalness:.6,roughness:.5}));
+bench.position.y=-0.06;scene.add(bench);
+
+/* ================= 材质 ================= */
+const M={
+  metal:new THREE.MeshStandardMaterial({color:0x9fb2c8,metalness:.85,roughness:.35}),
+  dark:new THREE.MeshStandardMaterial({color:0x39465a,metalness:.7,roughness:.5}),
+  copper:new THREE.MeshStandardMaterial({color:0xd97a3a,metalness:.9,roughness:.3,emissive:0x2a0e00,emissiveIntensity:.35}),
+  copperBurnt:new THREE.MeshStandardMaterial({color:0x3a2a22,metalness:.5,roughness:.85}),
+  copperWarm:new THREE.MeshStandardMaterial({color:0x8a5a3a,metalness:.8,roughness:.5}),
+  orange:new THREE.MeshStandardMaterial({color:0xff7a1a,metalness:.4,roughness:.4}),
+  rubber:new THREE.MeshStandardMaterial({color:0xffc21a,metalness:.1,roughness:.7}),
+  shell:new THREE.MeshStandardMaterial({color:0x7f9cc4,metalness:.9,roughness:.25,transparent:true,opacity:.26,side:THREE.DoubleSide,depthWrite:false}),
+  red:new THREE.MeshStandardMaterial({color:0xd93a2e,metalness:.3,roughness:.5}),
+  screen:new THREE.MeshStandardMaterial({color:0x0a1a2e,emissive:0x1d5c46,emissiveIntensity:.9,roughness:.3}),
+  blue:new THREE.MeshStandardMaterial({color:0x2f6fd0,metalness:.5,roughness:.4}),
+  green:new THREE.MeshStandardMaterial({color:0x2ea36a,metalness:.4,roughness:.5}),
+  white:new THREE.MeshStandardMaterial({color:0xdfe8f2,metalness:.3,roughness:.5}),
+  liquid:new THREE.MeshStandardMaterial({color:0x38b6e8,metalness:.1,roughness:.2,transparent:true,opacity:.85}),
+};
+
+/* ================= 道具 3D 建模 ================= */
+function buildTool(id){
+  const g=new THREE.Group();
+  const add=(geo,mat,x=0,y=0,z=0,rx=0,ry=0,rz=0)=>{const m=new THREE.Mesh(geo,mat);m.position.set(x,y,z);m.rotation.set(rx,ry,rz);g.add(m);return m};
+  switch(id){
+    case 'poweroff': /* 验电笔 */
+      add(new THREE.CylinderGeometry(0.05,0.05,0.55,16),M.red,0,0.1,0);
+      add(new THREE.CylinderGeometry(0.03,0.012,0.18,12),M.metal,0,-0.26,0);
+      add(new THREE.CylinderGeometry(0.052,0.052,0.1,16),M.dark,0,0.4,0);
+      add(new THREE.BoxGeometry(0.02,0.12,0.06),M.metal,0.055,0.15,0);
+      break;
+    case 'gloves': { /* 绝缘手套（一双） */
+      [-0.22,0.22].forEach(dx=>{
+        add(new THREE.BoxGeometry(0.24,0.3,0.1),M.rubber,dx,0,0);
+        for(let f=0;f<4;f++)add(new THREE.CapsuleGeometry(0.032,0.2,4,8),M.rubber,dx-0.085+f*0.056,0.26,0);
+        add(new THREE.CapsuleGeometry(0.035,0.16,4,8),M.rubber,dx+0.15,0.06,0,0,0,-0.7);
+        add(new THREE.CylinderGeometry(0.13,0.15,0.12,16),M.rubber,dx,-0.2,0);
+      });
+      break;}
+    case 'wrench': /* 绝缘扳手 */
+      add(new THREE.BoxGeometry(0.14,0.62,0.05),M.metal,0,0,0);
+      add(new THREE.TorusGeometry(0.11,0.045,10,24,Math.PI*1.35),M.metal,0,0.36,0);
+      add(new THREE.TorusGeometry(0.11,0.045,10,24,Math.PI*1.35),M.metal,0,-0.36,0,0,0,Math.PI);
+      add(new THREE.BoxGeometry(0.16,0.2,0.06),M.orange,0,-0.05,0);
+      break;
+    case 'torque': /* 扭力扳手 */
+      add(new THREE.CylinderGeometry(0.035,0.045,0.85,12),M.metal,0,0,0);
+      add(new THREE.CylinderGeometry(0.14,0.14,0.09,24),M.white,0,0.45,0);
+      add(new THREE.CylinderGeometry(0.11,0.11,0.1,24),M.red,0,0.45,0);
+      add(new THREE.BoxGeometry(0.1,0.22,0.08),M.dark,0,-0.42,0);
+      break;
+    case 'meter': { /* 万用表 + 表笔 */
+      add(new THREE.BoxGeometry(0.42,0.55,0.14),M.dark,0,0,0);
+      add(new THREE.BoxGeometry(0.3,0.2,0.02),M.screen,0,0.12,0.075);
+      add(new THREE.CylinderGeometry(0.09,0.09,0.05,20),M.rubber,0,-0.13,0.075,Math.PI/2,0,0);
+      const pr1=add(new THREE.CylinderGeometry(0.014,0.014,0.5,8),M.red,0.34,0.05,0,0,0,-0.5);
+      const pr2=add(new THREE.CylinderGeometry(0.014,0.014,0.5,8),M.dark,-0.34,0.05,0,0,0,0.5);
+      add(new THREE.ConeGeometry(0.018,0.08,8),M.metal,0.46,-0.18,0,0,0,-0.5);
+      add(new THREE.ConeGeometry(0.018,0.08,8),M.metal,-0.46,-0.18,0,0,0,0.5);
+      break;}
+    case 'diag': { /* 诊断仪 */
+      add(new THREE.BoxGeometry(0.5,0.34,0.06),M.dark,0,0,0);
+      add(new THREE.BoxGeometry(0.42,0.26,0.02),M.screen,0,0,0.035);
+      add(new THREE.CylinderGeometry(0.02,0.02,0.5,8),M.orange,0.32,-0.2,0,0,0,0.6);
+      break;}
+    case 'heatgun': /* 热风枪 */
+      add(new THREE.CylinderGeometry(0.09,0.11,0.42,16),M.dark,0,0.16,0);
+      add(new THREE.CylinderGeometry(0.11,0.075,0.16,16),M.metal,0,0.45,0);
+      add(new THREE.BoxGeometry(0.1,0.26,0.12),M.dark,0,-0.14,0.02);
+      add(new THREE.CylinderGeometry(0.02,0.02,0.3,8),M.red,0,-0.32,0.02);
+      break;
+    case 'paint': { /* 绝缘漆刷 + 漆罐 */
+      add(new THREE.CylinderGeometry(0.05,0.05,0.5,12),M.orange,0,0.05,0);
+      add(new THREE.CylinderGeometry(0.055,0.045,0.1,12),M.metal,0,0.33,0);
+      add(new THREE.ConeGeometry(0.05,0.16,10),M.copper,0,-0.26,0,Math.PI,0,0);
+      add(new THREE.CylinderGeometry(0.12,0.12,0.24,16),M.metal,0.32,-0.18,0);
+      add(new THREE.CylinderGeometry(0.105,0.105,0.02,16),M.copper,0.32,-0.06,0);
+      break;}
+    case 'megger': { /* 兆欧表（摇表） */
+      add(new THREE.BoxGeometry(0.46,0.5,0.2),M.red,0,0,0);
+      add(new THREE.CylinderGeometry(0.13,0.13,0.02,24),M.screen,0,0.06,0.105,Math.PI/2,0,0);
+      add(new THREE.BoxGeometry(0.05,0.05,0.12),M.metal,-0.12,-0.14,0.12);
+      add(new THREE.BoxGeometry(0.05,0.05,0.12),M.metal,0.12,-0.14,0.12);
+      const crank=add(new THREE.BoxGeometry(0.3,0.04,0.04),M.dark,0,0.36,0);
+      add(new THREE.CylinderGeometry(0.03,0.03,0.12,10),M.rubber,0.17,0.36,0,0,0,Math.PI/2);
+      g.userData.crank=crank;
+      break;}
+    case 'fill': { /* 加注器（漏斗+油壶） */
+      add(new THREE.ConeGeometry(0.18,0.22,20,1,true),M.green,0,0.25,0,Math.PI,0,0);
+      add(new THREE.CylinderGeometry(0.03,0.03,0.2,10),M.green,0,0.06,0);
+      add(new THREE.CylinderGeometry(0.13,0.15,0.34,16),M.white,0.32,-0.12,0);
+      add(new THREE.CylinderGeometry(0.02,0.02,0.4,8),M.blue,0.16,-0.1,0,0,0,1.1);
+      break;}
+    case 'vac': { /* 真空抽注机 */
+      add(new THREE.BoxGeometry(0.5,0.4,0.34),M.blue,0,0,0);
+      add(new THREE.CylinderGeometry(0.1,0.1,0.03,20),M.white,0.12,0.1,0.18,Math.PI/2,0,0);
+      add(new THREE.CylinderGeometry(0.02,0.02,0.55,8),M.dark,-0.3,0.1,0,0,0,1.2);
+      break;}
+    case 'clamp': { /* 压线钳 */
+      add(new THREE.BoxGeometry(0.08,0.5,0.06),M.red,-0.06,-0.1,0,0,0,0.12);
+      add(new THREE.BoxGeometry(0.08,0.5,0.06),M.red,0.06,-0.1,0,0,0,-0.12);
+      add(new THREE.BoxGeometry(0.16,0.14,0.08),M.metal,0,0.2,0);
+      break;}
+    case 'cleaner': { /* 清洁剂喷壶 */
+      add(new THREE.CylinderGeometry(0.12,0.13,0.3,16),M.white,0,-0.1,0);
+      add(new THREE.CylinderGeometry(0.04,0.04,0.1,10),M.blue,0,0.1,0);
+      add(new THREE.BoxGeometry(0.16,0.06,0.05),M.blue,0.08,0.15,0);
+      break;}
+  }
+  return g;
+}
+
+/* 道具图标：离屏渲染为 PNG */
+const iconR=new THREE.WebGLRenderer({alpha:true,antialias:true});
+iconR.setSize(190,140);
+const iconCam=new THREE.PerspectiveCamera(30,190/140,0.1,50);
+function toolIcon(id){
+  const m=buildTool(id);
+  const s=new THREE.Scene();
+  s.add(new THREE.HemisphereLight(0xd8e8ff,0x2a3648,1.6));
+  const d=new THREE.DirectionalLight(0xffffff,1.4);d.position.set(2.5,4,3);s.add(d);
+  const b=new THREE.Box3().setFromObject(m);
+  const c=b.getCenter(new THREE.Vector3()),sz=b.getSize(new THREE.Vector3());
+  const sc=1.9/Math.max(sz.x,sz.y,sz.z);
+  m.scale.setScalar(sc);m.position.sub(c.clone().multiplyScalar(sc));
+  m.rotation.set(0.25,0.65,0);
+  s.add(m);
+  iconCam.position.set(0,0,2.6);iconCam.lookAt(0,0,0);
+  iconR.render(s,iconCam);
+  const url=iconR.domElement.toDataURL();
+  m.traverse(o=>{if(o.geometry)o.geometry.dispose()});
+  return url;
+}
+/* ================= 共享粒子特效 ================= */
+function puffTexture(){
+  const c=document.createElement('canvas');c.width=c.height=64;
+  const g=c.getContext('2d');const gr=g.createRadialGradient(32,32,2,32,32,30);
+  gr.addColorStop(0,'rgba(200,200,210,.85)');gr.addColorStop(1,'rgba(200,200,210,0)');
+  g.fillStyle=gr;g.fillRect(0,0,64,64);return new THREE.CanvasTexture(c);
+}
+const puffTex=puffTexture();
+const sparkTex=(()=>{const c=document.createElement('canvas');c.width=c.height=32;const g=c.getContext('2d');const gr=g.createRadialGradient(16,16,1,16,16,15);gr.addColorStop(0,'rgba(255,240,200,1)');gr.addColorStop(.4,'rgba(255,160,50,.9)');gr.addColorStop(1,'rgba(255,120,20,0)');g.fillStyle=gr;g.fillRect(0,0,32,32);return new THREE.CanvasTexture(c);})();
+function pool(n,matOpt){const arr=[];for(let i=0;i<n;i++){const sp=new THREE.Sprite(new THREE.SpriteMaterial(Object.assign({map:puffTex,transparent:true,opacity:0,depthWrite:false},matOpt)));sp.userData={t:Math.random()*2};scene.add(sp);arr.push(sp)}return arr}
+const smokes=pool(26);
+const sparks=pool(10,{map:sparkTex});
+const drops=pool(22,{map:sparkTex,color:0x38b6e8});
+const heats=pool(16,{color:0xff9040});
+const glowL=new THREE.PointLight(0xff5030,0,5);scene.add(glowL);
+const arcL=new THREE.PointLight(0x9fd0ff,0,5);scene.add(arcL);
+let heatOn=false;
+const heatL=new THREE.PointLight(0xff8030,0,5);scene.add(heatL);
+function heatLight(p,i){heatL.position.copy(p);heatL.intensity=i}
+function arcFlash(p){
+  arcL.intensity=2+Math.random()*3;
+  for(let i=0;i<3;i++){const s=sparks[i];s.position.set(p.x+(Math.random()-.5)*.12,p.y+(Math.random()-.5)*.12,p.z+(Math.random()-.5)*.12);s.material.opacity=1;s.scale.setScalar(0.14+Math.random()*0.1);}
+}
+function ease(u){u=Math.max(0,Math.min(1,u));return 1-(1-u)**3}
+
+/* ================= 关卡建模助手 ================= */
+function P(parent,geo,mat,x=0,y=0,z=0,rx=0,ry=0,rz=0){const m=new THREE.Mesh(geo,mat);m.position.set(x,y,z);m.rotation.set(rx,ry,rz);parent.add(m);return m}
+function anchor(parent,name,bag,x,y,z){const o=new THREE.Object3D();o.position.set(x,y,z);parent.add(o);bag[name]=o;return o}
+const V3=(x,y,z)=>new THREE.Vector3(x,y,z);
+const wp=o=>o.getWorldPosition(new THREE.Vector3());
+
+/* ================= 18 个关卡定义 ================= */
+const LEVELS=[
+
+/* ---------- 第一关 驱动电机 ---------- */
+{
+ id:'motor',name:'驱动电机',color:'#f97316',no:'第一关',
+ title:'驱动电机 · 绝缘故障',
+ introP:'客户车辆报修：行驶中有焦糊味，READY 灯闪烁、动力受限。台上是拆下的驱动电机——接线盒还在冒烟打火，绕组局部已经烧焦变色。道具栏乱序摆放，自己判断工具与顺序。',
+ order:'车型：纯电轿车（驱动电机 120kW）<br>现象：<b>行驶焦糊味，READY 灯间歇闪烁，动力受限</b><br>读码：电机控制器报 <b>「旋变信号异常 / 绝缘过低」</b><br>初步判断：电机绕组受潮，绝缘下降',
+ tools:[
+  {id:'poweroff',obj:'断电验电：确认无电'},
+  {id:'gloves',obj:'穿戴防护：绝缘手套'},
+  {id:'wrench',obj:'拆卸高压连接器'},
+  {id:'meter',obj:'测量绕组绝缘阻值'},
+  {id:'heatgun',obj:'低温烘干受潮绕组'},
+  {id:'paint',obj:'修复绝缘：涂刷绝缘漆'},
+  {id:'megger',obj:'复测绝缘，验收合格'},
+ ],
+ steps:[
+  {tool:'poweroff',at:'conn',say:'好，先验电！笔尖搭上去——确认无电才能动手，这是铁律。',done:(c)=>{c.live=false;addOrderDone('验电确认无电')}},
+  {tool:'gloves',at:'body',say:'防护到位。绝缘手套戴好，下面才开始拆。',done:()=>addOrderDone('绝缘手套已穿戴')},
+  {tool:'wrench',at:'conn',say:'高压连接器已断开。注意橙色线束全程不能硬拽。',done:(c)=>{c.moveConn(1);addOrderDone('高压连接器已断开')}},
+  {tool:'meter',say:'读数出来了：绕组对壳绝缘只有 0.18MΩ，远低于 5MΩ 合格线——确实受潮。',done:()=>{showMeter('0.18 MΩ','绕组对壳绝缘 · 合格线 ≥ 5 MΩ → 不合格',false);addOrderDone('绝缘实测 0.18 MΩ（不合格）')}},
+  {tool:'heatgun',at:'windRear',say:'低温烘干中……温度别超过 80℃，把潮气慢慢逼出来。',done:(c)=>{c.warm();addOrderDone('绕组已烘干')}},
+  {tool:'paint',at:'windRear',say:'绝缘漆把绕组本色恢复。烧焦痕迹也一并打磨掉了。',done:(c)=>{c.restore();addOrderDone('绝缘漆修复完成')}},
+  {tool:'wrench',at:'conn',say:'连接器复装到位，螺栓力矩达标。',done:(c)=>{c.moveConn(0);addOrderDone('连接器已复装')}},
+  {tool:'megger',say:'摇表复测 52MΩ，绝缘合格！上电试车——',done:()=>{showMeter('52 MΩ','绕组对壳绝缘复测 → 合格',true);addOrderDone('绝缘复测 52 MΩ（合格）')}},
+ ],
+ build(){
+  const g=new THREE.Group();g.position.y=1.15;scene.add(g);
+  const L=1.9,R=1.05;
+  P(g,new THREE.CylinderGeometry(R,R,L,48,1,true),M.shell,0,0,0,0,0,Math.PI/2);
+  for(let i=0;i<14;i++){const a=i/14*Math.PI*2;P(g,new THREE.BoxGeometry(L*0.94,0.07,0.16),M.metal,0,Math.cos(a)*(R+0.045),Math.sin(a)*(R+0.045),-a,0,0)}
+  [-1,1].forEach(s=>{
+    P(g,new THREE.CylinderGeometry(R*0.98,R*0.98,0.14,48),M.metal,s*(L/2+0.07),0,0,0,0,Math.PI/2);
+    for(let i=0;i<6;i++){const a=i/6*Math.PI*2;P(g,new THREE.CylinderGeometry(0.05,0.05,0.1,6),M.dark,s*(L/2+0.14),Math.cos(a)*R*0.8,Math.sin(a)*R*0.8,-a,0,Math.PI/2)}
+  });
+  P(g,new THREE.CylinderGeometry(0.11,0.11,0.62,24),M.metal,L/2+0.42,0,0,0,0,Math.PI/2);
+  P(g,new THREE.BoxGeometry(0.5,0.05,0.08),M.dark,L/2+0.42,0.13,0);
+  P(g,new THREE.CylinderGeometry(0.78,0.78,1.5,36,1,true),new THREE.MeshStandardMaterial({color:0x2b4a5e,metalness:.6,roughness:.6,side:THREE.DoubleSide}),0,0,0,0,0,Math.PI/2);
+  const windings=[];
+  [-1,1].forEach((s,si)=>{for(let i=0;i<12;i++){const a=i/12*Math.PI*2;
+    const w=P(g,new THREE.BoxGeometry(0.34,0.2,0.13),M.copper,s*0.72,Math.cos(a)*0.62,Math.sin(a)*0.62,-a);
+    w.userData={burnt:(si===1&&i>=3&&i<=5),angle:a};
+    if(w.userData.burnt)w.material=M.copperBurnt;
+    windings.push(w)}});
+  const rotor=P(g,new THREE.CylinderGeometry(0.32,0.32,1.7,24),new THREE.MeshStandardMaterial({color:0xc9d4e2,metalness:.95,roughness:.2}),0,0,0,0,0,Math.PI/2);
+  const rotorShaft=P(g,new THREE.CylinderGeometry(0.09,0.09,2.9,16),M.metal,0,0,0,0,0,Math.PI/2);
+  const mst={fin:false};
+  P(g,new THREE.BoxGeometry(0.55,0.32,0.7),M.dark,0.15,R+0.16,0);
+  const connector=new THREE.Group();
+  P(connector,new THREE.CylinderGeometry(0.11,0.13,0.4,20),M.orange,0,0.2,0);
+  const latch=P(connector,new THREE.BoxGeometry(0.2,0.1,0.16),M.orange,0,0.44,0);
+  connector.position.set(0.15,R+0.32,0);g.add(connector);
+  const cable=P(g,new THREE.TubeGeometry(new THREE.CatmullRomCurve3([V3(0.15,R+0.32,0),V3(0.4,R+0.75,0.35),V3(1.1,0.7,1.5),V3(1.6,0.25,2.0)]),32,0.045,8),M.orange);
+  const burn=P(g,new THREE.CircleGeometry(0.28,24),new THREE.MeshBasicMaterial({color:0x120a06,transparent:true,opacity:.75}),0.15,R+0.02,0.21,-Math.PI/2+0.35,0,0);
+  const A={};anchor(g,'conn',A,0.15,R+0.85,0);anchor(g,'windRear',A,-1.35,0.75,0.55);anchor(g,'windFront',A,1.35,0.75,0.55);anchor(g,'body',A,0,0.2,1.5);anchor(g,'main',A,0,R+0.6,0);anchor(g,'probeA',A,1.35,0.75,0.55);anchor(g,'probeB',A,-1.35,0.75,0.55);
+  return {g,A,live:true,smokeOn:true,smokeAt:'conn',sparkAt:'conn',
+    moveConn:out=>{connector.position.x=out?0.15-0.5:0.15;connector.position.y=out?R+0.44:R+0.32;cable.visible=!out},
+    warm:()=>windings.forEach(w=>{if(w.userData.burnt)w.material=M.copperWarm}),
+    restore:()=>windings.forEach(w=>{w.userData.burnt=false;w.material=M.copper;burn.material.opacity=0}),
+    stepFx:(i,lu,dt,f)=>{ if(i===2){latch.rotation.y+=dt*8;if(lu>0.5){const k=Math.min(1,(lu-0.5)/0.4);connector.position.x=(0.15-0.5*k);connector.position.y=(R+0.32+0.12*k);cable.visible=lu<0.55}}
+      if(i===5){const p=wp(A.windRear);const ang=-0.9+lu*1.9;f.m.position.set(p.x+Math.cos(ang)*0.25,p.y+Math.sin(ang)*0.5,p.z+Math.cos(ang)*0.45);
+        windings.forEach(w=>{if(w.userData.burnt){const wa=Math.atan2(w.position.z,w.position.y);if(Math.abs(wa-0.6)<0.42&&w.position.x<0)w.material=M.copper}})} },
+    tick:(dt,t)=>{if(!mst.fin){rotor.rotation.x+=dt*0.4;rotorShaft.rotation.x+=dt*0.4}},
+    finishTick:(dt)=>{rotor.rotation.x+=dt*8;rotorShaft.rotation.x+=dt*8},
+    _setFin:()=>{mst.fin=true}};
+ },
+},
+/* ---------- 第二关 动力电池包 ---------- */
+{
+ id:'battery',name:'动力电池包',color:'#3b82f6',no:'第二关',
+ title:'动力电池包 · 冷却液渗漏',
+ introP:'车辆行驶中仪表点亮电池故障灯并提示「请检查高压系统」，冷却液液位持续下降。拆检发现液冷管路接头渗漏，冷却液已渗入电池包边缘，BMS 报绝缘过低。',
+ order:'车型：纯电 SUV（底盘中置电池包）<br>现象：<b>电池故障灯亮，仪表提示检查高压系统，冷却液缓慢减少</b><br>读码：BMS 报 <b>「绝缘电阻过低 / 冷却回路故障」</b><br>初步判断：液冷管路接头渗漏，冷却液进入电池舱',
+ tools:[
+  {id:'diag',obj:'读取 BMS 数据流定位故障'},
+  {id:'poweroff',obj:'高压下电，验电确认'},
+  {id:'gloves',obj:'穿戴高压防护装备'},
+  {id:'wrench',obj:'处理渗漏接头，更换密封圈'},
+  {id:'fill',obj:'真空加注冷却液并排气'},
+  {id:'torque',obj:'按力矩复紧电池护板螺栓'},
+  {id:'megger',obj:'绝缘复测，验收合格'},
+ ],
+ steps:[
+  {tool:'diag',at:'main',say:'数据流确认：绝缘阻值 80Ω/V，低于 100Ω/V 合格线，冷却回路压力保不住——漏点在液冷管路。',done:()=>{showMeter('80 Ω/V','电池包绝缘阻值 · 合格线 ≥ 100 Ω/V → 不合格',false);addOrderDone('数据流确认绝缘不合格')}},
+  {tool:'poweroff',at:'main',say:'执行高压下电：断维修开关，等 5 分钟，验电无压才能开电池舱。',done:(c)=>{c.live=false;addOrderDone('高压已下电并验电')}},
+  {tool:'gloves',at:'body',say:'电池包是整车能量核心，防护一步都不能省。',done:()=>addOrderDone('防护到位')},
+  {tool:'wrench',at:'joint',say:'接头渗液面还在扩大——换新密封圈，按对角顺序复紧卡箍。',done:(c)=>{c.fixLeak();addOrderDone('渗漏接头已更换密封圈')}},
+  {tool:'fill',at:'fillPort',say:'抽真空后定量加注专用低电导率冷却液，再加压排气，液位到 MAX 刻度。',done:(c)=>{c.fillUp();addOrderDone('冷却液已加注并排气')}},
+  {tool:'torque',at:'bolt',say:'护板螺栓按 25N·m 力矩复紧，逐颗打力矩标记。',done:()=>addOrderDone('护板螺栓力矩达标')},
+  {tool:'megger',say:'摇表复测：绝缘 520Ω/V，远超合格线。电池包密封完好，可以交车。',done:()=>{showMeter('520 Ω/V','电池包绝缘复测 → 合格',true);addOrderDone('绝缘复测合格');}},
+ ],
+ build(){
+  const g=new THREE.Group();g.position.y=0.95;scene.add(g);
+  P(g,new THREE.BoxGeometry(2.0,0.3,1.15),M.dark,0,0,0);
+  P(g,new THREE.BoxGeometry(1.9,0.08,1.05),M.metal,0,0.19,0);
+  for(let r=0;r<3;r++)for(let i=0;i<8;i++)P(g,new THREE.BoxGeometry(0.18,0.14,0.26),M.blue,-0.78+i*0.223,0.3,-0.32+r*0.32);
+  /* 液冷管路 */
+  const pipeMat=M.orange;
+  P(g,new THREE.TubeGeometry(new THREE.CatmullRomCurve3([V3(-0.9,0.24,0.62),V3(0,0.24,0.66),V3(0.9,0.24,0.62)]),20,0.035,8),pipeMat);
+  const joint=P(g,new THREE.CylinderGeometry(0.06,0.06,0.18,12),M.metal,0.45,0.24,0.66,Math.PI/2,0,0);
+  const seal=P(g,new THREE.TorusGeometry(0.065,0.018,8,16),M.rubber,0.45,0.24,0.72);
+  P(g,new THREE.BoxGeometry(0.5,0.06,1.2),M.white,0,-0.19,0); /* 护板 */
+  /* 液位视窗 */
+  const sight=P(g,new THREE.BoxGeometry(0.06,0.2,0.04),new THREE.MeshStandardMaterial({color:0x123044,roughness:.3}),-1.02,0.05,0.3);
+  const A={};anchor(g,'main',A,0,0.75,0);anchor(g,'joint',A,0.45,0.45,0.72);anchor(g,'fillPort',A,-1.05,0.35,0.3);anchor(g,'bolt',A,0.6,-0.25,0.5);anchor(g,'body',A,0,0.3,0.9);anchor(g,'probeA',A,0.95,0.35,0);anchor(g,'probeB',A,-0.95,0.35,0);
+  return {g,A,live:true,leakOn:true,leakAt:'joint',smokeOn:false,
+    fixLeak:()=>{seal.material=M.green},
+    fillUp:()=>{sight.material=M.liquid},
+  };
+ },
+},
+/* ---------- 第三关 BMS ---------- */
+{
+ id:'bms',name:'电池管理系统',color:'#06b6d4',no:'第三关',
+ title:'电池管理系统 BMS · 采样线束虚接',
+ introP:'车辆充电 80% 附近频繁报「单体电压不均衡」，动力间歇受限。读数据流发现第 37 串电压跳变异常——拆检 BMS 采样插头，线束端子虚接氧化。',
+ order:'车型：纯电轿车<br>现象：<b>充电至 80% 报单体不均衡，仪表动力受限灯亮</b><br>读码：BMS 报 <b>「第 37 串采样异常 / 压差过大」</b><br>初步判断：采样线束端子虚接氧化',
+ tools:[
+  {id:'diag',obj:'读数据流定位异常单体'},
+  {id:'wrench',obj:'断开低压蓄电池负极，拆 BMS 插头'},
+  {id:'meter',obj:'测量采样线通断'},
+  {id:'clamp',obj:'压接修复氧化端子'},
+  {id:'meter',obj:'复测通断确认'},
+  {id:'wrench',obj:'复插插头并固定'},
+  {id:'diag',obj:'清码并验证均衡恢复'},
+ ],
+ steps:[
+  {tool:'diag',at:'main',say:'数据流锁定第 37 串：充电时电压跳变超过 200mV，就是这串的采样回路出了问题。',done:()=>{showMeter('37 串','异常单体定位：电压跳变 230mV',false);addOrderDone('已定位第 37 串采样异常')}},
+  {tool:'wrench',at:'plug',say:'先断 12V 负极再拔 BMS 插头——低压件也一样，防止模块误动作。',done:(c)=>{c.unplug();addOrderDone('BMS 插头已断开')}},
+  {tool:'meter',say:'第 37 串采样线阻值 12Ω，正常应小于 1Ω——端子氧化虚接，找到了。',done:()=>{showMeter('12.0 Ω','第 37 串采样线阻值 · 正常 < 1 Ω → 虚接',false);addOrderDone('实测阻值 12Ω，确认虚接')}},
+  {tool:'clamp',at:'wire',say:'剪掉氧化段，重新压接端子，套热缩管绝缘。手劲要稳，压到位。',done:(c)=>{c.refit();addOrderDone('端子已重新压接')}},
+  {tool:'meter',say:'复测 0.2Ω，导通良好。采样回路恢复。',done:()=>{showMeter('0.2 Ω','第 37 串采样线复测 → 正常',true);addOrderDone('复测阻值正常')}},
+  {tool:'wrench',at:'plug',say:'插头复插到位，卡扣「咔」一声才算锁止，再缠防水胶带。',done:(c)=>{c.replug();addOrderDone('插头已复装')}},
+  {tool:'diag',at:'main',say:'清码后重新充电，压差回到 30mV 以内，均衡恢复正常。收工。',done:()=>{showMeter('30 mV','整包单体压差 → 正常',true);addOrderDone('均衡验证通过')}},
+ ],
+ build(){
+  const g=new THREE.Group();g.position.y=1.0;scene.add(g);
+  P(g,new THREE.BoxGeometry(0.72,0.16,0.5),M.metal,0,0.3,0);
+  P(g,new THREE.BoxGeometry(0.6,0.04,0.4),M.dark,0,0.4,0);
+  /* 电芯组（采样对象） */
+  P(g,new THREE.BoxGeometry(1.3,0.34,0.6),M.blue,0,-0.28,0);
+  const plug=new THREE.Group();
+  P(plug,new THREE.BoxGeometry(0.3,0.12,0.18),M.orange,0,0,0);
+  plug.position.set(0.55,0.28,0);g.add(plug);
+  /* 采样线束 */
+  const wires=[];
+  for(let i=0;i<5;i++){const w=P(g,new THREE.TubeGeometry(new THREE.CatmullRomCurve3([V3(0.42,0.3,0),V3(0.2,0.12,-0.1+i*0.05),V3(-0.4+i*0.05,-0.1,0.1-i*0.04)]),12,0.012,6),i===2?M.copperBurnt:M.copper);wires.push(w)}
+  const A={};anchor(g,'main',A,0,0.8,0);anchor(g,'plug',A,0.7,0.5,0);anchor(g,'wire',A,0.1,0.05,0);anchor(g,'probeA',A,0.25,0.1,0.15);anchor(g,'probeB',A,-0.35,-0.08,0.1);
+  return {g,A,glowOn:true,glowColor:0xd04030,glowAt:'main',smokeOn:false,
+    unplug:()=>{plug.position.x=0.85;plug.position.y=0.1},
+    replug:()=>{plug.position.x=0.55;plug.position.y=0.28},
+    refit:()=>{wires[2].material=M.copper},
+  };
+ },
+},
+/* ---------- 第四关 减速器 ---------- */
+{
+ id:'reducer',name:'减速器',color:'#a855f7',no:'第四关',
+ title:'减速器 · 油封渗漏异响',
+ introP:'车辆行驶中减速器部位发出周期性异响，举升检查发现输出轴油封渗油。需要更换油封并更换齿轮油——单速减速器结构简单，但清洁度和油液型号不能马虎。',
+ order:'车型：纯电轿车（电驱总成）<br>现象：<b>减速器部位周期性异响，输出轴处渗油</b><br>读码：无故障码（机械故障）<br>初步判断：输出轴油封老化渗漏，齿轮油液位下降',
+ tools:[
+  {id:'diag',obj:'路试确认异响与转速关系'},
+  {id:'wrench',obj:'拆卸放油螺栓，放旧油'},
+  {id:'wrench',obj:'拆旧油封'},
+  {id:'fill',obj:'加注新齿轮油至油位孔'},
+  {id:'torque',obj:'按力矩复紧螺栓'},
+  {id:'diag',obj:'路试验收异响'},
+ ],
+ steps:[
+  {tool:'diag',at:'main',say:'路试确认：异响频率与电机转速成正比，与车速脱钩——是减速器内部问题，不是轮胎。',done:()=>addOrderDone('异响定位在减速器')},
+  {tool:'wrench',at:'drain',say:'先放油再拆件——旧油放出来看看有没有金属屑，这是判断磨损程度的关键。',done:(c)=>{c.drain();addOrderDone('旧油已放净')}},
+  {tool:'wrench',at:'seal',say:'油封拉马拉出旧油封——别划伤轴颈，新油封唇口预涂齿轮油再压入。',done:(c)=>{c.swapSeal();addOrderDone('新油封已压装')}},
+  {tool:'fill',at:'fillPort',say:'从油位孔加注到刚好溢出，型号要对——部分车型与电机冷却油共用，别加错。',done:(c)=>{c.fillOil();addOrderDone('齿轮油已加注')}},
+  {tool:'torque',at:'drain',say:'放油螺栓 35N·m，通气塞别忘复位。',done:()=>addOrderDone('螺栓力矩达标')},
+  {tool:'diag',at:'main',say:'路试两公里，异响消失，油封位无渗漏。机械故障，手到病除。',done:()=>addOrderDone('路试验收通过')},
+ ],
+ build(){
+  const g=new THREE.Group();g.position.y=1.05;scene.add(g);
+  P(g,new THREE.CylinderGeometry(0.42,0.42,0.6,32),M.metal,0,0,0,0,0,Math.PI/2);
+  P(g,new THREE.CylinderGeometry(0.2,0.2,0.18,24),M.dark,-0.4,0,0,0,0,Math.PI/2);
+  P(g,new THREE.CylinderGeometry(0.14,0.14,0.5,20),M.metal,0.55,0,0,0,0,Math.PI/2);
+  const sealOld=P(g,new THREE.TorusGeometry(0.15,0.03,10,24),M.rubber,0.45,0,0,0,Math.PI/2,0);
+  const plug2=P(g,new THREE.CylinderGeometry(0.06,0.06,0.12,12),M.dark,0,-0.48,0);
+  const oilDisc=P(g,new THREE.CircleGeometry(0.3,24),new THREE.MeshBasicMaterial({color:0x151a12,transparent:true,opacity:0}),0,-0.56,0,-Math.PI/2,0,0);
+  const sight=P(g,new THREE.CylinderGeometry(0.05,0.05,0.06,12),new THREE.MeshStandardMaterial({color:0x2a2a18,roughness:.3}),0.2,0.28,0.28);
+  const A={};anchor(g,'main',A,0,0.7,0);anchor(g,'drain',A,0,-0.55,0.2);anchor(g,'seal',A,0.6,0.1,0);anchor(g,'fillPort',A,0.2,0.5,0.28);
+  return {g,A,leakOn:true,leakAt:'seal',smokeOn:false,
+    drain:()=>{oilDisc.material.opacity=.85;plug2.position.y=-0.56},
+    swapSeal:()=>{sealOld.material=M.green},
+    fillOil:()=>{sight.material=M.liquid;oilDisc.material.opacity=0},
+  };
+ },
+},
+/* ---------- 第五关 电机控制器 ---------- */
+{
+ id:'inverter',name:'电机控制器',color:'#ef4444',no:'第五关',
+ title:'电机控制器 · 过温降功率（冷却气堵）',
+ introP:'车辆大负荷行驶几分钟后仪表提示「功率受限」，读码为电机控制器过温。水泵转速正常、冷却液位正常——怀疑冷却回路气堵，冷却液不循环。',
+ order:'车型：纯电轿车<br>现象：<b>大负荷行驶数分钟后动力受限，静置后恢复</b><br>读码：电机控制器报 <b>「控制器过温」</b><br>初步判断：冷却回路气堵，液冷板冷却液不循环',
+ tools:[
+  {id:'diag',obj:'读码确认过温及水泵状态'},
+  {id:'poweroff',obj:'高压下电，验电确认'},
+  {id:'gloves',obj:'穿戴高压防护装备'},
+  {id:'wrench',obj:'打开排气螺丝排出空气'},
+  {id:'fill',obj:'补加冷却液并排净空气'},
+  {id:'diag',obj:'路试复测温度'},
+ ],
+ steps:[
+  {tool:'diag',at:'main',say:'确认过温码，但水泵占空比和转速都正常——泵在转，水不流，典型的气堵。',done:()=>{showMeter('92 ℃','控制器温度 · 报警阈值 85 ℃ → 超温',false);addOrderDone('确认过温，水泵正常')}},
+  {tool:'poweroff',at:'main',say:'控制器直连高压母线，断电验电一个都不能少。',done:(c)=>{c.live=false;addOrderDone('高压已下电并验电')}},
+  {tool:'gloves',at:'body',say:'戴好绝缘手套。控制器母线电容断电后仍存电，等 5 分钟再动手。',done:()=>addOrderDone('防护到位')},
+  {tool:'wrench',at:'bleed',say:'松开最高点的排气螺丝——咕噜咕噜，气泡出来了，冷却液开始流动。',done:(c)=>{c.bleed();addOrderDone('空气已排出')}},
+  {tool:'fill',at:'fillPort',say:'补加冷却液到规定液位，再按压水管确认无气阻，液面稳定。',done:()=>addOrderDone('冷却液已补加')},
+  {tool:'diag',at:'main',say:'大负荷路试十分钟，控制器温度稳定在 68℃。降温正常，交车。',done:()=>{showMeter('68 ℃','路试控制器温度 → 正常',true);addOrderDone('路试温度正常')}},
+ ],
+ build(){
+  const g=new THREE.Group();g.position.y=1.0;scene.add(g);
+  P(g,new THREE.BoxGeometry(1.1,0.3,0.7),M.metal,0,0,0);
+  for(let i=0;i<8;i++)P(g,new THREE.BoxGeometry(1.0,0.16,0.03),M.dark,0,0,-0.32+i*0.09);
+  P(g,new THREE.BoxGeometry(0.4,0.1,0.5),M.orange,0.3,0.2,0); /* 高压端子盖 */
+  P(g,new THREE.CylinderGeometry(0.05,0.05,0.16,12),M.blue,-0.4,0.2,0.15); /* 排气螺丝 */
+  P(g,new THREE.CylinderGeometry(0.06,0.06,0.14,12),M.green,-0.4,0.2,-0.15); /* 加注口 */
+  const A={};anchor(g,'main',A,0,0.75,0);anchor(g,'bleed',A,-0.4,0.5,0.15);anchor(g,'fillPort',A,-0.4,0.5,-0.15);anchor(g,'body',A,0,0.1,0.8);
+  return {g,A,live:true,glowOn:true,glowColor:0xff6020,glowAt:'main',smokeOn:false,
+    bleed:()=>{glowL.intensity=0},
+  };
+ },
+},
+/* ---------- 第六关 车载充电机 OBC ---------- */
+{
+ id:'obc',name:'车载充电机',color:'#eab308',no:'第六关',
+ title:'车载充电机 OBC · 慢充跳枪',
+ introP:'车辆慢充频繁跳枪，有时插入后完全无法启动充电。读码为充电通信异常——测量 CP 信号异常，判断 OBC 内部电路故障，需更换总成后实充验证。',
+ order:'车型：纯电轿车<br>现象：<b>慢充频繁跳枪，偶发完全无法启动充电</b><br>读码：<b>「充电通信异常 / CP 信号中断」</b><br>初步判断：OBC 内部故障，需更换总成',
+ tools:[
+  {id:'diag',obj:'读码并抓充电报文'},
+  {id:'poweroff',obj:'高压下电，验电确认'},
+  {id:'gloves',obj:'穿戴高压防护装备'},
+  {id:'wrench',obj:'拆低压与高压插头'},
+  {id:'meter',obj:'测量 CP 信号电压'},
+  {id:'wrench',obj:'更换 OBC 总成'},
+  {id:'wrench',obj:'复装插头'},
+  {id:'diag',obj:'实充验证六阶段'},
+ ],
+ steps:[
+  {tool:'diag',at:'main',say:'报文抓到 CP 信号在握手阶段中断——枪和桩都排除了，问题在车载充电机这一侧。',done:()=>addOrderDone('报文定位 OBC 侧故障')},
+  {tool:'poweroff',at:'main',say:'OBC 输入侧直连高压母线，断电验电，等母线电容放电。',done:(c)=>{c.live=false;addOrderDone('高压已下电并验电')}},
+  {tool:'gloves',at:'body',say:'穿戴防护。OBC 内部有工频市电和高压母线，双重危险。',done:()=>addOrderDone('防护到位')},
+  {tool:'wrench',at:'plug',say:'先拔低压插头再拔高压插头——严禁带载插拔，会拉弧烧蚀端子。',done:(c)=>{c.unplug();addOrderDone('高低压插头已断开')}},
+  {tool:'meter',say:'CP 对地电压异常波动，正常应是稳定的 9V/6V  PWM。内部电路坏了，换总成。',done:()=>{showMeter('0.4 V','CP 对地电压 · 正常 9V/6V PWM → 异常',false);addOrderDone('CP 信号实测异常')}},
+  {tool:'wrench',at:'main',say:'新 OBC 就位，固定螺栓对角紧固——总成级更换后一般要匹配配置。',done:(c)=>{c.swap();addOrderDone('新 OBC 总成已更换')}},
+  {tool:'wrench',at:'plug',say:'插头复装：高压橙插带互锁，插到位有咔哒声，低压插头卡扣锁止。',done:(c)=>{c.replug();addOrderDone('插头已复装')}},
+  {tool:'diag',at:'main',say:'实充全程走一遍：物理连接、低压辅助、握手、充电、结束——六阶段全部正常，不再跳枪。',done:()=>addOrderDone('实充验证通过')},
+ ],
+ build(){
+  const g=new THREE.Group();g.position.y=1.0;scene.add(g);
+  P(g,new THREE.BoxGeometry(0.85,0.34,0.55),M.metal,0,0.25,0);
+  const plugL=P(g,new THREE.BoxGeometry(0.18,0.12,0.16),M.dark,-0.35,0.45,0.15);
+  const plugH=P(g,new THREE.CylinderGeometry(0.09,0.1,0.24,16),M.orange,0.3,0.5,0);
+  P(g,new THREE.BoxGeometry(0.9,0.06,0.6),M.dark,0,0.02,0);
+  const A={};anchor(g,'main',A,0,0.85,0);anchor(g,'plug',A,-0.35,0.7,0.15);anchor(g,'body',A,0,0.1,0.9);
+  return {g,A,live:true,sparkAt:'plug',smokeOn:false,
+    unplug:()=>{plugL.position.set(-0.6,0.2,0.3);plugH.position.set(0.55,0.2,0.3)},
+    replug:()=>{plugL.position.set(-0.35,0.45,0.15);plugH.position.set(0.3,0.5,0)},
+    swap:()=>{g.children.forEach(m=>{if(m.geometry&&m.geometry.type==='BoxGeometry'&&m.material===M.metal&&Math.abs(m.position.y-0.25)<0.01)m.material=M.green})},
+  };
+ },
+},
+/* ---------- 第七关 DC-DC ---------- */
+{
+ id:'dcdc',name:'DC-DC 转换器',color:'#22c55e',no:'第七关',
+ title:'DC-DC 转换器 · 低压亏电无法唤醒',
+ introP:'车辆停放一夜后完全无法唤醒，喇叭不响、仪表不亮。测得 12V 蓄电池仅 9.8V——DC-DC 输出欠压，低压系统瘫痪，整车无法上电。',
+ order:'车型：纯电轿车<br>现象：<b>停放后整车无法唤醒，仪表黑屏</b><br>读码：DC-DC 报 <b>「输出欠压」</b>，历史码多次<br>初步判断：DC-DC 总成失效，蓄电池深度亏电',
+ tools:[
+  {id:'meter',obj:'测量蓄电池电压'},
+  {id:'diag',obj:'读码确认 DC-DC 状态'},
+  {id:'poweroff',obj:'高压下电，验电确认'},
+  {id:'gloves',obj:'穿戴高压防护装备'},
+  {id:'wrench',obj:'更换 DC-DC 总成'},
+  {id:'wrench',obj:'低压蓄电池充电匹配'},
+  {id:'diag',obj:'整车上电时序验证'},
+ ],
+ steps:[
+  {tool:'meter',say:'蓄电池只有 9.8V，低于 10.5V 唤醒阈值——整车当然叫不醒。先找低压供给为什么断了。',done:()=>{showMeter('9.8 V','蓄电池电压 · 唤醒阈值 10.5 V → 亏电',false);addOrderDone('实测蓄电池亏电')}},
+  {tool:'diag',at:'main',say:'DC-DC 报输出欠压，高压输入正常——变换器本身失效，蓄电池只放电没人充。',done:()=>{showMeter('欠压','DC-DC 故障码 → 输出欠压',false);addOrderDone('确认 DC-DC 失效')}},
+  {tool:'poweroff',at:'main',say:'DC-DC 输入侧是高压母线，断电验电照常执行。',done:(c)=>{c.live=false;addOrderDone('高压已下电并验电')}},
+  {tool:'gloves',at:'body',say:'防护穿戴。低压侧短路同样上百安培，别小看 12V。',done:()=>addOrderDone('防护到位')},
+  {tool:'wrench',at:'main',say:'新 DC-DC 就位，高低压插头锁止，搭铁点打磨见金属再紧固。',done:(c)=>{c.swap();addOrderDone('新 DC-DC 已更换')}},
+  {tool:'wrench',at:'batt',say:'蓄电池补电后装回，部分车型要做蓄电池匹配登记，不然充电策略异常。',done:()=>addOrderDone('蓄电池已充电匹配')},
+  {tool:'diag',at:'main',say:'上电时序走一遍：低压唤醒、预充、主接触器吸合、DC-DC 输出 14.2V——整车满血复活。',done:()=>{showMeter('14.2 V','DC-DC 输出电压 → 正常',true);addOrderDone('上电验证通过')}},
+ ],
+ build(){
+  const g=new THREE.Group();g.position.y=1.0;scene.add(g);
+  P(g,new THREE.BoxGeometry(0.6,0.3,0.45),M.metal,0,0.3,0);
+  const hv=P(g,new THREE.CylinderGeometry(0.08,0.09,0.2,14),M.orange,0.25,0.5,0);
+  P(g,new THREE.BoxGeometry(0.2,0.1,0.14),M.dark,-0.25,0.5,0);
+  /* 蓄电池 */
+  P(g,new THREE.BoxGeometry(0.5,0.32,0.36),M.dark,-1.1,-0.15,0);
+  P(g,new THREE.BoxGeometry(0.1,0.08,0.1),M.red,-1.25,0.05,0.1);
+  P(g,new THREE.BoxGeometry(0.1,0.08,0.1),M.dark,-0.95,0.05,0.1);
+  P(g,new THREE.TubeGeometry(new THREE.CatmullRomCurve3([V3(-0.85,-0.05,0.1),V3(-0.5,0.1,0.1),V3(-0.2,0.2,0.1)]),12,0.02,6),M.red);
+  const A={};anchor(g,'main',A,0,0.85,0);anchor(g,'batt',A,-1.1,0.3,0);anchor(g,'body',A,0,0.05,0.9);
+  return {g,A,live:true,glowOn:true,glowColor:0xd04030,glowAt:'batt',smokeOn:false,
+    swap:()=>{g.children.forEach(m=>{if(m.geometry&&m.geometry.type==='BoxGeometry'&&m.material===M.metal&&Math.abs(m.position.y-0.3)<0.01)m.material=M.green})},
+  };
+ },
+},
+/* ---------- 第八关 高压配电盒 ---------- */
+{
+ id:'pdu',name:'高压配电盒',color:'#f472b6',no:'第八关',
+ title:'高压配电盒 PDU · 支路保险烧蚀',
+ introP:'车辆空调完全不制冷，检查发现电动压缩机无高压供电。高压配电盒是全车高压的交汇点——拆检发现压缩机支路保险烧蚀，接触器触点轻微烧结。',
+ order:'车型：纯电轿车<br>现象：<b>空调不制冷，压缩机支路无高压</b><br>读码：<b>「压缩机高压供电丢失」</b><br>初步判断：PDU 内压缩机支路保险烧蚀',
+ tools:[
+  {id:'poweroff',obj:'高压下电，验电确认'},
+  {id:'gloves',obj:'穿戴高压防护装备'},
+  {id:'wrench',obj:'拆卸盒盖'},
+  {id:'meter',obj:'测量各支路保险'},
+  {id:'wrench',obj:'更换保险与接触器'},
+  {id:'wrench',obj:'复装盒盖'},
+  {id:'diag',obj:'上电测试各支路'},
+ ],
+ steps:[
+  {tool:'poweroff',at:'main',say:'PDU 是全车高压交汇点，断电验电必须最先做。',done:(c)=>{c.live=false;addOrderDone('高压已下电并验电')}},
+  {tool:'gloves',at:'body',say:'配电盒内全是裸排和熔断器，防护到位再开盖。',done:()=>addOrderDone('防护到位')},
+  {tool:'wrench',at:'cover',say:'盒盖螺栓对角松——看，压缩机支路保险已经烧黑，接触器也有拉弧痕迹。',done:(c)=>{c.openBox();addOrderDone('盒盖已拆')}},
+  {tool:'meter',say:'压缩机支路保险阻值无穷大，确认熔断；相邻支路正常。',done:()=>{showMeter('∞ Ω','压缩机支路保险 · 正常 0 Ω → 熔断',false);addOrderDone('确认保险熔断')}},
+  {tool:'wrench',at:'fuse',say:'换新保险，烧结接触器一并换掉——带载拉弧过的触点靠不住。',done:(c)=>{c.refit();addOrderDone('保险与接触器已更换')}},
+  {tool:'wrench',at:'cover',say:'盒盖复装，密封圈对位，螺栓按力矩上紧。',done:(c)=>{c.closeBox();addOrderDone('盒盖已复装')}},
+  {tool:'diag',at:'main',say:'上电：主接触器吸合干脆，压缩机支路电压到位，空调恢复制冷。',done:()=>{showMeter('386 V','压缩机支路母线电压 → 正常',true);addOrderDone('上电验证通过')}},
+ ],
+ build(){
+  const g=new THREE.Group();g.position.y=1.0;scene.add(g);
+  P(g,new THREE.BoxGeometry(0.95,0.16,0.62),M.dark,0,0.12,0);
+  const cover=P(g,new THREE.BoxGeometry(0.99,0.1,0.66),M.metal,0,0.26,0);
+  const bars=[];for(let i=0;i<3;i++)bars.push(P(g,new THREE.BoxGeometry(0.06,0.06,0.5),M.copper,-0.3+i*0.3,0.21,0));
+  const fuseA=P(g,new THREE.BoxGeometry(0.14,0.08,0.12),M.copperBurnt,0.3,0.24,0.1);
+  const fuseB=P(g,new THREE.BoxGeometry(0.14,0.08,0.12),M.green,-0.3,0.24,0.1);
+  const cont=P(g,new THREE.CylinderGeometry(0.07,0.07,0.14,16),M.dark,0,0.24,-0.15);
+  const A={};anchor(g,'main',A,0,0.8,0);anchor(g,'cover',A,0,0.45,0);anchor(g,'fuse',A,0.3,0.5,0.1);anchor(g,'probeA',A,0.3,0.3,0.2);anchor(g,'probeB',A,0.3,0.3,-0.05);anchor(g,'body',A,0,0.1,0.9);
+  return {g,A,live:true,sparkAt:'fuse',smokeOn:true,smokeAt:'fuse',
+    openBox:()=>{cover.position.y=0.62},
+    closeBox:()=>{cover.position.y=0.26},
+    refit:()=>{fuseA.material=M.green;cont.material=M.metal},
+  };
+ },
+},
+/* ---------- 第九关 整车控制器 ---------- */
+{
+ id:'vcu',name:'整车控制器',color:'#14b8a6',no:'第九关',
+ title:'整车控制器 VCU · CAN 通信故障',
+ introP:'车辆无法上高压，仪表多个报警同时点亮。诊断仪读码显示 VCU 与 BMS 通信丢失——测量 CAN 总线发现 CAN-L 对地短路，线束在转向管柱附近磨破。',
+ order:'车型：纯电轿车<br>现象：<b>无法上高压，多报警同亮</b><br>读码：<b>「VCU 与 BMS 通信丢失」</b><br>初步判断：CAN 线束破损短路',
+ tools:[
+  {id:'diag',obj:'读码定位通信故障'},
+  {id:'meter',obj:'测量 CAN 总线电压'},
+  {id:'wrench',obj:'拆检破损线束'},
+  {id:'clamp',obj:'修复包扎线束'},
+  {id:'meter',obj:'测终端电阻确认'},
+  {id:'diag',obj:'刷写配置清码'},
+  {id:'diag',obj:'上高压验证'},
+ ],
+ steps:[
+  {tool:'diag',at:'main',say:'多个报警同亮先别慌——读码定位：VCU 和 BMS「失联」，是通信总线问题，不是两个模块同时坏。',done:()=>addOrderDone('定位 CAN 通信故障')},
+  {tool:'meter',say:'CAN-H 2.3V 正常，CAN-L 只有 0.1V——对地短路了。沿总线找破损点。',done:()=>{showMeter('0.1 V','CAN-L 电压 · 正常 2.3V 左右 → 对地短路',false);addOrderDone('CAN-L 对地短路')}},
+  {tool:'wrench',at:'wire',say:'转向管柱附近找到了——波纹管磨穿，CAN-L 裸线搭在金属支架上。',done:(c)=>{c.expose();addOrderDone('破损点已找到')}},
+  {tool:'clamp',at:'wire',say:'截掉损伤段，同色同径重新压接，防水胶布三层包扎，波纹管复位。',done:(c)=>{c.fix();addOrderDone('线束已修复包扎')}},
+  {tool:'meter',say:'终端电阻 60Ω，总线电压恢复正常——通信物理层修好了。',done:()=>{showMeter('60 Ω','CAN 终端电阻 → 正常',true);addOrderDone('总线复测正常')}},
+  {tool:'diag',at:'main',say:'VCU 更换后需刷写车型配置——刷错配置比不刷更麻烦，核对 VIN 再写入。',done:()=>addOrderDone('配置已刷写')},
+  {tool:'diag',at:'main',say:'清码、上电：预充正常、接触器吸合、READY 点亮——通信恢复，故障排除。',done:()=>addOrderDone('上高压验证通过')},
+ ],
+ build(){
+  const g=new THREE.Group();g.position.y=1.0;scene.add(g);
+  P(g,new THREE.BoxGeometry(0.55,0.16,0.4),M.metal,0,0.3,0);
+  P(g,new THREE.BoxGeometry(0.3,0.12,0.2),M.dark,0.42,0.28,0);
+  const pair=new THREE.Group();
+  P(pair,new THREE.TubeGeometry(new THREE.CatmullRomCurve3([V3(-0.3,0.32,0.05),V3(-0.8,0.5,0.3),V3(-1.2,0.3,0.5)]),16,0.015,6),M.orange);
+  P(pair,new THREE.TubeGeometry(new THREE.CatmullRomCurve3([V3(-0.3,0.32,0.0),V3(-0.8,0.47,0.25),V3(-1.2,0.27,0.45)]),16,0.015,6),M.white);
+  g.add(pair);
+  const brace=P(g,new THREE.BoxGeometry(0.08,0.5,0.08),M.dark,-1.0,0.25,0.35);
+  const A={};anchor(g,'main',A,0,0.8,0);anchor(g,'wire',A,-0.85,0.5,0.3);anchor(g,'probeA',A,-0.2,0.45,0.05);anchor(g,'probeB',A,-0.2,0.45,-0.02);
+  return {g,A,glowOn:true,glowColor:0xd04030,glowAt:'main',smokeOn:false,
+    expose:()=>{pair.children[1].material=M.copperBurnt},
+    fix:()=>{pair.children[1].material=M.white},
+  };
+ },
+},
+/* ---------- 第十关 电动压缩机 ---------- */
+{
+ id:'compressor',name:'电动压缩机',color:'0x60a5fa'.replace('0x','#'),no:'第十关',
+ title:'电动压缩机 · 绝缘击穿',
+ introP:'车辆空调完全不制冷，读码为压缩机绝缘故障。电动压缩机是绝缘故障高发部件——内部高压电机对地击穿。更换前必须先回收冷媒，更换后抽真空定量加注。',
+ order:'车型：纯电轿车<br>现象：<b>空调不制冷，压缩机不启动</b><br>读码：<b>「压缩机绝缘故障」</b><br>初步判断：压缩机内部对地击穿，需更换总成',
+ tools:[
+  {id:'diag',obj:'读码确认绝缘故障'},
+  {id:'vac',obj:'回收冷媒'},
+  {id:'poweroff',obj:'高压下电，验电确认'},
+  {id:'gloves',obj:'穿戴高压防护装备'},
+  {id:'wrench',obj:'拆卸并更换压缩机'},
+  {id:'vac',obj:'抽真空'},
+  {id:'fill',obj:'定量加注冷媒并检漏'},
+  {id:'diag',obj:'试车验证制冷'},
+ ],
+ steps:[
+  {tool:'diag',at:'main',say:'绝缘故障码确认。压缩机内部存高压电，接插件防水一旦失效，这就是高发故障点。',done:()=>{showMeter('0.1 MΩ','压缩机绕组对地绝缘 → 击穿',false);addOrderDone('确认绝缘击穿')}},
+  {tool:'vac',at:'port',say:'拆压缩机前必须回收冷媒——直接拆会喷得到处都是，还破坏臭氧层。',done:()=>addOrderDone('冷媒已回收')},
+  {tool:'poweroff',at:'main',say:'压缩机支路走高压母线，断电验电，母线电容等放电。',done:(c)=>{c.live=false;addOrderDone('高压已下电并验电')}},
+  {tool:'gloves',at:'body',say:'防护到位。高压接插件带互锁，拔的时候按住锁扣，别硬拽。',done:()=>addOrderDone('防护到位')},
+  {tool:'wrench',at:'main',say:'旧机拆下，新机就位——高压接插件密封圈检查一遍，防水失效就是这个故障的源头。',done:(c)=>{c.swap();addOrderDone('新压缩机已更换')}},
+  {tool:'vac',at:'port',say:'管路抽真空 15 分钟以上，真空度到位保压不漏，才能加注。',done:()=>addOrderDone('抽真空完成')},
+  {tool:'fill',at:'port',say:'按铭牌克数定量加注，电子秤盯着。加完检漏仪扫一遍接头。',done:()=>addOrderDone('冷媒已加注检漏')},
+  {tool:'diag',at:'main',say:'启动空调，低压管冰凉，出风口的温度直线下降——制冷恢复。',done:()=>{showMeter('6.2 ℃','出风口温度 → 正常',true);addOrderDone('试车验证通过')}},
+ ],
+ build(){
+  const g=new THREE.Group();g.position.y=1.05;scene.add(g);
+  const body=P(g,new THREE.CylinderGeometry(0.3,0.3,0.55,32),M.metal,0,0.3,0,0,0,Math.PI/2);
+  P(g,new THREE.CylinderGeometry(0.31,0.31,0.08,32),M.dark,0.3,0.3,0,0,0,Math.PI/2);
+  P(g,new THREE.BoxGeometry(0.25,0.15,0.2),M.orange,-0.15,0.55,0);
+  const portA=P(g,new THREE.CylinderGeometry(0.06,0.06,0.14,12),M.red,0.05,0.62,0.12);
+  const portB=P(g,new THREE.CylinderGeometry(0.06,0.06,0.14,12),M.blue,0.05,0.62,-0.12);
+  P(g,new THREE.BoxGeometry(0.6,0.06,0.4),M.dark,0,-0.02,0);
+  const A={};anchor(g,'main',A,0,0.9,0);anchor(g,'port',A,0.05,0.85,0.12);anchor(g,'body',A,0,0.15,0.9);
+  return {g,A,live:true,sparkAt:'main',smokeOn:true,smokeAt:'main',
+    swap:()=>{body.material=M.green},
+  };
+ },
+},
+/* ---------- 第十一关 热管理系统 ---------- */
+{
+ id:'thermal',name:'热管理系统',color:'#38bdf8',no:'第十一关',
+ title:'热管理系统 · 水泵卡滞',
+ introP:'车辆快充 10 分钟后充电功率骤降，电池温度报警。读数据流：水泵指令 100% 占空比，实际转速为零——电子水泵卡滞，冷却液不循环。',
+ order:'车型：纯电轿车<br>现象：<b>快充降功率，电池过热报警</b><br>读码：<b>「电池温度高 / 水泵转速异常」</b><br>初步判断：电子水泵卡滞，冷却液不循环',
+ tools:[
+  {id:'diag',obj:'读数据流确认水泵状态'},
+  {id:'poweroff',obj:'高压下电，验电确认'},
+  {id:'gloves',obj:'穿戴高压防护装备'},
+  {id:'wrench',obj:'更换电子水泵'},
+  {id:'fill',obj:'加注冷却液并抽真空排气'},
+  {id:'diag',obj:'路试验证温度回落'},
+ ],
+ steps:[
+  {tool:'diag',at:'main',say:'占空比 100%、转速 0——指令到了泵不转，水泵机械卡滞，不用猜了。',done:()=>{showMeter('0 rpm','水泵转速 · 指令 100% → 卡滞',false);addOrderDone('确认水泵卡滞')}},
+  {tool:'poweroff',at:'main',say:'热管理部件全是高压件，断电验电。',done:(c)=>{c.live=false;addOrderDone('高压已下电并验电')}},
+  {tool:'gloves',at:'body',say:'戴好手套。冷却液温度还高，别急着拆管，先等降温。',done:()=>addOrderDone('防护到位')},
+  {tool:'wrench',at:'pump',say:'旧泵拆下——转子果然卡死。新泵就位，水管卡箍换新，插头锁止。',done:(c)=>{c.swap();addOrderDone('新水泵已更换')}},
+  {tool:'fill',at:'pump',say:'补液后抽真空排气，气堵会让新泵白换。捏水管听水流声，确认循环。',done:()=>addOrderDone('加注排气完成')},
+  {tool:'diag',at:'main',say:'快充复测：水泵转速跟上指令，电池温度稳定在 32℃，功率回到满充。',done:()=>{showMeter('32 ℃','快充电池温度 → 正常',true);addOrderDone('验证通过')}},
+ ],
+ build(){
+  const g=new THREE.Group();g.position.y=1.0;scene.add(g);
+  const volute=P(g,new THREE.CylinderGeometry(0.26,0.26,0.16,32),M.metal,0,0.3,0);
+  P(g,new THREE.TorusGeometry(0.2,0.06,12,28),M.dark,0,0.3,0,Math.PI/2,0,0);
+  P(g,new THREE.CylinderGeometry(0.07,0.07,0.3,14),M.blue,0.3,0.3,0,0,0,Math.PI/2);
+  P(g,new THREE.CylinderGeometry(0.07,0.07,0.3,14),M.blue,-0.3,0.3,0,0,0,Math.PI/2);
+  P(g,new THREE.BoxGeometry(0.14,0.1,0.12),M.dark,0,0.52,0.1);
+  P(g,new THREE.BoxGeometry(0.5,0.05,0.3),M.dark,0,0.05,0);
+  const A={};anchor(g,'main',A,0,0.85,0);anchor(g,'pump',A,0,0.55,0.15);anchor(g,'body',A,0,0.1,0.9);
+  return {g,A,live:true,glowOn:true,glowColor:0xff6020,glowAt:'main',smokeOn:true,smokeAt:'main',
+    swap:()=>{volute.material=M.green},
+  };
+ },
+},
+/* ---------- 第十二关 充电口 ---------- */
+{
+ id:'chargeport',name:'充电口',color:'#fbbf24',no:'第十二关',
+ title:'充电口 · 触点烧蚀',
+ introP:'车辆慢充偶发断连，充电口有焦糊味。拆检充电座：交流触点烧蚀发黑，绝缘阻值超标——进水加电弧烧蚀，需要更换充电座总成。',
+ order:'车型：纯电轿车<br>现象：<b>慢充偶发断连，充电口焦糊味</b><br>读码：<b>「充电连接异常」</b><br>初步判断：充电口触点烧蚀，绝缘超标',
+ tools:[
+  {id:'poweroff',obj:'断电验电'},
+  {id:'gloves',obj:'穿戴防护装备'},
+  {id:'wrench',obj:'拆卸充电座'},
+  {id:'cleaner',obj:'清洁烧蚀触点'},
+  {id:'meter',obj:'测触点绝缘阻值'},
+  {id:'wrench',obj:'更换充电座总成'},
+  {id:'diag',obj:'实充验证'},
+ ],
+ steps:[
+  {tool:'poweroff',at:'main',say:'充电口触点直连高压回路，先断电验电。',done:(c)=>{c.live=false;addOrderDone('已断电验电')}},
+  {tool:'gloves',at:'body',say:'防护穿戴。充电口检修最怕进水，先看密封圈老化没有。',done:()=>addOrderDone('防护到位')},
+  {tool:'wrench',at:'main',say:'充电座拆下来——触点烧蚀发黑，这状态清洁是救不回来的。',done:(c)=>{c.pullOut();addOrderDone('充电座已拆下')}},
+  {tool:'cleaner',at:'pin',say:'触点清洁剂喷上，无尘布擦——烧蚀层去掉看看基体损伤程度。',done:()=>addOrderDone('触点已清洁')},
+  {tool:'meter',say:'清洁后绝缘还是只有 0.4MΩ，远低于 10MΩ 要求——基体已碳化，必须换总成。',done:()=>{showMeter('0.4 MΩ','充电口绝缘 · 合格线 ≥ 10 MΩ → 不合格',false);addOrderDone('确认需更换总成')}},
+  {tool:'wrench',at:'main',say:'新充电座就位，防水圈换新——充电口进水严禁插枪，这条要记住。',done:(c)=>{c.swap();addOrderDone('新充电座已更换')}},
+  {tool:'diag',at:'main',say:'插枪实充：连接确认干脆，电子锁正常，充电全程不断连。',done:()=>addOrderDone('实充验证通过')},
+ ],
+ build(){
+  const g=new THREE.Group();g.position.y=1.1;scene.add(g);
+  const plate=P(g,new THREE.CylinderGeometry(0.34,0.34,0.08,32),M.dark,0,0.3,0,Math.PI/2,0,0);
+  const socket=P(g,new THREE.CylinderGeometry(0.24,0.24,0.14,32),M.metal,0,0.3,0,Math.PI/2,0,0);
+  for(let i=0;i<7;i++){const a=i/7*Math.PI*2;P(g,new THREE.CylinderGeometry(0.02,0.02,0.08,8),M.copperBurnt,Math.cos(a)*0.13,0.38,Math.sin(a)*0.13,Math.PI/2,0,0)}
+  P(g,new THREE.CylinderGeometry(0.045,0.045,0.1,10),M.copperBurnt,-0.05,0.38,0,Math.PI/2,0,0);
+  P(g,new THREE.CylinderGeometry(0.045,0.045,0.1,10),M.copperBurnt,0.05,0.38,0,Math.PI/2,0,0);
+  const A={};anchor(g,'main',A,0,0.75,0);anchor(g,'pin',A,0,0.55,0);anchor(g,'body',A,0,0.1,0.9);
+  return {g,A,live:true,sparkAt:'pin',smokeOn:true,smokeAt:'pin',
+    pullOut:()=>{plate.position.z=0.3;socket.position.z=0.3},
+    swap:()=>{g.traverse(o=>{if(o.geometry&&o.geometry.type==='CylinderGeometry'&&o.material===M.copperBurnt)o.material=M.copper})},
+  };
+ },
+},
+/* ---------- 第十三关 座舱内饰（低压电气） ---------- */
+{
+ id:'cabin',name:'座舱低压电气',color:'#a78bfa',no:'第十三关',
+ title:'座舱低压电气 · 改装虚接隐患',
+ introP:'车辆座椅保险反复熔断，改装低音炮后出现的故障。拆检发现改装线路虚接发热、车身搭铁点氧化——低压虚接是车辆自燃的常见源头，必须彻底整改。',
+ order:'车型：纯电轿车（改装车）<br>现象：<b>座椅保险反复熔断，偶发焦糊味</b><br>读码：无码（低压线路故障）<br>初步判断：改装线路虚接发热，搭铁点氧化',
+ tools:[
+  {id:'meter',obj:'测改装线路电流'},
+  {id:'wrench',obj:'拆检线束'},
+  {id:'cleaner',obj:'清洁车身搭铁点'},
+  {id:'clamp',obj:'重新压接端子并包扎'},
+  {id:'meter',obj:'复测电流确认'},
+  {id:'torque',obj:'恢复内饰板'},
+  {id:'diag',obj:'路试验证'},
+ ],
+ steps:[
+  {tool:'meter',say:'改装线路静态电流 4.2A，保险丝 10A 长期满负荷——发热熔断只是时间问题。',done:()=>{showMeter('4.2 A','改装线路电流 · 长期 >50% 额定 → 过载',false);addOrderDone('确认线路过载')}},
+  {tool:'wrench',at:'wire',say:'座椅底下拆开——接头包着胶布糊弄，线芯半数虚接，胶布已经烤化了。',done:(c)=>{c.expose();addOrderDone('虚接点已暴露')}},
+  {tool:'cleaner',at:'ground',say:'车身搭铁点打磨见金属，氧化物是虚接的温床。',done:(c)=>{c.cleanG();addOrderDone('搭铁点已清洁')}},
+  {tool:'clamp',at:'wire',say:'端子全部重新压接，烫锡，热缩管绝缘，线束固定夹复原——改装也要按规范来。',done:(c)=>{c.fix();addOrderDone('端子已重新压接')}},
+  {tool:'meter',say:'复测电流 0.8A，线路温度正常。这才叫改装。',done:()=>{showMeter('0.8 A','整改后线路电流 → 正常',true);addOrderDone('复测正常')}},
+  {tool:'torque',at:'panel',say:'内饰板复位，卡扣对齐，螺栓别上过头——塑料件滑牙就麻烦了。',done:()=>addOrderDone('内饰已恢复')},
+  {tool:'diag',at:'main',say:'路试半小时，音响正常、保险不再熔断、无异味——隐患排除。',done:()=>addOrderDone('路试验证通过')},
+ ],
+ build(){
+  const g=new THREE.Group();g.position.y=1.0;scene.add(g);
+  P(g,new THREE.BoxGeometry(1.0,0.12,0.5),M.dark,0,0.1,0); /* 座椅导轨 */
+  const amp=P(g,new THREE.BoxGeometry(0.45,0.3,0.35),M.dark,-0.25,0.32,0);
+  P(g,new THREE.BoxGeometry(0.35,0.2,0.02),M.screen,-0.25,0.32,0.18);
+  const wire=P(g,new THREE.TubeGeometry(new THREE.CatmullRomCurve3([V3(0.3,0.15,0),V3(0.5,0.3,0.1),V3(0.1,0.35,0.15)]),14,0.025,6),M.copperBurnt);
+  const tape=P(g,new THREE.CylinderGeometry(0.045,0.045,0.08,10),M.rubber,0.42,0.26,0.08,0,0,1.2);
+  const ground=P(g,new THREE.CylinderGeometry(0.08,0.1,0.06,12),M.copperBurnt,0.6,0.16,0.1);
+  const A={};anchor(g,'main',A,0,0.8,0);anchor(g,'wire',A,0.42,0.45,0.08);anchor(g,'ground',A,0.6,0.4,0.1);anchor(g,'panel',A,-0.25,0.6,0);
+  return {g,A,live:false,sparkAt:'wire',smokeOn:true,smokeAt:'wire',
+    expose:()=>{tape.visible=false},
+    cleanG:()=>{ground.material=M.copper},
+    fix:()=>{wire.material=M.orange},
+  };
+ },
+},
+/* ---------- 第十四关 车轮与制动 ---------- */
+{
+ id:'wheel',name:'车轮与制动',color:'#94a3b8',no:'第十四关',
+ title:'车轮与制动 · 制动液含水超标',
+ introP:'车辆回收制动时车身抖动，读码显示制动回收协调异常。检测制动液含水率 3.8% 严重超标——电液复合制动对制动液更敏感，回收制动频繁工况要求更高。',
+ order:'车型：纯电轿车<br>现象：<b>回收制动抖动，制动脚感变软</b><br>读码：<b>「制动回收协调异常」</b><br>初步判断：制动液含水率超标，需换液排气',
+ tools:[
+  {id:'diag',obj:'读码确认回收协调异常'},
+  {id:'meter',obj:'检测制动液含水率'},
+  {id:'wrench',obj:'更换制动液并四轮排气'},
+  {id:'torque',obj:'紧固导向销与轮毂螺栓'},
+  {id:'diag',obj:'路试验收'},
+ ],
+ steps:[
+  {tool:'diag',at:'main',say:'回收协调报异常先别换泵——纯电车前半段靠电机制动，机械部分状态差也会报这个码。',done:()=>addOrderDone('读码完成')},
+  {tool:'meter',say:'含水率 3.8%，远超 2% 限值——气泡在回收频繁工况里就是抖动来源。',done:()=>{showMeter('3.8 %','制动液含水率 · 限值 2% → 超标',false);addOrderDone('含水率超标确认')}},
+  {tool:'wrench',at:'caliper',say:'按离制动总缸最远的轮先排，一踩一松，出来的旧液由浑变清——四轮挨个来。',done:(c)=>{c.flush();addOrderDone('制动液已更换排气')}},
+  {tool:'torque',at:'caliper',say:'导向销 28N·m，轮毂螺栓按对角 120N·m——回收扭矩大，松一颗都抖。',done:(c)=>{c.tight();addOrderDone('力矩紧固完成')}},
+  {tool:'diag',at:'main',say:'路试：回收制动从满回收到机械衔接全程平顺，脚感回来了。',done:()=>addOrderDone('路试验收通过')},
+ ],
+ build(){
+  const g=new THREE.Group();g.position.y=1.1;scene.add(g);
+  const disc=P(g,new THREE.CylinderGeometry(0.42,0.42,0.05,40),M.metal,0,0,0,0,0,Math.PI/2);
+  P(g,new THREE.CylinderGeometry(0.13,0.13,0.09,20),M.dark,0,0,0,0,0,Math.PI/2);
+  for(let i=0;i<5;i++){const a=i/5*Math.PI*2;P(g,new THREE.BoxGeometry(0.36,0.03,0.06),M.dark,0,Math.cos(a)*0.28,Math.sin(a)*0.28,-a,0,0)}
+  const caliper=P(g,new THREE.BoxGeometry(0.12,0.3,0.26),M.red,0,0.32,0.2);
+  const bottle=P(g,new THREE.CylinderGeometry(0.09,0.09,0.28,16),M.white,0.85,-0.3,0);
+  const fluid=P(g,new THREE.CylinderGeometry(0.075,0.075,0.1,16),new THREE.MeshStandardMaterial({color:0x8a6a20,roughness:.3}),0.85,-0.34,0);
+  const A={};anchor(g,'main',A,0,0.75,0);anchor(g,'caliper',A,0,0.6,0.25);
+  const st={shake:true};
+  return {g,A,glowOn:false,smokeOn:false,_st:st,
+    tick:(dt,t)=>{if(st.shake){disc.rotation.x+=dt*0.5;g.position.y=1.1+Math.sin(t*30)*0.006}},
+    flush:()=>{fluid.material=M.liquid},
+    tight:()=>{st.shake=false;g.position.y=1.1},
+  };
+ },
+},
+/* ---------- 第十五关 车身壳体 ---------- */
+{
+ id:'body',name:'车身壳体',color:'#cbd5e1',no:'第十五关',
+ title:'车身壳体 · 托底损伤高压线束',
+ introP:'车辆托底事故，电池护板变形。读码为高压互锁回路故障——拆检发现高压线束被挤压破损。涉及电池区域的钣金作业，必须严格执行高压下电规程。',
+ order:'车型：纯电轿车（托底事故车）<br>现象：<b>托底后仪表高压报警，无法上电</b><br>读码：<b>「高压互锁回路故障」</b><br>初步判断：护板变形挤压高压线束',
+ tools:[
+  {id:'diag',obj:'读码确认互锁故障'},
+  {id:'poweroff',obj:'高压下电，验电确认'},
+  {id:'gloves',obj:'穿戴高压防护装备'},
+  {id:'wrench',obj:'拆卸变形护板'},
+  {id:'meter',obj:'测量线束绝缘'},
+  {id:'clamp',obj:'修复包扎线束'},
+  {id:'torque',obj:'按力矩复装护板'},
+  {id:'megger',obj:'绝缘复测，验收合格'},
+  {id:'diag',obj:'路试交车验证'},
+ ],
+ steps:[
+  {tool:'diag',at:'main',say:'互锁回路报警——沿互锁回路逐段排查前先确保高压已断，这是事故车的规矩。',done:()=>addOrderDone('互锁故障确认')},
+  {tool:'poweroff',at:'cable',say:'断 12V 负极、拔维修开关、等待 5 分钟、验电无压——四步做完才碰高压线。',done:(c)=>{c.live=false;addOrderDone('高压下电验电完成')}},
+  {tool:'gloves',at:'body',say:'事故车线束状态未知，防护到位。',done:()=>addOrderDone('防护到位')},
+  {tool:'wrench',at:'plate',say:'护板拆下——线束绝缘皮被护板锐边割破，铜线裸露，再磨一下就短路了。',done:(c)=>{c.open();addOrderDone('护板已拆')}},
+  {tool:'meter',say:'破损点对车身绝缘 0.3MΩ，低于 100Ω/V 要求——确认损伤段范围。',done:()=>{showMeter('0.3 MΩ','线束对车身绝缘 → 不合格',false);addOrderDone('绝缘实测不合格')}},
+  {tool:'clamp',at:'cable',say:'截除损伤段，高压专用线重新压接，绝缘胶带三层，波纹管加护套——锐边处加橡胶护线圈。',done:(c)=>{c.fix();addOrderDone('线束已修复')}},
+  {tool:'torque',at:'plate',say:'护板整形复位，按力矩复紧——错误举升会顶坏电池，交车前再查一遍举升点。',done:(c)=>{c.close();addOrderDone('护板已复装')}},
+  {tool:'megger',say:'高压系统绝缘复测 200MΩ，互锁回路导通正常。',done:()=>{showMeter('200 MΩ','高压系统绝缘复测 → 合格',true);addOrderDone('绝缘复测合格')}},
+  {tool:'diag',at:'main',say:'路试：上电正常、行驶无报警——事故车维修后必须做高压功能验证才能交车。',done:()=>addOrderDone('路试交车验证通过')},
+ ],
+ build(){
+  const g=new THREE.Group();g.position.y=0.95;scene.add(g);
+  P(g,new THREE.BoxGeometry(2.0,0.12,1.0),M.metal,0,0.15,0); /* 地板 */
+  P(g,new THREE.BoxGeometry(1.6,0.22,0.8),M.dark,0,-0.12,0); /* 电池托盘 */
+  const cable=P(g,new THREE.TubeGeometry(new THREE.CatmullRomCurve3([V3(-0.9,0.22,0.35),V3(0,0.24,0.4),V3(0.9,0.22,0.35)]),20,0.035,8),M.orange);
+  const bare=P(g,new THREE.CylinderGeometry(0.035,0.035,0.12,10),M.copperBurnt,0.2,0.24,0.42,Math.PI/2,0,0);
+  const plate=P(g,new THREE.BoxGeometry(1.9,0.04,0.9),M.white,0,0.26,0.05,0,0,0.06);
+  const A={};anchor(g,'main',A,0,0.85,0);anchor(g,'cable',A,0.2,0.55,0.42);anchor(g,'plate',A,0.6,0.6,0.2);anchor(g,'body',A,0,0.4,0.9);
+  return {g,A,live:true,sparkAt:'cable',smokeOn:true,smokeAt:'cable',
+    open:()=>{plate.position.y=0.7},
+    close:()=>{plate.position.set(0,0.26,0.05);plate.rotation.z=0},
+    fix:()=>{bare.material=M.orange},
+  };
+ },
+},
+/* ---------- 第十六关 旋变传感器 ---------- */
+{
+ id:'resolver',name:'旋变传感器',color:'#e8b23a',no:'第十六关',
+ title:'旋变传感器 · 信号失真',
+ introP:'车辆加速时动力断断续续，仪表亮乌龟灯。读码报旋变信号异常——电机控制器失去转子位置就无法精确换相。拆检发现旋变连接器触点烧蚀、线束压接松脱。旋变是电机的"眼睛"，信号一断，动力立刻受限。',
+ order:'车型：纯电轿车（永磁同步电机）<br>现象：<b>加速顿挫，仪表乌龟灯，动力受限</b><br>读码：<b>「旋变信号异常 / 转子位置丢失」</b><br>初步判断：旋变连接器触点烧蚀，线束松脱',
+ tools:[
+  {id:'diag',obj:'读码确认旋变信号异常'},
+  {id:'meter',obj:'测量旋变正余弦绕组阻值'},
+  {id:'wrench',obj:'拆开旋变连接器'},
+  {id:'cleaner',obj:'清洁烧蚀触点'},
+  {id:'meter',obj:'复测绕组与触点阻值'},
+  {id:'clamp',obj:'压接修复松脱线束'},
+  {id:'torque',obj:'按力矩复装连接器'},
+  {id:'diag',obj:'路试验收'},
+ ],
+ steps:[
+  {tool:'diag',at:'main',say:'旋变信号异常先别怀疑电机本体——多数问题出在连接器和线束上，一步一步查。',done:()=>addOrderDone('读码完成')},
+  {tool:'meter',say:'正弦绕组 62Ω、余弦绕组 61Ω（标准 40~90Ω）——绕组本体没问题，问题在链路。',done:()=>{showMeter('62 Ω','旋变正弦绕组阻值 → 正常',true);addOrderDone('绕组阻值正常')}},
+  {tool:'wrench',at:'plug',say:'连接器拆开——触点烧蚀发黑，插头锁扣也松了，颠簸路段信号就是这么断的。',done:(c)=>{c.open();addOrderDone('连接器已拆开')}},
+  {tool:'cleaner',at:'plug',say:'触点烧蚀层轻轻打磨清洁，露出铜本色——别磨过头，镀层磨没了更容易氧化。',done:(c)=>{c.clean();addOrderDone('触点已清洁')}},
+  {tool:'meter',say:'触点接触阻值从 4.2Ω 降到 0.1Ω——链路通了。',done:()=>{showMeter('0.1 Ω','触点接触阻值 → 正常',true);addOrderDone('接触阻值合格')}},
+  {tool:'clamp',at:'wire',say:'松脱的压接端子剪掉重压，套热缩管——旋变线束最忌虚接，虚接在高温大电流工况下就是信号抖动。',done:(c)=>{c.fix();addOrderDone('线束已压接修复')}},
+  {tool:'torque',at:'plug',say:'连接器按力矩复装，锁扣到位听到咔哒一声——防水圈也要检查，进水还得烧。',done:(c)=>{c.close();addOrderDone('连接器已复装')}},
+  {tool:'diag',at:'main',say:'路试：全油门加速平顺，旋变信号波形稳定——电机的"眼睛"擦亮了。',done:()=>addOrderDone('路试验收通过')},
+ ],
+ build(){
+  const g=new THREE.Group();g.position.y=1.0;scene.add(g);
+  P(g,new THREE.CylinderGeometry(0.42,0.42,0.34,32),M.metal,0,0,0,Math.PI/2,0,0); /* 电机端盖 */
+  P(g,new THREE.TorusGeometry(0.3,0.045,12,40),M.copper,0,0.19,0,Math.PI/2,0,0); /* 旋变定子绕组 */
+  P(g,new THREE.CylinderGeometry(0.1,0.1,0.12,20),M.orange,0,0.14,0,Math.PI/2,0,0); /* 旋变转子 */
+  const plug=P(g,new THREE.BoxGeometry(0.22,0.16,0.18),M.dark,0,0.12,0.44);
+  const contact=P(g,new THREE.BoxGeometry(0.12,0.02,0.1),M.copperBurnt,0,0.215,0.44); /* 烧蚀触点 */
+  P(g,new THREE.TubeGeometry(new THREE.CatmullRomCurve3([V3(0,0.16,0.53),V3(0.3,0.3,0.7),V3(0.55,0.42,0.6)]),16,0.022,8),M.orange);
+  const loose=P(g,new THREE.CylinderGeometry(0.024,0.024,0.1,8),M.copperBurnt,0.2,0.26,0.62,0.9,0.4,0); /* 松脱压接 */
+  const A={};anchor(g,'main',A,0,0.8,0);anchor(g,'plug',A,0,0.45,0.44);anchor(g,'wire',A,0.35,0.5,0.62);
+  return {g,A,sparkAt:'plug',smokeOn:true,smokeAt:'plug',
+    open:()=>{plug.position.set(0,0.22,0.6)},
+    clean:()=>{contact.material=M.copper;loose.material=M.copperWarm},
+    fix:()=>{loose.material=M.orange},
+    close:()=>{plug.position.set(0,0.12,0.44)},
+  };
+ },
+},
+/* ---------- 第十七关 高压互锁 ---------- */
+{
+ id:'hvil',name:'高压互锁',color:'#f97316',no:'第十七关',
+ title:'高压互锁 · 回路虚接',
+ introP:'车辆无法上高压，仪表提示高压系统故障。读码为高压互锁回路断开——沿互锁小信号回路逐段排查，发现高压连接器内互锁端子退位虚接。互锁是"高压在不在位"的哨兵，哨兵误报，整车就拒不上电。',
+ order:'车型：纯电轿车<br>现象：<b>无法上高压，仪表高压系统故障</b><br>读码：<b>「高压互锁回路断开」</b><br>初步判断：某高压连接器互锁端子退位虚接',
+ tools:[
+  {id:'diag',obj:'读码确认互锁回路断开'},
+  {id:'meter',obj:'沿互锁回路测量通断'},
+  {id:'wrench',obj:'拆开可疑高压连接器'},
+  {id:'clamp',obj:'修复退位互锁端子'},
+  {id:'meter',obj:'复测互锁回路导通'},
+  {id:'diag',obj:'上电验证'},
+ ],
+ steps:[
+  {tool:'diag',at:'main',say:'互锁断开是"防呆哨兵"在报警——先量回路定位是哪一段断，别上来就换件。',done:()=>addOrderDone('读码完成')},
+  {tool:'meter',say:'互锁回路电阻无穷大——确认断开点在电源侧连接器这段，分段排查。',done:()=>{showMeter('OL','互锁回路阻值 → 断路',false);addOrderDone('断路位置锁定')}},
+  {tool:'wrench',at:'plug',say:'连接器拆开——互锁端子退位了 2mm，插头插到底也碰不到，颠簸一下全断。',done:(c)=>{c.open();addOrderDone('连接器已拆开')}},
+  {tool:'clamp',at:'branch',say:'端子重新卡入锁扣，拉线确认锁止——互锁端子小，压接深度不到位还会虚接。',done:(c)=>{c.fix();addOrderDone('端子已修复')}},
+  {tool:'meter',say:'互锁回路 0.4Ω 导通正常——哨兵回路通了。',done:()=>{showMeter('0.4 Ω','互锁回路阻值 → 导通',true);addOrderDone('回路导通')}},
+  {tool:'diag',at:'main',say:'上电验证：高压正常接通，READY 灯点亮——互锁这关过了。',done:()=>addOrderDone('上电验证通过')},
+ ],
+ build(){
+  const g=new THREE.Group();g.position.y=1.0;scene.add(g);
+  P(g,new THREE.CylinderGeometry(0.5,0.5,0.4,32),M.dark,0,0,0,Math.PI/2,0,0); /* 高压部件壳体 */
+  P(g,new THREE.CylinderGeometry(0.14,0.14,0.16,20),M.orange,0,0,0.42,Math.PI/2,0,0); /* 插座 */
+  const plug=P(g,new THREE.CylinderGeometry(0.12,0.12,0.2,20),M.orange,0,0,0.52,Math.PI/2,0,0); /* 插头 */
+  const pin=P(g,new THREE.CylinderGeometry(0.015,0.015,0.06,8),M.metal,0.05,0.14,0.55); /* 互锁端子 */
+  const branch=P(g,new THREE.TubeGeometry(new THREE.CatmullRomCurve3([V3(0.05,0.17,0.55),V3(0.2,0.34,0.5),V3(0.45,0.4,0.35)]),16,0.012,6),M.blue); /* 互锁小信号线 */
+  P(g,new THREE.TubeGeometry(new THREE.CatmullRomCurve3([V3(0,0,0.62),V3(0,0.15,0.9),V3(-0.4,0.2,1.0)]),20,0.04,10),M.orange);
+  const A={};anchor(g,'main',A,0,0.5,0.6);anchor(g,'plug',A,0,0.35,0.52);anchor(g,'branch',A,0.25,0.5,0.45);
+  const st={jig:true};
+  return {g,A,glowOn:true,glowAt:'plug',glowColor:0xffa030,
+    tick:(dt,t)=>{if(st.jig)plug.position.z=0.52+Math.sin(t*40)*0.004},
+    open:()=>{plug.position.z=0.62;pin.position.y=0.1},
+    fix:()=>{pin.position.y=0.14;pin.material=M.copper},
+    close:()=>{plug.position.z=0.52;st.jig=false},
+  };
+ },
+},
+/* ---------- 第十八关 绝缘监测 ---------- */
+{
+ id:'imd',name:'绝缘监测',color:'#38b6e8',no:'第十八关',
+ title:'绝缘监测 · 母线对壳漏电',
+ introP:'仪表弹绝缘故障灯，限制功率行驶。车载绝缘监测系统报正母线对壳体绝缘过低。雨季涉水后高发——母线对壳体漏电不处理，轻则限功率，重则拉弧起火。需用兆欧表分段定位并修复绝缘破损点。',
+ order:'车型：纯电轿车（涉水后）<br>现象：<b>绝缘故障灯亮，限制功率</b><br>读码：<b>「正母线对壳体绝缘过低」</b><br>初步判断：高压母线对壳体绝缘破损漏电',
+ tools:[
+  {id:'diag',obj:'读取绝缘监测系统故障'},
+  {id:'meter',obj:'测量母线对壳体电压分布'},
+  {id:'wrench',obj:'拆检电池上盖母线排'},
+  {id:'meter',obj:'分段定位绝缘破损点'},
+  {id:'clamp',obj:'包扎修复绝缘破损'},
+  {id:'megger',obj:'兆欧表复测绝缘'},
+  {id:'diag',obj:'验收交车'},
+ ],
+ steps:[
+  {tool:'diag',at:'main',say:'绝缘报警先读绝缘监测数据——它报的是正母线侧偏低，方向有了。',done:()=>addOrderDone('故障确认')},
+  {tool:'meter',say:'正母线对壳 180V、负母线对壳 60V（正常应各半）——确认正侧漏电。',done:()=>{showMeter('180 V / 60 V','正负母线对壳电压 → 正侧漏电',false);addOrderDone('漏电侧确认')}},
+  {tool:'wrench',at:'ring',say:'拆检电池上盖——正母线排一处绝缘护套被压伤，碳化的痕迹就是爬电起点。',done:(c)=>{c.open();addOrderDone('母线排已拆检')}},
+  {tool:'meter',at:'ring',say:'破损点对壳 0.4MΩ，而整车要求 100Ω/V——这一处就是罪魁祸首。',done:()=>{showMeter('0.4 MΩ','破损点对壳绝缘 → 不合格',false);addOrderDone('破损点确认')}},
+  {tool:'clamp',at:'ring',say:'破损段绝缘包扎三层加护套，母线排复装前再目视全排一遍——一颗毛刺都可能再破一次。',done:(c)=>{c.fix();addOrderDone('绝缘已修复')}},
+  {tool:'megger',say:'兆欧表 500V 档复测：正母线对壳 200MΩ——整车绝缘恢复。',done:()=>{showMeter('200 MΩ','正母线对壳绝缘复测 → 合格',true);addOrderDone('绝缘复测合格')}},
+  {tool:'diag',at:'main',say:'交车前再读一遍绝缘监测——无故障码、绝缘阻值正常，涉水车必须重点跟踪回访。',done:()=>addOrderDone('验收通过')},
+ ],
+ build(){
+  const g=new THREE.Group();g.position.y=0.9;scene.add(g);
+  P(g,new THREE.BoxGeometry(2.0,0.14,1.1),M.metal,0,0,0); /* 电池上盖 */
+  P(g,new THREE.CylinderGeometry(0.04,0.04,1.7,14),M.copper,0,0.14,0.3,0,0,Math.PI/2); /* 正母线 */
+  P(g,new THREE.CylinderGeometry(0.04,0.04,1.7,14),M.dark,0,0.14,-0.3,0,0,Math.PI/2); /* 负母线 */
+  const sleeve=P(g,new THREE.CylinderGeometry(0.07,0.07,0.3,14),M.orange,0.5,0.14,0.3,0,0,Math.PI/2); /* 绝缘护套 */
+  const burnt=P(g,new THREE.CylinderGeometry(0.072,0.072,0.12,14),M.copperBurnt,0.5,0.14,0.3,0,0,Math.PI/2); /* 压伤碳化 */
+  const A={};anchor(g,'main',A,0,0.7,0);anchor(g,'ring',A,0.5,0.5,0.3);
+  return {g,A,glowOn:true,glowAt:'ring',
+    open:()=>{sleeve.position.set(0.5,0.44,0.3)},
+    fix:()=>{burnt.material=M.orange;sleeve.position.set(0.5,0.14,0.3)},
+  };
+ },
+},
+/* ---------- 第十九关 电池模组 ---------- */
+{
+ id:'module',name:'电池模组',color:'#3b82f6',no:'第十九关',
+ title:'电池模组 · 单体压差过大',
+ introP:'车辆续航明显缩水，满充后仪表 SOC 跳动。诊断仪读取 BMS 数据流：3 号模组单体电压最高 4.21V、最低 3.62V，压差超过 0.5V，均衡电路不工作。台上是拆下的电池模组——需要均衡维护并复测。',
+ order:'车型：纯电 SUV（底盘中置电池包）<br>现象：<b>电池故障灯亮，仪表提示检查高压系统，冷却液缓慢减少</b><br>读码：BMS 报 <b>「绝缘电阻过低 / 冷却回路故障」</b><br>初步判断：液冷管路接头渗漏，冷却液进入电池舱',
+ tools:[
+  {id:'diag',obj:'读取 BMS 数据流定位故障'},
+  {id:'poweroff',obj:'高压下电，验电确认'},
+  {id:'gloves',obj:'穿戴高压防护装备'},
+  {id:'wrench',obj:'处理渗漏接头，更换密封圈'},
+  {id:'fill',obj:'真空加注冷却液并排气'},
+  {id:'torque',obj:'按力矩复紧电池护板螺栓'},
+  {id:'megger',obj:'绝缘复测，验收合格'},
+ ],
+ steps:[
+  {tool:'diag',at:'main',say:'数据流确认：绝缘阻值 80Ω/V，低于 100Ω/V 合格线，冷却回路压力保不住——漏点在液冷管路。',done:()=>{showMeter('80 Ω/V','电池包绝缘阻值 · 合格线 ≥ 100 Ω/V → 不合格',false);addOrderDone('数据流确认绝缘不合格')}},
+  {tool:'poweroff',at:'main',say:'执行高压下电：断维修开关，等 5 分钟，验电无压才能开电池舱。',done:(c)=>{c.live=false;addOrderDone('高压已下电并验电')}},
+  {tool:'gloves',at:'body',say:'电池包是整车能量核心，防护一步都不能省。',done:()=>addOrderDone('防护到位')},
+  {tool:'wrench',at:'joint',say:'接头渗液面还在扩大——换新密封圈，按对角顺序复紧卡箍。',done:(c)=>{c.fixLeak();addOrderDone('渗漏接头已更换密封圈')}},
+  {tool:'fill',at:'fillPort',say:'抽真空后定量加注专用低电导率冷却液，再加压排气，液位到 MAX 刻度。',done:(c)=>{c.fillUp();addOrderDone('冷却液已加注并排气')}},
+  {tool:'torque',at:'bolt',say:'护板螺栓按 25N·m 力矩复紧，逐颗打力矩标记。',done:()=>addOrderDone('护板螺栓力矩达标')},
+  {tool:'megger',say:'摇表复测：绝缘 520Ω/V，远超合格线。电池包密封完好，可以交车。',done:()=>{showMeter('520 Ω/V','电池包绝缘复测 → 合格',true);addOrderDone('绝缘复测合格');}},
+ ],
+ build(){
+  const g=new THREE.Group();g.position.y=0.95;scene.add(g);
+  P(g,new THREE.BoxGeometry(2.0,0.3,1.15),M.dark,0,0,0);
+  P(g,new THREE.BoxGeometry(1.9,0.08,1.05),M.metal,0,0.19,0);
+  for(let r=0;r<3;r++)for(let i=0;i<8;i++)P(g,new THREE.BoxGeometry(0.18,0.14,0.26),M.blue,-0.78+i*0.223,0.3,-0.32+r*0.32);
+  /* 液冷管路 */
+  const pipeMat=M.orange;
+  P(g,new THREE.TubeGeometry(new THREE.CatmullRomCurve3([V3(-0.9,0.24,0.62),V3(0,0.24,0.66),V3(0.9,0.24,0.62)]),20,0.035,8),pipeMat);
+  const joint=P(g,new THREE.CylinderGeometry(0.06,0.06,0.18,12),M.metal,0.45,0.24,0.66,Math.PI/2,0,0);
+  const seal=P(g,new THREE.TorusGeometry(0.065,0.018,8,16),M.rubber,0.45,0.24,0.72);
+  P(g,new THREE.BoxGeometry(0.5,0.06,1.2),M.white,0,-0.19,0); /* 护板 */
+  /* 液位视窗 */
+  const sight=P(g,new THREE.BoxGeometry(0.06,0.2,0.04),new THREE.MeshStandardMaterial({color:0x123044,roughness:.3}),-1.02,0.05,0.3);
+  const A={};anchor(g,'main',A,0,0.75,0);anchor(g,'joint',A,0.45,0.45,0.72);anchor(g,'fillPort',A,-1.05,0.35,0.3);anchor(g,'bolt',A,0.6,-0.25,0.5);anchor(g,'body',A,0,0.3,0.9);anchor(g,'probeA',A,0.95,0.35,0);anchor(g,'probeB',A,-0.95,0.35,0);
+  return {g,A,live:true,leakOn:true,leakAt:'joint',smokeOn:false,
+    fixLeak:()=>{seal.material=M.green},
+    fillUp:()=>{sight.material=M.liquid},
+  };
+ },
+},
+/* ---------- 第二十关 充电电子锁 ---------- */
+{
+ id:'elock',name:'充电电子锁',color:'#fbbf24',no:'第二十关',
+ title:'充电电子锁 · 锁止失效',
+ introP:'客户反映慢充枪插到底后车辆不启动充电，仪表提示「充电连接未锁定」，稍一晃动就断开。读码：车载充电机报「电子锁反馈信号异常」。初步判断：充电口电子锁机构卡滞/线圈断路。',
+ order:'车型：纯电轿车<br>现象：<b>慢充偶发断连，充电口焦糊味</b><br>读码：<b>「充电连接异常」</b><br>初步判断：充电口触点烧蚀，绝缘超标',
+ tools:[
+  {id:'poweroff',obj:'断电验电'},
+  {id:'gloves',obj:'穿戴防护装备'},
+  {id:'wrench',obj:'拆卸充电座'},
+  {id:'cleaner',obj:'清洁烧蚀触点'},
+  {id:'meter',obj:'测触点绝缘阻值'},
+  {id:'wrench',obj:'更换充电座总成'},
+  {id:'diag',obj:'实充验证'},
+ ],
+ steps:[
+  {tool:'poweroff',at:'main',say:'充电口触点直连高压回路，先断电验电。',done:(c)=>{c.live=false;addOrderDone('已断电验电')}},
+  {tool:'gloves',at:'body',say:'防护穿戴。充电口检修最怕进水，先看密封圈老化没有。',done:()=>addOrderDone('防护到位')},
+  {tool:'wrench',at:'main',say:'充电座拆下来——触点烧蚀发黑，这状态清洁是救不回来的。',done:(c)=>{c.pullOut();addOrderDone('充电座已拆下')}},
+  {tool:'cleaner',at:'pin',say:'触点清洁剂喷上，无尘布擦——烧蚀层去掉看看基体损伤程度。',done:()=>addOrderDone('触点已清洁')},
+  {tool:'meter',say:'清洁后绝缘还是只有 0.4MΩ，远低于 10MΩ 要求——基体已碳化，必须换总成。',done:()=>{showMeter('0.4 MΩ','充电口绝缘 · 合格线 ≥ 10 MΩ → 不合格',false);addOrderDone('确认需更换总成')}},
+  {tool:'wrench',at:'main',say:'新充电座就位，防水圈换新——充电口进水严禁插枪，这条要记住。',done:(c)=>{c.swap();addOrderDone('新充电座已更换')}},
+  {tool:'diag',at:'main',say:'插枪实充：连接确认干脆，电子锁正常，充电全程不断连。',done:()=>addOrderDone('实充验证通过')},
+ ],
+ build(){
+  const g=new THREE.Group();g.position.y=1.1;scene.add(g);
+  const plate=P(g,new THREE.CylinderGeometry(0.34,0.34,0.08,32),M.dark,0,0.3,0,Math.PI/2,0,0);
+  const socket=P(g,new THREE.CylinderGeometry(0.24,0.24,0.14,32),M.metal,0,0.3,0,Math.PI/2,0,0);
+  for(let i=0;i<7;i++){const a=i/7*Math.PI*2;P(g,new THREE.CylinderGeometry(0.02,0.02,0.08,8),M.copperBurnt,Math.cos(a)*0.13,0.38,Math.sin(a)*0.13,Math.PI/2,0,0)}
+  P(g,new THREE.CylinderGeometry(0.045,0.045,0.1,10),M.copperBurnt,-0.05,0.38,0,Math.PI/2,0,0);
+  P(g,new THREE.CylinderGeometry(0.045,0.045,0.1,10),M.copperBurnt,0.05,0.38,0,Math.PI/2,0,0);
+  const A={};anchor(g,'main',A,0,0.75,0);anchor(g,'pin',A,0,0.55,0);anchor(g,'body',A,0,0.1,0.9);
+  return {g,A,live:true,sparkAt:'pin',smokeOn:true,smokeAt:'pin',
+    pullOut:()=>{plate.position.z=0.3;socket.position.z=0.3},
+    swap:()=>{g.traverse(o=>{if(o.geometry&&o.geometry.type==='CylinderGeometry'&&o.material===M.copperBurnt)o.material=M.copper})},
+  };
+ },
+},
+/* ---------- 第二十一关 CAN总线 ---------- */
+{
+ id:'canbus',name:'CAN总线',color:'#14b8a6',no:'第二十一关',
+ title:'CAN 总线 · 通讯故障',
+ introP:'车辆行驶中多个故障灯同时点亮，诊断仪只能连上部分模块，VCU 报「CAN 总线关闭 / 报文超时」。初步判断：CAN 主干线束接触不良或终端电阻失效，需要断电后逐段排查。',
+ order:'车型：纯电轿车<br>现象：<b>无法上高压，多报警同亮</b><br>读码：<b>「VCU 与 BMS 通信丢失」</b><br>初步判断：CAN 线束破损短路',
+ tools:[
+  {id:'diag',obj:'读码定位通信故障'},
+  {id:'meter',obj:'测量 CAN 总线电压'},
+  {id:'wrench',obj:'拆检破损线束'},
+  {id:'clamp',obj:'修复包扎线束'},
+  {id:'meter',obj:'测终端电阻确认'},
+  {id:'diag',obj:'刷写配置清码'},
+  {id:'diag',obj:'上高压验证'},
+ ],
+ steps:[
+  {tool:'diag',at:'main',say:'多个报警同亮先别慌——读码定位：VCU 和 BMS「失联」，是通信总线问题，不是两个模块同时坏。',done:()=>addOrderDone('定位 CAN 通信故障')},
+  {tool:'meter',say:'CAN-H 2.3V 正常，CAN-L 只有 0.1V——对地短路了。沿总线找破损点。',done:()=>{showMeter('0.1 V','CAN-L 电压 · 正常 2.3V 左右 → 对地短路',false);addOrderDone('CAN-L 对地短路')}},
+  {tool:'wrench',at:'wire',say:'转向管柱附近找到了——波纹管磨穿，CAN-L 裸线搭在金属支架上。',done:(c)=>{c.expose();addOrderDone('破损点已找到')}},
+  {tool:'clamp',at:'wire',say:'截掉损伤段，同色同径重新压接，防水胶布三层包扎，波纹管复位。',done:(c)=>{c.fix();addOrderDone('线束已修复包扎')}},
+  {tool:'meter',say:'终端电阻 60Ω，总线电压恢复正常——通信物理层修好了。',done:()=>{showMeter('60 Ω','CAN 终端电阻 → 正常',true);addOrderDone('总线复测正常')}},
+  {tool:'diag',at:'main',say:'VCU 更换后需刷写车型配置——刷错配置比不刷更麻烦，核对 VIN 再写入。',done:()=>addOrderDone('配置已刷写')},
+  {tool:'diag',at:'main',say:'清码、上电：预充正常、接触器吸合、READY 点亮——通信恢复，故障排除。',done:()=>addOrderDone('上高压验证通过')},
+ ],
+ build(){
+  const g=new THREE.Group();g.position.y=1.0;scene.add(g);
+  P(g,new THREE.BoxGeometry(0.55,0.16,0.4),M.metal,0,0.3,0);
+  P(g,new THREE.BoxGeometry(0.3,0.12,0.2),M.dark,0.42,0.28,0);
+  const pair=new THREE.Group();
+  P(pair,new THREE.TubeGeometry(new THREE.CatmullRomCurve3([V3(-0.3,0.32,0.05),V3(-0.8,0.5,0.3),V3(-1.2,0.3,0.5)]),16,0.015,6),M.orange);
+  P(pair,new THREE.TubeGeometry(new THREE.CatmullRomCurve3([V3(-0.3,0.32,0.0),V3(-0.8,0.47,0.25),V3(-1.2,0.27,0.45)]),16,0.015,6),M.white);
+  g.add(pair);
+  const brace=P(g,new THREE.BoxGeometry(0.08,0.5,0.08),M.dark,-1.0,0.25,0.35);
+  const A={};anchor(g,'main',A,0,0.8,0);anchor(g,'wire',A,-0.85,0.5,0.3);anchor(g,'probeA',A,-0.2,0.45,0.05);anchor(g,'probeB',A,-0.2,0.45,-0.02);
+  return {g,A,glowOn:true,glowColor:0xd04030,glowAt:'main',smokeOn:false,
+    expose:()=>{pair.children[1].material=M.copperBurnt},
+    fix:()=>{pair.children[1].material=M.white},
+  };
+ },
+},
+/* ---------- 第二十二关 维修开关MSD ---------- */
+{
+ id:'msd',name:'维修开关MSD',color:'#f472b6',no:'第二十二关',
+ title:'维修开关 MSD · 熔断更换',
+ introP:'车辆完全无法上高压，READY 灯不亮。读码：BMS 报「高压互锁回路开路」。检查发现电池包上的 MSD 维修开关熔芯熔断——上次误操作短接所致。更换熔芯并复测互锁回路。',
+ order:'车型：纯电轿车<br>现象：<b>空调不制冷，压缩机支路无高压</b><br>读码：<b>「压缩机高压供电丢失」</b><br>初步判断：PDU 内压缩机支路保险烧蚀',
+ tools:[
+  {id:'poweroff',obj:'高压下电，验电确认'},
+  {id:'gloves',obj:'穿戴高压防护装备'},
+  {id:'wrench',obj:'拆卸盒盖'},
+  {id:'meter',obj:'测量各支路保险'},
+  {id:'wrench',obj:'更换保险与接触器'},
+  {id:'wrench',obj:'复装盒盖'},
+  {id:'diag',obj:'上电测试各支路'},
+ ],
+ steps:[
+  {tool:'poweroff',at:'main',say:'PDU 是全车高压交汇点，断电验电必须最先做。',done:(c)=>{c.live=false;addOrderDone('高压已下电并验电')}},
+  {tool:'gloves',at:'body',say:'配电盒内全是裸排和熔断器，防护到位再开盖。',done:()=>addOrderDone('防护到位')},
+  {tool:'wrench',at:'cover',say:'盒盖螺栓对角松——看，压缩机支路保险已经烧黑，接触器也有拉弧痕迹。',done:(c)=>{c.openBox();addOrderDone('盒盖已拆')}},
+  {tool:'meter',say:'压缩机支路保险阻值无穷大，确认熔断；相邻支路正常。',done:()=>{showMeter('∞ Ω','压缩机支路保险 · 正常 0 Ω → 熔断',false);addOrderDone('确认保险熔断')}},
+  {tool:'wrench',at:'fuse',say:'换新保险，烧结接触器一并换掉——带载拉弧过的触点靠不住。',done:(c)=>{c.refit();addOrderDone('保险与接触器已更换')}},
+  {tool:'wrench',at:'cover',say:'盒盖复装，密封圈对位，螺栓按力矩上紧。',done:(c)=>{c.closeBox();addOrderDone('盒盖已复装')}},
+  {tool:'diag',at:'main',say:'上电：主接触器吸合干脆，压缩机支路电压到位，空调恢复制冷。',done:()=>{showMeter('386 V','压缩机支路母线电压 → 正常',true);addOrderDone('上电验证通过')}},
+ ],
+ build(){
+  const g=new THREE.Group();g.position.y=1.0;scene.add(g);
+  P(g,new THREE.BoxGeometry(0.95,0.16,0.62),M.dark,0,0.12,0);
+  const cover=P(g,new THREE.BoxGeometry(0.99,0.1,0.66),M.metal,0,0.26,0);
+  const bars=[];for(let i=0;i<3;i++)bars.push(P(g,new THREE.BoxGeometry(0.06,0.06,0.5),M.copper,-0.3+i*0.3,0.21,0));
+  const fuseA=P(g,new THREE.BoxGeometry(0.14,0.08,0.12),M.copperBurnt,0.3,0.24,0.1);
+  const fuseB=P(g,new THREE.BoxGeometry(0.14,0.08,0.12),M.green,-0.3,0.24,0.1);
+  const cont=P(g,new THREE.CylinderGeometry(0.07,0.07,0.14,16),M.dark,0,0.24,-0.15);
+  const A={};anchor(g,'main',A,0,0.8,0);anchor(g,'cover',A,0,0.45,0);anchor(g,'fuse',A,0.3,0.5,0.1);anchor(g,'probeA',A,0.3,0.3,0.2);anchor(g,'probeB',A,0.3,0.3,-0.05);anchor(g,'body',A,0,0.1,0.9);
+  return {g,A,live:true,sparkAt:'fuse',smokeOn:true,smokeAt:'fuse',
+    openBox:()=>{cover.position.y=0.62},
+    closeBox:()=>{cover.position.y=0.26},
+    refit:()=>{fuseA.material=M.green;cont.material=M.metal},
+  };
+ },
+},
+/* ---------- 第二十三关 BMS主继电器 ---------- */
+{
+ id:'relay',name:'BMS主继电器',color:'#06b6d4',no:'第二十三关',
+ title:'BMS 主继电器 · 触点烧结',
+ introP:'车辆偶发无法充电，慢充插入 10 秒后跳枪。读码：BMS 报「主正继电器粘连 / 预充失败」。初步判断：主继电器触点烧结，预充电阻反复冲击发热。需要断电更换继电器总成。',
+ order:'车型：纯电轿车<br>现象：<b>充电至 80% 报单体不均衡，仪表动力受限灯亮</b><br>读码：BMS 报 <b>「第 37 串采样异常 / 压差过大」</b><br>初步判断：采样线束端子虚接氧化',
+ tools:[
+  {id:'diag',obj:'读数据流定位异常单体'},
+  {id:'wrench',obj:'断开低压蓄电池负极，拆 BMS 插头'},
+  {id:'meter',obj:'测量采样线通断'},
+  {id:'clamp',obj:'压接修复氧化端子'},
+  {id:'meter',obj:'复测通断确认'},
+  {id:'wrench',obj:'复插插头并固定'},
+  {id:'diag',obj:'清码并验证均衡恢复'},
+ ],
+ steps:[
+  {tool:'diag',at:'main',say:'数据流锁定第 37 串：充电时电压跳变超过 200mV，就是这串的采样回路出了问题。',done:()=>{showMeter('37 串','异常单体定位：电压跳变 230mV',false);addOrderDone('已定位第 37 串采样异常')}},
+  {tool:'wrench',at:'plug',say:'先断 12V 负极再拔 BMS 插头——低压件也一样，防止模块误动作。',done:(c)=>{c.unplug();addOrderDone('BMS 插头已断开')}},
+  {tool:'meter',say:'第 37 串采样线阻值 12Ω，正常应小于 1Ω——端子氧化虚接，找到了。',done:()=>{showMeter('12.0 Ω','第 37 串采样线阻值 · 正常 < 1 Ω → 虚接',false);addOrderDone('实测阻值 12Ω，确认虚接')}},
+  {tool:'clamp',at:'wire',say:'剪掉氧化段，重新压接端子，套热缩管绝缘。手劲要稳，压到位。',done:(c)=>{c.refit();addOrderDone('端子已重新压接')}},
+  {tool:'meter',say:'复测 0.2Ω，导通良好。采样回路恢复。',done:()=>{showMeter('0.2 Ω','第 37 串采样线复测 → 正常',true);addOrderDone('复测阻值正常')}},
+  {tool:'wrench',at:'plug',say:'插头复插到位，卡扣「咔」一声才算锁止，再缠防水胶带。',done:(c)=>{c.replug();addOrderDone('插头已复装')}},
+  {tool:'diag',at:'main',say:'清码后重新充电，压差回到 30mV 以内，均衡恢复正常。收工。',done:()=>{showMeter('30 mV','整包单体压差 → 正常',true);addOrderDone('均衡验证通过')}},
+ ],
+ build(){
+  const g=new THREE.Group();g.position.y=1.0;scene.add(g);
+  P(g,new THREE.BoxGeometry(0.72,0.16,0.5),M.metal,0,0.3,0);
+  P(g,new THREE.BoxGeometry(0.6,0.04,0.4),M.dark,0,0.4,0);
+  /* 电芯组（采样对象） */
+  P(g,new THREE.BoxGeometry(1.3,0.34,0.6),M.blue,0,-0.28,0);
+  const plug=new THREE.Group();
+  P(plug,new THREE.BoxGeometry(0.3,0.12,0.18),M.orange,0,0,0);
+  plug.position.set(0.55,0.28,0);g.add(plug);
+  /* 采样线束 */
+  const wires=[];
+  for(let i=0;i<5;i++){const w=P(g,new THREE.TubeGeometry(new THREE.CatmullRomCurve3([V3(0.42,0.3,0),V3(0.2,0.12,-0.1+i*0.05),V3(-0.4+i*0.05,-0.1,0.1-i*0.04)]),12,0.012,6),i===2?M.copperBurnt:M.copper);wires.push(w)}
+  const A={};anchor(g,'main',A,0,0.8,0);anchor(g,'plug',A,0.7,0.5,0);anchor(g,'wire',A,0.1,0.05,0);anchor(g,'probeA',A,0.25,0.1,0.15);anchor(g,'probeB',A,-0.35,-0.08,0.1);
+  return {g,A,glowOn:true,glowColor:0xd04030,glowAt:'main',smokeOn:false,
+    unplug:()=>{plug.position.x=0.85;plug.position.y=0.1},
+    replug:()=>{plug.position.x=0.55;plug.position.y=0.28},
+    refit:()=>{wires[2].material=M.copper},
+  };
+ },
+},
+/* ---------- 第二十四关 PTC加热器 ---------- */
+{
+ id:'ptc',name:'PTC加热器',color:'0x60a5fa'.replace('0x','#'),no:'第二十四关',
+ title:'PTC 加热器 · 不制热',
+ introP:'冬天开空调只有自然风，PTC 加热器不工作。读码：整车控制器报「PTC 高压回路开路 / 加热器过温」。测量 PTC 高压端子不通，判断加热芯体烧断，更换前必须完成高压下电验电。',
+ order:'车型：纯电轿车<br>现象：<b>空调不制冷，压缩机不启动</b><br>读码：<b>「压缩机绝缘故障」</b><br>初步判断：压缩机内部对地击穿，需更换总成',
+ tools:[
+  {id:'diag',obj:'读码确认绝缘故障'},
+  {id:'vac',obj:'回收冷媒'},
+  {id:'poweroff',obj:'高压下电，验电确认'},
+  {id:'gloves',obj:'穿戴高压防护装备'},
+  {id:'wrench',obj:'拆卸并更换压缩机'},
+  {id:'vac',obj:'抽真空'},
+  {id:'fill',obj:'定量加注冷媒并检漏'},
+  {id:'diag',obj:'试车验证制冷'},
+ ],
+ steps:[
+  {tool:'diag',at:'main',say:'绝缘故障码确认。压缩机内部存高压电，接插件防水一旦失效，这就是高发故障点。',done:()=>{showMeter('0.1 MΩ','压缩机绕组对地绝缘 → 击穿',false);addOrderDone('确认绝缘击穿')}},
+  {tool:'vac',at:'port',say:'拆压缩机前必须回收冷媒——直接拆会喷得到处都是，还破坏臭氧层。',done:()=>addOrderDone('冷媒已回收')},
+  {tool:'poweroff',at:'main',say:'压缩机支路走高压母线，断电验电，母线电容等放电。',done:(c)=>{c.live=false;addOrderDone('高压已下电并验电')}},
+  {tool:'gloves',at:'body',say:'防护到位。高压接插件带互锁，拔的时候按住锁扣，别硬拽。',done:()=>addOrderDone('防护到位')},
+  {tool:'wrench',at:'main',say:'旧机拆下，新机就位——高压接插件密封圈检查一遍，防水失效就是这个故障的源头。',done:(c)=>{c.swap();addOrderDone('新压缩机已更换')}},
+  {tool:'vac',at:'port',say:'管路抽真空 15 分钟以上，真空度到位保压不漏，才能加注。',done:()=>addOrderDone('抽真空完成')},
+  {tool:'fill',at:'port',say:'按铭牌克数定量加注，电子秤盯着。加完检漏仪扫一遍接头。',done:()=>addOrderDone('冷媒已加注检漏')},
+  {tool:'diag',at:'main',say:'启动空调，低压管冰凉，出风口的温度直线下降——制冷恢复。',done:()=>{showMeter('6.2 ℃','出风口温度 → 正常',true);addOrderDone('试车验证通过')}},
+ ],
+ build(){
+  const g=new THREE.Group();g.position.y=1.05;scene.add(g);
+  const body=P(g,new THREE.CylinderGeometry(0.3,0.3,0.55,32),M.metal,0,0.3,0,0,0,Math.PI/2);
+  P(g,new THREE.CylinderGeometry(0.31,0.31,0.08,32),M.dark,0.3,0.3,0,0,0,Math.PI/2);
+  P(g,new THREE.BoxGeometry(0.25,0.15,0.2),M.orange,-0.15,0.55,0);
+  const portA=P(g,new THREE.CylinderGeometry(0.06,0.06,0.14,12),M.red,0.05,0.62,0.12);
+  const portB=P(g,new THREE.CylinderGeometry(0.06,0.06,0.14,12),M.blue,0.05,0.62,-0.12);
+  P(g,new THREE.BoxGeometry(0.6,0.06,0.4),M.dark,0,-0.02,0);
+  const A={};anchor(g,'main',A,0,0.9,0);anchor(g,'port',A,0.05,0.85,0.12);anchor(g,'body',A,0,0.15,0.9);
+  return {g,A,live:true,sparkAt:'main',smokeOn:true,smokeAt:'main',
+    swap:()=>{body.material=M.green},
+  };
+ },
+},
+/* ---------- 第二十五关 制动能量回收 ---------- */
+{
+ id:'brake',name:'制动能量回收',color:'#94a3b8',no:'第二十五关',
+ title:'制动能量回收 · 踏板异常',
+ introP:'客户感觉制动踏板前半段变「空」，能量回收经常突然退出，仪表偶报「制动系统故障」。读码：报「回收扭矩请求异常」。需要检查制动踏板行程传感器与相关高压回路。',
+ order:'车型：纯电轿车<br>现象：<b>回收制动抖动，制动脚感变软</b><br>读码：<b>「制动回收协调异常」</b><br>初步判断：制动液含水率超标，需换液排气',
+ tools:[
+  {id:'diag',obj:'读码确认回收协调异常'},
+  {id:'meter',obj:'检测制动液含水率'},
+  {id:'wrench',obj:'更换制动液并四轮排气'},
+  {id:'torque',obj:'紧固导向销与轮毂螺栓'},
+  {id:'diag',obj:'路试验收'},
+ ],
+ steps:[
+  {tool:'diag',at:'main',say:'回收协调报异常先别换泵——纯电车前半段靠电机制动，机械部分状态差也会报这个码。',done:()=>addOrderDone('读码完成')},
+  {tool:'meter',say:'含水率 3.8%，远超 2% 限值——气泡在回收频繁工况里就是抖动来源。',done:()=>{showMeter('3.8 %','制动液含水率 · 限值 2% → 超标',false);addOrderDone('含水率超标确认')}},
+  {tool:'wrench',at:'caliper',say:'按离制动总缸最远的轮先排，一踩一松，出来的旧液由浑变清——四轮挨个来。',done:(c)=>{c.flush();addOrderDone('制动液已更换排气')}},
+  {tool:'torque',at:'caliper',say:'导向销 28N·m，轮毂螺栓按对角 120N·m——回收扭矩大，松一颗都抖。',done:(c)=>{c.tight();addOrderDone('力矩紧固完成')}},
+  {tool:'diag',at:'main',say:'路试：回收制动从满回收到机械衔接全程平顺，脚感回来了。',done:()=>addOrderDone('路试验收通过')},
+ ],
+ build(){
+  const g=new THREE.Group();g.position.y=1.1;scene.add(g);
+  const disc=P(g,new THREE.CylinderGeometry(0.42,0.42,0.05,40),M.metal,0,0,0,0,0,Math.PI/2);
+  P(g,new THREE.CylinderGeometry(0.13,0.13,0.09,20),M.dark,0,0,0,0,0,Math.PI/2);
+  for(let i=0;i<5;i++){const a=i/5*Math.PI*2;P(g,new THREE.BoxGeometry(0.36,0.03,0.06),M.dark,0,Math.cos(a)*0.28,Math.sin(a)*0.28,-a,0,0)}
+  const caliper=P(g,new THREE.BoxGeometry(0.12,0.3,0.26),M.red,0,0.32,0.2);
+  const bottle=P(g,new THREE.CylinderGeometry(0.09,0.09,0.28,16),M.white,0.85,-0.3,0);
+  const fluid=P(g,new THREE.CylinderGeometry(0.075,0.075,0.1,16),new THREE.MeshStandardMaterial({color:0x8a6a20,roughness:.3}),0.85,-0.34,0);
+  const A={};anchor(g,'main',A,0,0.75,0);anchor(g,'caliper',A,0,0.6,0.25);
+  const st={shake:true};
+  return {g,A,glowOn:false,smokeOn:false,_st:st,
+    tick:(dt,t)=>{if(st.shake){disc.rotation.x+=dt*0.5;g.position.y=1.1+Math.sin(t*30)*0.006}},
+    flush:()=>{fluid.material=M.liquid},
+    tight:()=>{st.shake=false;g.position.y=1.1},
+  };
+ },
+},
+/* ---------- 第二十六关 减速器油 ---------- */
+{
+ id:'gearoil',name:'减速器油',color:'#a855f7',no:'第二十六关',
+ title:'减速器 · 油液渗漏',
+ introP:'车辆行驶中底盘有异响，举升检查发现减速器壳体接缝渗油，油位已低于下限。长期缺油会烧毁轴承齿轮。需要清洁渗漏点、补充减速器专用油并复紧。',
+ order:'车型：纯电轿车（电驱总成）<br>现象：<b>减速器部位周期性异响，输出轴处渗油</b><br>读码：无故障码（机械故障）<br>初步判断：输出轴油封老化渗漏，齿轮油液位下降',
+ tools:[
+  {id:'diag',obj:'路试确认异响与转速关系'},
+  {id:'wrench',obj:'拆卸放油螺栓，放旧油'},
+  {id:'wrench',obj:'拆旧油封'},
+  {id:'fill',obj:'加注新齿轮油至油位孔'},
+  {id:'torque',obj:'按力矩复紧螺栓'},
+  {id:'diag',obj:'路试验收异响'},
+ ],
+ steps:[
+  {tool:'diag',at:'main',say:'路试确认：异响频率与电机转速成正比，与车速脱钩——是减速器内部问题，不是轮胎。',done:()=>addOrderDone('异响定位在减速器')},
+  {tool:'wrench',at:'drain',say:'先放油再拆件——旧油放出来看看有没有金属屑，这是判断磨损程度的关键。',done:(c)=>{c.drain();addOrderDone('旧油已放净')}},
+  {tool:'wrench',at:'seal',say:'油封拉马拉出旧油封——别划伤轴颈，新油封唇口预涂齿轮油再压入。',done:(c)=>{c.swapSeal();addOrderDone('新油封已压装')}},
+  {tool:'fill',at:'fillPort',say:'从油位孔加注到刚好溢出，型号要对——部分车型与电机冷却油共用，别加错。',done:(c)=>{c.fillOil();addOrderDone('齿轮油已加注')}},
+  {tool:'torque',at:'drain',say:'放油螺栓 35N·m，通气塞别忘复位。',done:()=>addOrderDone('螺栓力矩达标')},
+  {tool:'diag',at:'main',say:'路试两公里，异响消失，油封位无渗漏。机械故障，手到病除。',done:()=>addOrderDone('路试验收通过')},
+ ],
+ build(){
+  const g=new THREE.Group();g.position.y=1.05;scene.add(g);
+  P(g,new THREE.CylinderGeometry(0.42,0.42,0.6,32),M.metal,0,0,0,0,0,Math.PI/2);
+  P(g,new THREE.CylinderGeometry(0.2,0.2,0.18,24),M.dark,-0.4,0,0,0,0,Math.PI/2);
+  P(g,new THREE.CylinderGeometry(0.14,0.14,0.5,20),M.metal,0.55,0,0,0,0,Math.PI/2);
+  const sealOld=P(g,new THREE.TorusGeometry(0.15,0.03,10,24),M.rubber,0.45,0,0,0,Math.PI/2,0);
+  const plug2=P(g,new THREE.CylinderGeometry(0.06,0.06,0.12,12),M.dark,0,-0.48,0);
+  const oilDisc=P(g,new THREE.CircleGeometry(0.3,24),new THREE.MeshBasicMaterial({color:0x151a12,transparent:true,opacity:0}),0,-0.56,0,-Math.PI/2,0,0);
+  const sight=P(g,new THREE.CylinderGeometry(0.05,0.05,0.06,12),new THREE.MeshStandardMaterial({color:0x2a2a18,roughness:.3}),0.2,0.28,0.28);
+  const A={};anchor(g,'main',A,0,0.7,0);anchor(g,'drain',A,0,-0.55,0.2);anchor(g,'seal',A,0.6,0.1,0);anchor(g,'fillPort',A,0.2,0.5,0.28);
+  return {g,A,leakOn:true,leakAt:'seal',smokeOn:false,
+    drain:()=>{oilDisc.material.opacity=.85;plug2.position.y=-0.56},
+    swapSeal:()=>{sealOld.material=M.green},
+    fillOil:()=>{sight.material=M.liquid;oilDisc.material.opacity=0},
+  };
+ },
+},
+/* ---------- 第二十七关 12V蓄电池 ---------- */
+{
+ id:'lvbat',name:'12V蓄电池',color:'#a78bfa',no:'第二十七关',
+ title:'12V 蓄电池 · 亏电更换',
+ introP:'车辆停放一夜后无法唤醒，遥控无反应，搭电后能正常启动。测量 12V 蓄电池电压仅 10.8V，健康度严重衰减。更换蓄电池并检查 DC-DC 充电回路。',
+ order:'车型：纯电轿车（改装车）<br>现象：<b>座椅保险反复熔断，偶发焦糊味</b><br>读码：无码（低压线路故障）<br>初步判断：改装线路虚接发热，搭铁点氧化',
+ tools:[
+  {id:'meter',obj:'测改装线路电流'},
+  {id:'wrench',obj:'拆检线束'},
+  {id:'cleaner',obj:'清洁车身搭铁点'},
+  {id:'clamp',obj:'重新压接端子并包扎'},
+  {id:'meter',obj:'复测电流确认'},
+  {id:'torque',obj:'恢复内饰板'},
+  {id:'diag',obj:'路试验证'},
+ ],
+ steps:[
+  {tool:'meter',say:'改装线路静态电流 4.2A，保险丝 10A 长期满负荷——发热熔断只是时间问题。',done:()=>{showMeter('4.2 A','改装线路电流 · 长期 >50% 额定 → 过载',false);addOrderDone('确认线路过载')}},
+  {tool:'wrench',at:'wire',say:'座椅底下拆开——接头包着胶布糊弄，线芯半数虚接，胶布已经烤化了。',done:(c)=>{c.expose();addOrderDone('虚接点已暴露')}},
+  {tool:'cleaner',at:'ground',say:'车身搭铁点打磨见金属，氧化物是虚接的温床。',done:(c)=>{c.cleanG();addOrderDone('搭铁点已清洁')}},
+  {tool:'clamp',at:'wire',say:'端子全部重新压接，烫锡，热缩管绝缘，线束固定夹复原——改装也要按规范来。',done:(c)=>{c.fix();addOrderDone('端子已重新压接')}},
+  {tool:'meter',say:'复测电流 0.8A，线路温度正常。这才叫改装。',done:()=>{showMeter('0.8 A','整改后线路电流 → 正常',true);addOrderDone('复测正常')}},
+  {tool:'torque',at:'panel',say:'内饰板复位，卡扣对齐，螺栓别上过头——塑料件滑牙就麻烦了。',done:()=>addOrderDone('内饰已恢复')},
+  {tool:'diag',at:'main',say:'路试半小时，音响正常、保险不再熔断、无异味——隐患排除。',done:()=>addOrderDone('路试验证通过')},
+ ],
+ build(){
+  const g=new THREE.Group();g.position.y=1.0;scene.add(g);
+  P(g,new THREE.BoxGeometry(1.0,0.12,0.5),M.dark,0,0.1,0); /* 座椅导轨 */
+  const amp=P(g,new THREE.BoxGeometry(0.45,0.3,0.35),M.dark,-0.25,0.32,0);
+  P(g,new THREE.BoxGeometry(0.35,0.2,0.02),M.screen,-0.25,0.32,0.18);
+  const wire=P(g,new THREE.TubeGeometry(new THREE.CatmullRomCurve3([V3(0.3,0.15,0),V3(0.5,0.3,0.1),V3(0.1,0.35,0.15)]),14,0.025,6),M.copperBurnt);
+  const tape=P(g,new THREE.CylinderGeometry(0.045,0.045,0.08,10),M.rubber,0.42,0.26,0.08,0,0,1.2);
+  const ground=P(g,new THREE.CylinderGeometry(0.08,0.1,0.06,12),M.copperBurnt,0.6,0.16,0.1);
+  const A={};anchor(g,'main',A,0,0.8,0);anchor(g,'wire',A,0.42,0.45,0.08);anchor(g,'ground',A,0.6,0.4,0.1);anchor(g,'panel',A,-0.25,0.6,0);
+  return {g,A,live:false,sparkAt:'wire',smokeOn:true,smokeAt:'wire',
+    expose:()=>{tape.visible=false},
+    cleanG:()=>{ground.material=M.copper},
+    fix:()=>{wire.material=M.orange},
+  };
+ },
+},
+/* ---------- 第二十八关 电子水泵 ---------- */
+{
+ id:'pump',name:'电子水泵',color:'#38bdf8',no:'第二十八关',
+ title:'电子水泵 · 卡死更换',
+ introP:'车辆行驶中仪表提示「冷却系统故障」，读码报「冷却液流量过低」。摸水泵壳体发烫但出水管冰凉——水泵叶轮卡死。更换电子水泵并排气。',
+ order:'车型：纯电轿车<br>现象：<b>快充降功率，电池过热报警</b><br>读码：<b>「电池温度高 / 水泵转速异常」</b><br>初步判断：电子水泵卡滞，冷却液不循环',
+ tools:[
+  {id:'diag',obj:'读数据流确认水泵状态'},
+  {id:'poweroff',obj:'高压下电，验电确认'},
+  {id:'gloves',obj:'穿戴高压防护装备'},
+  {id:'wrench',obj:'更换电子水泵'},
+  {id:'fill',obj:'加注冷却液并抽真空排气'},
+  {id:'diag',obj:'路试验证温度回落'},
+ ],
+ steps:[
+  {tool:'diag',at:'main',say:'占空比 100%、转速 0——指令到了泵不转，水泵机械卡滞，不用猜了。',done:()=>{showMeter('0 rpm','水泵转速 · 指令 100% → 卡滞',false);addOrderDone('确认水泵卡滞')}},
+  {tool:'poweroff',at:'main',say:'热管理部件全是高压件，断电验电。',done:(c)=>{c.live=false;addOrderDone('高压已下电并验电')}},
+  {tool:'gloves',at:'body',say:'戴好手套。冷却液温度还高，别急着拆管，先等降温。',done:()=>addOrderDone('防护到位')},
+  {tool:'wrench',at:'pump',say:'旧泵拆下——转子果然卡死。新泵就位，水管卡箍换新，插头锁止。',done:(c)=>{c.swap();addOrderDone('新水泵已更换')}},
+  {tool:'fill',at:'pump',say:'补液后抽真空排气，气堵会让新泵白换。捏水管听水流声，确认循环。',done:()=>addOrderDone('加注排气完成')},
+  {tool:'diag',at:'main',say:'快充复测：水泵转速跟上指令，电池温度稳定在 32℃，功率回到满充。',done:()=>{showMeter('32 ℃','快充电池温度 → 正常',true);addOrderDone('验证通过')}},
+ ],
+ build(){
+  const g=new THREE.Group();g.position.y=1.0;scene.add(g);
+  const volute=P(g,new THREE.CylinderGeometry(0.26,0.26,0.16,32),M.metal,0,0.3,0);
+  P(g,new THREE.TorusGeometry(0.2,0.06,12,28),M.dark,0,0.3,0,Math.PI/2,0,0);
+  P(g,new THREE.CylinderGeometry(0.07,0.07,0.3,14),M.blue,0.3,0.3,0,0,0,Math.PI/2);
+  P(g,new THREE.CylinderGeometry(0.07,0.07,0.3,14),M.blue,-0.3,0.3,0,0,0,Math.PI/2);
+  P(g,new THREE.BoxGeometry(0.14,0.1,0.12),M.dark,0,0.52,0.1);
+  P(g,new THREE.BoxGeometry(0.5,0.05,0.3),M.dark,0,0.05,0);
+  const A={};anchor(g,'main',A,0,0.85,0);anchor(g,'pump',A,0,0.55,0.15);anchor(g,'body',A,0,0.1,0.9);
+  return {g,A,live:true,glowOn:true,glowColor:0xff6020,glowAt:'main',smokeOn:true,smokeAt:'main',
+    swap:()=>{volute.material=M.green},
+  };
+ },
+},
+/* ---------- 第二十九关 雨刮电机 ---------- */
+{
+ id:'wiper',name:'雨刮电机',color:'#cbd5e1',no:'第二十九关',
+ title:'雨刮电机 · 不工作',
+ introP:'雨天雨刮突然停在风挡中间不动了，开关各档位均无反应，保险丝熔断过一次。初步判断：雨刮电机碳刷磨损/电枢烧毁，更换电机并验证各档位。',
+ order:'车型：纯电轿车（托底事故车）<br>现象：<b>托底后仪表高压报警，无法上电</b><br>读码：<b>「高压互锁回路故障」</b><br>初步判断：护板变形挤压高压线束',
+ tools:[
+  {id:'diag',obj:'读码确认互锁故障'},
+  {id:'poweroff',obj:'高压下电，验电确认'},
+  {id:'gloves',obj:'穿戴高压防护装备'},
+  {id:'wrench',obj:'拆卸变形护板'},
+  {id:'meter',obj:'测量线束绝缘'},
+  {id:'clamp',obj:'修复包扎线束'},
+  {id:'torque',obj:'按力矩复装护板'},
+  {id:'megger',obj:'绝缘复测，验收合格'},
+  {id:'diag',obj:'路试交车验证'},
+ ],
+ steps:[
+  {tool:'diag',at:'main',say:'互锁回路报警——沿互锁回路逐段排查前先确保高压已断，这是事故车的规矩。',done:()=>addOrderDone('互锁故障确认')},
+  {tool:'poweroff',at:'cable',say:'断 12V 负极、拔维修开关、等待 5 分钟、验电无压——四步做完才碰高压线。',done:(c)=>{c.live=false;addOrderDone('高压下电验电完成')}},
+  {tool:'gloves',at:'body',say:'事故车线束状态未知，防护到位。',done:()=>addOrderDone('防护到位')},
+  {tool:'wrench',at:'plate',say:'护板拆下——线束绝缘皮被护板锐边割破，铜线裸露，再磨一下就短路了。',done:(c)=>{c.open();addOrderDone('护板已拆')}},
+  {tool:'meter',say:'破损点对车身绝缘 0.3MΩ，低于 100Ω/V 要求——确认损伤段范围。',done:()=>{showMeter('0.3 MΩ','线束对车身绝缘 → 不合格',false);addOrderDone('绝缘实测不合格')}},
+  {tool:'clamp',at:'cable',say:'截除损伤段，高压专用线重新压接，绝缘胶带三层，波纹管加护套——锐边处加橡胶护线圈。',done:(c)=>{c.fix();addOrderDone('线束已修复')}},
+  {tool:'torque',at:'plate',say:'护板整形复位，按力矩复紧——错误举升会顶坏电池，交车前再查一遍举升点。',done:(c)=>{c.close();addOrderDone('护板已复装')}},
+  {tool:'megger',say:'高压系统绝缘复测 200MΩ，互锁回路导通正常。',done:()=>{showMeter('200 MΩ','高压系统绝缘复测 → 合格',true);addOrderDone('绝缘复测合格')}},
+  {tool:'diag',at:'main',say:'路试：上电正常、行驶无报警——事故车维修后必须做高压功能验证才能交车。',done:()=>addOrderDone('路试交车验证通过')},
+ ],
+ build(){
+  const g=new THREE.Group();g.position.y=0.95;scene.add(g);
+  P(g,new THREE.BoxGeometry(2.0,0.12,1.0),M.metal,0,0.15,0); /* 地板 */
+  P(g,new THREE.BoxGeometry(1.6,0.22,0.8),M.dark,0,-0.12,0); /* 电池托盘 */
+  const cable=P(g,new THREE.TubeGeometry(new THREE.CatmullRomCurve3([V3(-0.9,0.22,0.35),V3(0,0.24,0.4),V3(0.9,0.22,0.35)]),20,0.035,8),M.orange);
+  const bare=P(g,new THREE.CylinderGeometry(0.035,0.035,0.12,10),M.copperBurnt,0.2,0.24,0.42,Math.PI/2,0,0);
+  const plate=P(g,new THREE.BoxGeometry(1.9,0.04,0.9),M.white,0,0.26,0.05,0,0,0.06);
+  const A={};anchor(g,'main',A,0,0.85,0);anchor(g,'cable',A,0.2,0.55,0.42);anchor(g,'plate',A,0.6,0.6,0.2);anchor(g,'body',A,0,0.4,0.9);
+  return {g,A,live:true,sparkAt:'cable',smokeOn:true,smokeAt:'cable',
+    open:()=>{plate.position.y=0.7},
+    close:()=>{plate.position.set(0,0.26,0.05);plate.rotation.z=0},
+    fix:()=>{bare.material=M.orange},
+  };
+ },
+},
+/* ---------- 第三十关 快充握手 ---------- */
+{
+ id:'fastgun',name:'快充握手',color:'#fbbf24',no:'第三十关',
+ title:'快充桩握手 · 充电中止',
+ introP:'客户反映快充枪插上后充电 30 秒就中止，换桩也一样。读码：报「快充连接确认 CC/CP 异常」。检查快充口端子烧蚀退针，需要处理端子并验证握手信号。',
+ order:'车型：纯电轿车<br>现象：<b>慢充偶发断连，充电口焦糊味</b><br>读码：<b>「充电连接异常」</b><br>初步判断：充电口触点烧蚀，绝缘超标',
+ tools:[
+  {id:'poweroff',obj:'断电验电'},
+  {id:'gloves',obj:'穿戴防护装备'},
+  {id:'wrench',obj:'拆卸充电座'},
+  {id:'cleaner',obj:'清洁烧蚀触点'},
+  {id:'meter',obj:'测触点绝缘阻值'},
+  {id:'wrench',obj:'更换充电座总成'},
+  {id:'diag',obj:'实充验证'},
+ ],
+ steps:[
+  {tool:'poweroff',at:'main',say:'充电口触点直连高压回路，先断电验电。',done:(c)=>{c.live=false;addOrderDone('已断电验电')}},
+  {tool:'gloves',at:'body',say:'防护穿戴。充电口检修最怕进水，先看密封圈老化没有。',done:()=>addOrderDone('防护到位')},
+  {tool:'wrench',at:'main',say:'充电座拆下来——触点烧蚀发黑，这状态清洁是救不回来的。',done:(c)=>{c.pullOut();addOrderDone('充电座已拆下')}},
+  {tool:'cleaner',at:'pin',say:'触点清洁剂喷上，无尘布擦——烧蚀层去掉看看基体损伤程度。',done:()=>addOrderDone('触点已清洁')},
+  {tool:'meter',say:'清洁后绝缘还是只有 0.4MΩ，远低于 10MΩ 要求——基体已碳化，必须换总成。',done:()=>{showMeter('0.4 MΩ','充电口绝缘 · 合格线 ≥ 10 MΩ → 不合格',false);addOrderDone('确认需更换总成')}},
+  {tool:'wrench',at:'main',say:'新充电座就位，防水圈换新——充电口进水严禁插枪，这条要记住。',done:(c)=>{c.swap();addOrderDone('新充电座已更换')}},
+  {tool:'diag',at:'main',say:'插枪实充：连接确认干脆，电子锁正常，充电全程不断连。',done:()=>addOrderDone('实充验证通过')},
+ ],
+ build(){
+  const g=new THREE.Group();g.position.y=1.1;scene.add(g);
+  const plate=P(g,new THREE.CylinderGeometry(0.34,0.34,0.08,32),M.dark,0,0.3,0,Math.PI/2,0,0);
+  const socket=P(g,new THREE.CylinderGeometry(0.24,0.24,0.14,32),M.metal,0,0.3,0,Math.PI/2,0,0);
+  for(let i=0;i<7;i++){const a=i/7*Math.PI*2;P(g,new THREE.CylinderGeometry(0.02,0.02,0.08,8),M.copperBurnt,Math.cos(a)*0.13,0.38,Math.sin(a)*0.13,Math.PI/2,0,0)}
+  P(g,new THREE.CylinderGeometry(0.045,0.045,0.1,10),M.copperBurnt,-0.05,0.38,0,Math.PI/2,0,0);
+  P(g,new THREE.CylinderGeometry(0.045,0.045,0.1,10),M.copperBurnt,0.05,0.38,0,Math.PI/2,0,0);
+  const A={};anchor(g,'main',A,0,0.75,0);anchor(g,'pin',A,0,0.55,0);anchor(g,'body',A,0,0.1,0.9);
+  return {g,A,live:true,sparkAt:'pin',smokeOn:true,smokeAt:'pin',
+    pullOut:()=>{plate.position.z=0.3;socket.position.z=0.3},
+    swap:()=>{g.traverse(o=>{if(o.geometry&&o.geometry.type==='CylinderGeometry'&&o.material===M.copperBurnt)o.material=M.copper})},
+  };
+ },
+},
+/* ---------- 专项关卡：混动/增程/氢燃料专属部件 ---------- */
+{
+ id:'engine_oil',name:'发动机保养',color:'#f97316',no:'专项',
+ title:'混动发动机 · 机油保养',
+ introP:'插混车发动机长期间歇运行，机油乳化变质更快。客户反映发动机启动后噪音大，仪表提示「请保养发动机」，底盘可见渗油痕迹。台上是拆下的混动专用发动机，油底壳放油螺栓正在渗油。',
+ order:'车型：插电混动轿车<br>现象：<b>发动机噪音大，仪表提示保养，底盘有渗油痕</b><br>判断：<b>机油超期乳化，放油螺栓密封失效渗油</b>',
+ tools:[
+  {id:'diag',obj:'读取保养提示与油压记录'},
+  {id:'poweroff',obj:'高压下电并确认发动机熄火'},
+  {id:'gloves',obj:'穿戴防护装备'},
+  {id:'wrench',obj:'拆下放油螺栓'},
+  {id:'cleaner',obj:'清洁油底壳结合面'},
+  {id:'fill',obj:'加注新机油 4.2L'},
+  {id:'torque',obj:'力矩复紧放油螺栓'},
+ ],
+ steps:[
+  {tool:'diag',say:'诊断仪读到「机油寿命 0%，怠速油压偏低历史记录」——先保养再用车。',done:()=>addOrderDone('保养需求已确认')},
+  {tool:'poweroff',at:'main',say:'混动车辆先下高压、发动机熄火。机械保养同样要确认无电无火。',done:(c)=>{c.live=false;addOrderDone('已下电熄火')}},
+  {tool:'gloves',at:'body',say:'防护到位。废旧机油对皮肤有刺激性，手套戴好。',done:()=>addOrderDone('防护到位')},
+  {tool:'wrench',at:'drain',say:'放油螺栓松掉，旧机油放出来——颜色发黑还带乳化痕迹，确实该换了。',done:(c)=>{c.drainOut();addOrderDone('旧机油已放净')}},
+  {tool:'cleaner',at:'pan',say:'油底壳结合面清洁干净，旧密封圈残留全部刮除。',done:()=>addOrderDone('结合面已清洁')},
+  {tool:'fill',at:'filler',say:'新机油 4.2L 加注——混动专用 0W-20 低粘度，低温启动保护更好。',done:(c)=>{c.fillOil();addOrderDone('新机油已加注')}},
+  {tool:'torque',at:'drain',say:'新密封圈装好，力矩扳手 25N·m 复紧——渗油点就是上次没打力矩。',done:(c)=>{c.tight();addOrderDone('放油螺栓已力矩紧固')}},
+  {tool:'diag',say:'复检：怠速机油压力 3.2bar，正常！保养灯复位，交车。',done:()=>{showMeter('3.2 bar','怠速机油压力 · 正常范围 2.5~4.5 bar',true);addOrderDone('油压复检正常')}},
+ ],
+ build(){
+  const g=new THREE.Group();g.position.y=1.05;scene.add(g);
+  P(g,new THREE.BoxGeometry(1.0,0.5,0.72),M.dark,0,0.25,0);
+  P(g,new THREE.BoxGeometry(0.94,0.14,0.66),M.metal,0,0.57,0);
+  P(g,new THREE.BoxGeometry(0.86,0.09,0.56),M.dark,0,0.68,0);
+  P(g,new THREE.BoxGeometry(0.9,0.18,0.62),new THREE.MeshStandardMaterial({color:0x2f3846,metalness:.6,roughness:.5}),0,-0.08,0);
+  const bolt=P(g,new THREE.CylinderGeometry(0.05,0.05,0.09,6),M.metal,0.28,-0.2,0.14);
+  P(g,new THREE.CylinderGeometry(0.09,0.09,0.07,20),M.dark,-0.3,0.74,0.1);
+  const stain=P(g,new THREE.CircleGeometry(0.3,24),new THREE.MeshBasicMaterial({color:0x150e06,transparent:true,opacity:.8}),0.28,-0.33,0.16,-Math.PI/2,0,0);
+  P(g,new THREE.CylinderGeometry(0.02,0.02,0.3,10),M.orange,0.42,0.6,0.2);
+  const A={};anchor(g,'main',A,0,0.4,0);anchor(g,'drain',A,0.28,-0.36,0.16);anchor(g,'pan',A,-0.15,-0.32,0);anchor(g,'filler',A,-0.3,0.88,0.1);anchor(g,'body',A,0,0.1,0.95);
+  return {g,A,live:true,smokeOn:true,smokeAt:'drain',
+    drainOut:()=>{bolt.position.y=-0.36;stain.scale.setScalar(1.6)},
+    fillOil:()=>{},
+    tight:()=>{bolt.position.y=-0.2;},
+  };
+ },
+},
+{
+ id:'engine_ign',name:'点火系统',color:'#ef4444',no:'专项',
+ title:'发动机 · 第二缸失火',
+ introP:'客户反映怠速明显抖动、加速无力，仪表亮发动机故障灯。读码显示「2缸失火/失火计数超标」。台上发动机第2缸点火线圈外壳有击穿烧灼痕迹，火花塞电极烧蚀发白。',
+ order:'车型：插电混动轿车<br>现象：<b>怠速抖动、加速无力、故障灯亮</b><br>读码：<b>P0302 第二缸失火</b><br>判断：<b>点火线圈击穿 + 火花塞烧蚀</b>',
+ tools:[
+  {id:'diag',obj:'读取失火故障码'},
+  {id:'poweroff',obj:'车辆下电熄火确认'},
+  {id:'gloves',obj:'穿戴防护装备'},
+  {id:'wrench',obj:'拆下点火线圈'},
+  {id:'meter',obj:'测量线圈次级阻值'},
+  {id:'wrench',obj:'更换火花塞'},
+  {id:'torque',obj:'力矩紧固火花塞'},
+ ],
+ steps:[
+  {tool:'diag',say:'读码：P0302——2缸失火计数还在涨。先看线圈和火花塞。',done:()=>addOrderDone('故障码 P0302 已确认')},
+  {tool:'poweroff',at:'main',say:'下电熄火。热车拆点火线圈，先等温度降下来。',done:(c)=>{c.live=false;addOrderDone('已下电熄火')}},
+  {tool:'gloves',at:'body',say:'防护到位。',done:()=>addOrderDone('防护到位')},
+  {tool:'wrench',at:'coil2',say:'2缸点火线圈拆下——外壳一道击穿痕，这线圈报废了。',done:(c)=>{c.pullCoil();addOrderDone('故障线圈已拆下')}},
+  {tool:'meter',say:'次级绕组阻值无穷大（开路），对照1缸 8.6kΩ——线圈内部烧断。',done:()=>{showMeter('OL ∞','点火线圈次级阻值 · 正常 6~10 kΩ → 开路',false);addOrderDone('线圈开路已确认')}},
+  {tool:'wrench',at:'plug2',say:'火花塞一并更换——电极烧蚀发白、间隙过大，救不回来了。',done:(c)=>{c.swapPlug();addOrderDone('火花塞已更换')}},
+  {tool:'torque',at:'plug2',say:'新火花塞力矩 25N·m 上紧，线圈插回锁卡到位。',done:()=>addOrderDone('已按规定力矩紧固')},
+  {tool:'diag',say:'清码点火：怠速平稳，失火计数为 0——交车！',done:()=>{showMeter('0 次','热车 10 分钟失火计数 → 正常',true);addOrderDone('试车验证通过')}},
+ ],
+ build(){
+  const g=new THREE.Group();g.position.y=1.0;scene.add(g);
+  P(g,new THREE.BoxGeometry(1.0,0.34,0.6),M.dark,0,0.1,0);
+  P(g,new THREE.BoxGeometry(0.94,0.1,0.54),M.metal,0,0.32,0);
+  const coil2=P(g,new THREE.BoxGeometry(0.16,0.24,0.2),M.copperBurnt,-0.15,0.5,0);
+  for(let i=0;i<4;i++){if(i!==1)P(g,new THREE.BoxGeometry(0.16,0.24,0.2),M.dark,-0.45+i*0.3,0.5,0)}
+  const plug2=P(g,new THREE.CylinderGeometry(0.03,0.03,0.16,10),M.copperBurnt,-0.15,0.36,0);
+  const burn=P(g,new THREE.CircleGeometry(0.09,18),new THREE.MeshBasicMaterial({color:0x0d0705,transparent:true,opacity:.85}),-0.15,0.63,0.06,-Math.PI/2+0.4,0,0);
+  P(g,new THREE.CylinderGeometry(0.02,0.02,0.5,8),M.orange,0.2,0.5,0.14,0,0,Math.PI/2);
+  const A={};anchor(g,'main',A,0,0.4,0);anchor(g,'coil2',A,-0.15,0.85,0);anchor(g,'plug2',A,-0.15,0.5,0.25);anchor(g,'body',A,0,0.1,0.85);
+  return {g,A,live:true,sparkAt:'coil2',smokeOn:true,smokeAt:'coil2',
+    pullCoil:()=>{coil2.position.y=0.86;coil2.position.x=-0.5},
+    swapPlug:()=>{plug2.material=M.copper;burn.material.opacity=0;coil2.material=M.dark;coil2.position.set(-0.15,0.5,0)},
+  };
+ },
+},
+{
+ id:'dht_oil',name:'变速箱油',color:'#8b5cf6',no:'专项',
+ title:'DHT混动变速箱 · 油液更换',
+ introP:'客户反映变速箱换挡顿挫、低速蠕动有异响。DHT混动专用变速箱油 6 万公里未换，油液已经变质，油底壳边缘渗油。台上是拆下的 DHT 总成。',
+ order:'车型：插电混动轿车<br>现象：<b>换挡顿挫、低速异响</b><br>判断：<b>变速箱油超期变质，油底壳渗油</b>',
+ tools:[
+  {id:'diag',obj:'读取变速箱油寿命与故障码'},
+  {id:'poweroff',obj:'高压下电，挂 P 挡熄火'},
+  {id:'gloves',obj:'穿戴防护装备'},
+  {id:'wrench',obj:'拆下油底壳放油'},
+  {id:'cleaner',obj:'清洁油底壳与滤网'},
+  {id:'fill',obj:'加注新变速箱油'},
+  {id:'torque',obj:'力矩紧固油底壳螺栓'},
+ ],
+ steps:[
+  {tool:'diag',say:'诊断仪读到「油液寿命 0%，油温传感器历史故障」——先换油。',done:()=>addOrderDone('换油需求已确认')},
+  {tool:'poweroff',at:'main',say:'下电、P挡、拉手刹——变速箱作业车辆必须稳稳停住。',done:(c)=>{c.live=false;addOrderDone('已下电驻车')}},
+  {tool:'gloves',at:'body',say:'防护到位。变速箱油温度高，防烫。',done:()=>addOrderDone('防护到位')},
+  {tool:'wrench',at:'pan',say:'油底壳螺栓松开，旧油放出——又黑又稠，还有焦糊味。',done:(c)=>{c.dropPan();addOrderDone('旧油已放净')}},
+  {tool:'cleaner',at:'pan',say:'油底壳滤网清洁干净，磁铁上的铁屑清除——铁屑多说明磨损超标，要提醒客户。',done:()=>addOrderDone('滤网已清洁')},
+  {tool:'fill',at:'filler',say:'新 DHT 专用油 4.8L 加注，油色透亮呈淡红色。',done:(c)=>{c.fillOil();addOrderDone('新油已加注')}},
+  {tool:'torque',at:'pan',say:'油底壳螺栓对角分两次力矩 10N·m 上紧，防渗漏。',done:(c)=>{c.tight();addOrderDone('油底壳已复紧')}},
+  {tool:'diag',say:'路试复检：换挡平顺、异响消失，油压正常——完工。',done:()=>{showMeter('4.6 bar','DHT 系统油压 · 正常范围 4~5.5 bar',true);addOrderDone('路试验证通过')}},
+ ],
+ build(){
+  const g=new THREE.Group();g.position.y=1.05;scene.add(g);
+  P(g,new THREE.CylinderGeometry(0.42,0.42,0.9,32),M.metal,0,0.3,0,0,0,Math.PI/2);
+  P(g,new THREE.CylinderGeometry(0.3,0.3,0.34,28),M.dark,0.62,0.3,0,0,0,Math.PI/2);
+  P(g,new THREE.BoxGeometry(0.7,0.12,0.56),new THREE.MeshStandardMaterial({color:0x2f3846,metalness:.6,roughness:.5}),0,0.02,0);
+  const boltRow=P(g,new THREE.BoxGeometry(0.66,0.05,0.5),M.metal,0,0.1,0);
+  const stain=P(g,new THREE.CircleGeometry(0.26,22),new THREE.MeshBasicMaterial({color:0x1c0e08,transparent:true,opacity:.75}),0.2,-0.08,0.2,-Math.PI/2,0,0);
+  const cap=P(g,new THREE.CylinderGeometry(0.08,0.08,0.08,18),M.red,-0.25,0.78,0.15);
+  const A={};anchor(g,'main',A,0,0.4,0);anchor(g,'pan',A,0.2,-0.14,0.2);anchor(g,'filler',A,-0.25,0.9,0.15);anchor(g,'body',A,0,0.2,0.95);
+  return {g,A,live:true,smokeOn:true,smokeAt:'pan',
+    dropPan:()=>{boltRow.position.y=-0.06;stain.scale.setScalar(1.5)},
+    fillOil:()=>{},
+    tight:()=>{boltRow.position.y=0.1},
+  };
+ },
+},
+{
+ id:'dht_clutch',name:'混动离合器',color:'#a855f7',no:'专项',
+ title:'DHT混动变速箱 · 离合器打滑',
+ introP:'客户反映起步抖动、急加速转速高但车速上不去。读码显示「离合器打滑/液压压力异常」。拆检发现离合器片烧蚀发黑、摩擦材料脱落，液压分泵压力偏低。',
+ order:'车型：插电混动轿车<br>现象：<b>起步抖动、加速无力、转速虚高</b><br>读码：<b>离合器打滑计数超标</b><br>判断：<b>离合器片烧蚀 + 液压压力不足</b>',
+ tools:[
+  {id:'diag',obj:'读取离合器打滑计数'},
+  {id:'poweroff',obj:'高压下电熄火'},
+  {id:'gloves',obj:'穿戴防护装备'},
+  {id:'wrench',obj:'拆离合器端盖'},
+  {id:'meter',obj:'测量液压分泵压力'},
+  {id:'wrench',obj:'更换离合器组件'},
+  {id:'cleaner',obj:'清洁压盘与飞轮'},
+  {id:'torque',obj:'力矩紧固端盖'},
+ ],
+ steps:[
+  {tool:'diag',say:'打滑计数 127 次，远超阈值 20——离合器已经在硬磨了。',done:()=>addOrderDone('打滑计数已确认')},
+  {tool:'poweroff',at:'main',say:'下电熄火。离合器烧蚀后舱内气味刺鼻，先通风。',done:(c)=>{c.live=false;addOrderDone('已下电熄火')}},
+  {tool:'gloves',at:'body',say:'防护到位。摩擦粉尘吸进肺里不是闹着玩的。',done:()=>addOrderDone('防护到位')},
+  {tool:'wrench',at:'cover',say:'端盖拆开——离合器片烧得焦黑，摩擦材料成片脱落。',done:(c)=>{c.openCover();addOrderDone('端盖已拆')}},
+  {tool:'meter',say:'液压分泵压力只有 8.2bar，正常 12~14bar——打滑烧蚀的真因是压不紧。',done:()=>{showMeter('8.2 bar','离合器液压压力 · 正常 12~14 bar → 偏低',false);addOrderDone('液压压力偏低已确认')}},
+  {tool:'wrench',at:'disc',say:'旧片总成取下，新离合器片组就位——注意摩擦片方向别装反。',done:(c)=>{c.swapDisc();addOrderDone('离合器组件已更换')}},
+  {tool:'cleaner',at:'disc',say:'压盘与飞轮结合面清洁干净，油渍一丁点都不能留——沾油必打滑。',done:()=>addOrderDone('结合面已清洁')},
+  {tool:'torque',at:'cover',say:'端盖新密封圈 + 力矩 18N·m 分次紧固。',done:(c)=>{c.closeCover();addOrderDone('端盖已复紧')}},
+  {tool:'diag',say:'路试：起步干脆、全油门不再转速虚高——离合器修好了。',done:()=>{showMeter('0 次','路试 20km 打滑计数 → 0',true);addOrderDone('路试验证通过')}},
+ ],
+ build(){
+  const g=new THREE.Group();g.position.y=1.05;scene.add(g);
+  P(g,new THREE.CylinderGeometry(0.42,0.42,0.8,32),M.metal,0,0.28,0,0,0,Math.PI/2);
+  const cover=P(g,new THREE.CylinderGeometry(0.46,0.46,0.16,32),M.dark,-0.5,0.28,0,0,0,Math.PI/2);
+  const disc=P(g,new THREE.CylinderGeometry(0.3,0.3,0.08,28),M.copperBurnt,-0.42,0.28,0,0,0,Math.PI/2);
+  const discNew=new THREE.MeshStandardMaterial({color:0x8a6a4a,metalness:.6,roughness:.55});
+  const stain=P(g,new THREE.CircleGeometry(0.2,20),new THREE.MeshBasicMaterial({color:0x120a06,transparent:true,opacity:.7}),-0.42,0.28,0.31,0,0,0);
+  const A={};anchor(g,'main',A,0,0.4,0);anchor(g,'cover',A,-0.5,0.9,0);anchor(g,'disc',A,-0.42,0.28,0.45);anchor(g,'body',A,0,0.2,0.95);
+  return {g,A,live:true,smokeOn:true,smokeAt:'disc',
+    openCover:()=>{cover.position.x=-1.0},
+    swapDisc:()=>{disc.material=discNew;stain.material.opacity=0},
+    closeCover:()=>{cover.position.x=-0.5},
+  };
+ },
+},
+{
+ id:'tank_leak',name:'油箱渗漏',color:'#eab308',no:'专项',
+ title:'油箱 · 渗油检修',
+ introP:'客户反映车内有汽油味，仪表亮「请检查燃油蒸发系统」。检查发现油箱上表面一道渗油痕迹，阳光暴晒后气味更明显。台上是拆下的油箱总成。',
+ order:'车型：插电混动轿车<br>现象：<b>车内汽油味，EVAP 系统报警</b><br>判断：<b>油箱焊缝/密封圈处渗漏</b>',
+ tools:[
+  {id:'diag',obj:'读取 EVAP 故障码'},
+  {id:'poweroff',obj:'熄火并断开油泵电源'},
+  {id:'gloves',obj:'穿戴防护装备'},
+  {id:'wrench',obj:'拆检油箱护板'},
+  {id:'cleaner',obj:'清洁渗漏部位'},
+  {id:'wrench',obj:'更换密封组件'},
+  {id:'torque',obj:'力矩紧固'},
+ ],
+ steps:[
+  {tool:'diag',say:'读码：P0442 蒸发系统小泄漏。结合汽油味，泄漏点在油箱本体。',done:()=>addOrderDone('EVAP 故障码已确认')},
+  {tool:'poweroff',at:'main',say:'熄火、断开油泵电源——油箱作业严禁明火，场地先确认通风。',done:(c)=>{c.live=false;addOrderDone('油泵电源已断开')}},
+  {tool:'gloves',at:'body',say:'防护到位。汽油渗透性强，手套+护目镜都戴上。',done:()=>addOrderDone('防护到位')},
+  {tool:'wrench',at:'seam',say:'护板拆开，渗漏点找到了——焊缝砂眼渗油，周边全是油泥。',done:(c)=>{c.openShield();addOrderDone('护板已拆检')}},
+  {tool:'cleaner',at:'seam',say:'渗漏部位彻底清洁，旧密封胶清除干净，露出金属本色。',done:()=>addOrderDone('渗漏部位已清洁')},
+  {tool:'wrench',at:'seam',say:'按工艺封堵砂眼并更换密封组件——油箱本体损伤超标就必须换总成，这台还够修。',done:(c)=>{c.fixSeam();addOrderDone('密封组件已更换')}},
+  {tool:'torque',at:'seam',say:'固定螺栓力矩复紧，护板复位。',done:()=>addOrderDone('已力矩复紧')},
+  {tool:'diag',say:'复检：P0442 清除后不再出现，静置 2 小时无渗油——交车。',done:()=>addOrderDone('复检通过')},
+ ],
+ build(){
+  const g=new THREE.Group();g.position.y=1.0;scene.add(g);
+  const tankM=new THREE.MeshStandardMaterial({color:0x8a7f3a,metalness:.5,roughness:.6});
+  P(g,new THREE.BoxGeometry(1.15,0.42,0.78),tankM,0,0,0);
+  P(g,new THREE.BoxGeometry(0.98,0.12,0.62),tankM,0,0.27,0);
+  const shield=P(g,new THREE.BoxGeometry(1.25,0.5,0.86),M.dark,0,0.02,0);
+  shield.material=new THREE.MeshStandardMaterial({color:0x39465a,metalness:.7,roughness:.5,transparent:true,opacity:.4});
+  const seam=P(g,new THREE.BoxGeometry(0.3,0.04,0.1),new THREE.MeshStandardMaterial({color:0x241505,metalness:.3,roughness:.8}),0.25,0.34,0.12);
+  const stain=P(g,new THREE.CircleGeometry(0.22,20),new THREE.MeshBasicMaterial({color:0x1c1408,transparent:true,opacity:.7}),0.25,0.36,0.12,-Math.PI/2,0,0);
+  const A={};anchor(g,'main',A,0,0.2,0);anchor(g,'seam',A,0.25,0.55,0.12);anchor(g,'body',A,0,0,0.95);
+  return {g,A,live:true,leakOn:true,leakAt:'seam',
+    openShield:()=>{shield.visible=false},
+    fixSeam:()=>{seam.material=tankM;stain.material.opacity=0},
+  };
+ },
+},
+{
+ id:'tank_pump',name:'燃油泵',color:'#ca8a04',no:'专项',
+ title:'油箱 · 燃油泵更换',
+ introP:'客户反映行驶中发动机突然熄火，重新启动困难，多次点火后才能着车。读码显示「燃油压力过低」。拆检燃油泵：泵芯卡滞、滤网被胶质堵塞，供油能力严重衰减。',
+ order:'车型：插电混动轿车<br>现象：<b>行驶中熄火、启动困难</b><br>读码：<b>燃油轨压力过低</b><br>判断：<b>燃油泵卡滞、滤网堵塞</b>',
+ tools:[
+  {id:'diag',obj:'读取燃油压力故障码'},
+  {id:'poweroff',obj:'熄火并断开油泵电源'},
+  {id:'gloves',obj:'穿戴防护装备'},
+  {id:'wrench',obj:'拆开燃油泵法兰盖'},
+  {id:'clamp',obj:'断开进出油管路'},
+  {id:'wrench',obj:'取出并更换泵总成'},
+  {id:'torque',obj:'力矩紧固法兰盖'},
+ ],
+ steps:[
+  {tool:'diag',say:'读数据流：点火开关 ON 后燃油轨压力只有 0.8bar，正常应到 3bar 左右——泵不行了。',done:()=>{showMeter('0.8 bar','燃油轨压力 · 正常 ≈ 3.0 bar → 过低',false);addOrderDone('油压过低已确认')}},
+  {tool:'poweroff',at:'main',say:'熄火、断开油泵电源。油路有残压，先泄压再拆。',done:(c)=>{c.live=false;addOrderDone('油泵电源已断开')}},
+  {tool:'gloves',at:'body',say:'防护到位。汽油别沾手，明火零 tolerance。',done:()=>addOrderDone('防护到位')},
+  {tool:'wrench',at:'flange',say:'法兰盖 8 颗螺栓对角松开——泵芯已经锈住了，提的时候晃着劲。',done:(c)=>{c.openFlange();addOrderDone('法兰盖已拆开')}},
+  {tool:'clamp',at:'line',say:'进出油管卡箍松开，残油用接油盘接着——橡胶管老化发硬，一并更换。',done:()=>addOrderDone('油管路已断开')},
+  {tool:'wrench',at:'pump',say:'旧泵取出：滤网糊满胶质，泵芯转子卡死。新泵总成就位，密封圈换新。',done:(c)=>{c.swapPump();addOrderDone('燃油泵已更换')}},
+  {tool:'torque',at:'flange',say:'法兰盖力矩 8N·m 对角紧固——拧不均会渗油。',done:(c)=>{c.closeFlange();addOrderDone('法兰盖已复紧')}},
+  {tool:'diag',say:'点火测压：油轨 3.0bar 稳稳的，启动一次就着——收工！',done:()=>{showMeter('3.0 bar','燃油轨压力复测 → 正常',true);addOrderDone('油压复检正常')}},
+ ],
+ build(){
+  const g=new THREE.Group();g.position.y=1.0;scene.add(g);
+  const tankM=new THREE.MeshStandardMaterial({color:0x8a7f3a,metalness:.5,roughness:.6});
+  P(g,new THREE.BoxGeometry(1.15,0.42,0.78),tankM,0,-0.1,0);
+  const flange=P(g,new THREE.CylinderGeometry(0.17,0.17,0.07,24),M.metal,0.12,0.16,0);
+  const pump=P(g,new THREE.CylinderGeometry(0.1,0.1,0.3,18),M.dark,0.12,0.32,0);
+  const sock=P(g,new THREE.CylinderGeometry(0.13,0.13,0.06,18),new THREE.MeshStandardMaterial({color:0x3a2f12,metalness:.2,roughness:.85}),0.12,0.12,0);
+  P(g,new THREE.CylinderGeometry(0.03,0.03,0.5,10),M.orange,-0.1,0.3,0.12,0,0,Math.PI/2);
+  const A={};anchor(g,'main',A,0,0.2,0);anchor(g,'flange',A,0.12,0.5,0);anchor(g,'line',A,-0.3,0.3,0.12);anchor(g,'pump',A,0.12,0.62,0);anchor(g,'body',A,0,-0.1,0.95);
+  return {g,A,live:true,glowOn:true,glowColor:0xd04030,glowAt:'pump',smokeOn:true,smokeAt:'pump',
+    openFlange:()=>{flange.position.x=0.5},
+    swapPump:()=>{pump.material=M.metal;sock.material=M.white},
+    closeFlange:()=>{flange.position.x=0.12},
+  };
+ },
+},
+{
+ id:'exhaust_rust',name:'排气补焊',color:'#78716c',no:'专项',
+ title:'排气系统 · 锈蚀穿孔',
+ introP:'客户反映冷车启动后「突突」异响、车内能闻到尾气味。举升检查发现排气管中段锈蚀穿孔，排气从孔洞泄漏。台上是拆下的排气中段总成。',
+ order:'车型：插电混动轿车<br>现象：<b>排气异响、车内尾气异味</b><br>判断：<b>排气管锈蚀穿孔泄漏</b>',
+ tools:[
+  {id:'diag',obj:'确认异响与泄漏位置'},
+  {id:'poweroff',obj:'发动机熄火降温'},
+  {id:'gloves',obj:'穿戴隔热防护'},
+  {id:'cleaner',obj:'锈蚀部位打磨除锈'},
+  {id:'wrench',obj:'更换接口卡箍'},
+  {id:'paint',obj:'喷涂耐高温涂层'},
+  {id:'torque',obj:'力矩紧固卡箍'},
+ ],
+ steps:[
+  {tool:'diag',say:'冷启动听诊：中段「突突」漏气声明显——孔就在中段锈蚀鼓包处。',done:()=>addOrderDone('泄漏点已定位')},
+  {tool:'poweroff',at:'main',say:'熄火并等待降温——排气管温度能到几百度，烫一下就是水泡。',done:(c)=>{c.live=false;addOrderDone('已熄火降温')}},
+  {tool:'gloves',at:'body',say:'隔热手套戴好。排气作业防烫第一。',done:()=>addOrderDone('防护到位')},
+  {tool:'cleaner',at:'hole',say:'穿孔周边打磨除锈，露出金属本色——锈不除干净，补了也白补。',done:()=>addOrderDone('锈蚀已打磨')},
+  {tool:'wrench',at:'clamp',say:'接口卡箍锈死了，割掉换新的——密封靠它。',done:(c)=>{c.newClamp();addOrderDone('卡箍已更换')}},
+  {tool:'paint',at:'hole',say:'耐高温涂层喷涂到位，形成隔热防腐保护层。',done:(c)=>{c.patch();addOrderDone('耐高温涂层已喷涂')}},
+  {tool:'torque',at:'clamp',say:'新卡箍力矩 25N·m 上紧，密封垫压实。',done:()=>addOrderDone('卡箍已复紧')},
+  {tool:'diag',say:'点火试车：排气声均匀，尾气味消失——修复完成。',done:()=>addOrderDone('试车验证通过')},
+ ],
+ build(){
+  const g=new THREE.Group();g.position.y=1.0;scene.add(g);
+  const pipe=P(g,new THREE.CylinderGeometry(0.08,0.08,1.6,20),M.metal,0,0,0,0,0,Math.PI/2);
+  P(g,new THREE.CylinderGeometry(0.15,0.15,0.5,22),M.dark,0.15,0,0,0,0,Math.PI/2);
+  const rustM=new THREE.MeshStandardMaterial({color:0x6b4226,metalness:.3,roughness:.9});
+  P(g,new THREE.CylinderGeometry(0.085,0.085,0.3,20),rustM,-0.3,0,0,0,0,Math.PI/2);
+  const hole=P(g,new THREE.CircleGeometry(0.055,16),new THREE.MeshBasicMaterial({color:0x0a0603}),-0.3,0.085,0,-Math.PI/2,0,0);
+  const clamp=P(g,new THREE.CylinderGeometry(0.1,0.1,0.08,20),M.copperBurnt,0.62,0,0,0,0,Math.PI/2);
+  const A={};anchor(g,'main',A,0,0.2,0);anchor(g,'hole',A,-0.3,0.3,0);anchor(g,'clamp',A,0.62,0.3,0);anchor(g,'body',A,0,0,0.8);
+  return {g,A,live:true,smokeOn:true,smokeAt:'hole',
+    newClamp:()=>{clamp.material=M.metal},
+    patch:()=>{hole.visible=false},
+  };
+ },
+},
+{
+ id:'exhaust_hanger',name:'排气吊耳',color:'#57534e',no:'专项',
+ title:'排气系统 · 吊耳断裂消音器下垂',
+ introP:'客户反映过减速带时底盘「哐当」巨响。举升检查发现排气吊耳橡胶全部老化断裂，消音器下垂倾斜、托底变形。台上是拆下的排气后段。',
+ order:'车型：插电混动轿车<br>现象：<b>过坎底盘巨响、排气异响</b><br>判断：<b>吊耳老化断裂，消音器下垂托底</b>',
+ tools:[
+  {id:'diag',obj:'确认异响来源'},
+  {id:'poweroff',obj:'发动机熄火降温'},
+  {id:'gloves',obj:'穿戴隔热防护'},
+  {id:'wrench',obj:'拆下断裂吊耳'},
+  {id:'wrench',obj:'拆下托底变形的消音器'},
+  {id:'cleaner',obj:'清洁密封接口'},
+  {id:'torque',obj:'装新消音器并力矩紧固'},
+ ],
+ steps:[
+  {tool:'diag',say:'过坎异响在车尾——消音器下垂后碰到副车架，橡胶吊耳全断了。',done:()=>addOrderDone('异响来源已确认')},
+  {tool:'poweroff',at:'main',say:'熄火降温。排气悬挂件拆装，防烫防砸。',done:(c)=>{c.live=false;addOrderDone('已熄火降温')}},
+  {tool:'gloves',at:'body',say:'防护到位。消音器死沉，托稳了再拆。',done:()=>addOrderDone('防护到位')},
+  {tool:'wrench',at:'hanger',say:'断裂吊耳螺栓拆掉——橡胶老化一捏就碎，全部换新。',done:(c)=>{c.cutHanger();addOrderDone('断裂吊耳已拆下')}},
+  {tool:'wrench',at:'muff',say:'托住消音器再松卡箍——壳体托底已经撞凹了，换新的。',done:(c)=>{c.dropMuff();addOrderDone('旧消音器已拆下')}},
+  {tool:'cleaner',at:'joint',say:'接口密封面清洁干净，旧垫片残渣清掉。',done:()=>addOrderDone('接口已清洁')},
+  {tool:'torque',at:'muff',say:'新消音器挂上新吊耳，卡箍力矩 25N·m——最后一挂，排气归位。',done:(c)=>{c.hangNew();addOrderDone('新消音器已装复')}},
+  {tool:'diag',say:'路试过坎：安静！排气不再晃悠——修好了。',done:()=>addOrderDone('路试验证通过')},
+ ],
+ build(){
+  const g=new THREE.Group();g.position.y=1.0;scene.add(g);
+  P(g,new THREE.CylinderGeometry(0.06,0.06,0.7,16),M.metal,-0.85,0.28,0,0,0,Math.PI/2);
+  const muff=P(g,new THREE.CylinderGeometry(0.17,0.17,0.8,24),M.dark,0.15,0.05,0,0,0,Math.PI/2);
+  muff.rotation.z=-0.18;
+  const dent=P(g,new THREE.CircleGeometry(0.09,16),new THREE.MeshBasicMaterial({color:0x0d0a08}),0.35,0.16,0.1,-Math.PI/2+0.5,0,0);
+  const hanger=P(g,new THREE.BoxGeometry(0.05,0.26,0.05),M.rubber,0.15,0.32,0);
+  hanger.rotation.z=0.7;
+  const A={};anchor(g,'main',A,0,0.3,0);anchor(g,'hanger',A,0.15,0.55,0);anchor(g,'muff',A,0.15,0.3,0.4);anchor(g,'joint',A,-0.55,0.28,0);anchor(g,'body',A,0,0,0.9);
+  return {g,A,live:true,
+    cutHanger:()=>{hanger.visible=false},
+    dropMuff:()=>{muff.position.y=-0.5;muff.rotation.z=0;dent.visible=false},
+    hangNew:()=>{hanger.visible=true;hanger.rotation.z=0;muff.position.y=0.05},
+  };
+ },
+},
+{
+ id:'rex_maint',name:'增程器保养',color:'#0ea5e9',no:'专项',
+ title:'增程器总成 · 例行保养',
+ introP:'增程车跑到 4 万公里，仪表提示「请保养增程系统」。增程器长期定点工况运行，机油劣化与皮带磨损都要检查。台上是拆下的增程器总成（发动机+同轴发电机）。',
+ order:'车型：增程式 SUV<br>现象：<b>增程系统保养提示</b><br>判断：<b>机油到期、皮带张紧度衰减、发电机状态待检</b>',
+ tools:[
+  {id:'diag',obj:'读取增程器运行数据'},
+  {id:'poweroff',obj:'高压下电并熄火'},
+  {id:'gloves',obj:'穿戴防护装备'},
+  {id:'wrench',obj:'更换增程器机油'},
+  {id:'fill',obj:'加注新机油'},
+  {id:'wrench',obj:'检查皮带与张紧轮'},
+  {id:'meter',obj:'测发电机绕组绝缘'},
+  {id:'torque',obj:'力矩复紧'},
+ ],
+ steps:[
+  {tool:'diag',say:'运行数据：累计发电 1800 小时，机油寿命 0%——到保养周期了。',done:()=>addOrderDone('保养需求已确认')},
+  {tool:'poweroff',at:'main',say:'增程器虽是「发电机」，检修同样先下高压、再熄火。',done:(c)=>{c.live=false;addOrderDone('已下电熄火')}},
+  {tool:'gloves',at:'body',say:'防护到位。',done:()=>addOrderDone('防护到位')},
+  {tool:'wrench',at:'drain',say:'放油螺栓松开，旧机油放出——定点工况运行机油劣化快，这油又黑又稠。',done:(c)=>{c.drainOut();addOrderDone('旧机油已放净')}},
+  {tool:'fill',at:'filler',say:'新机油 3.5L 加注——增程专用低灰分机油，保护三元催化。',done:()=>addOrderDone('新机油已加注')},
+  {tool:'wrench',at:'belt',say:'皮带检查：边缘起毛、张紧轮有旷量——皮带换新，张紧轮重新张紧。',done:(c)=>{c.swapBelt();addOrderDone('皮带与张紧轮已处理')}},
+  {tool:'meter',say:'发电机绕组对壳绝缘 9.8MΩ，合格线在 5MΩ 以上——发电机状态很好。',done:()=>{showMeter('9.8 MΩ','发电机绕组绝缘 · 合格 ≥ 5 MΩ → 合格',true);addOrderDone('发电机绝缘正常')}},
+  {tool:'torque',at:'drain',say:'放油螺栓力矩 22N·m 复紧。',done:(c)=>{c.tight();addOrderDone('已力矩复紧')}},
+  {tool:'diag',say:'启动增程器试运行：发电功率爬升平稳，无异响——保养完成。',done:()=>addOrderDone('试运行通过')},
+ ],
+ build(){
+  const g=new THREE.Group();g.position.y=1.0;scene.add(g);
+  P(g,new THREE.BoxGeometry(0.62,0.4,0.5),M.dark,-0.45,0.15,0);
+  P(g,new THREE.BoxGeometry(0.56,0.1,0.44),M.metal,-0.45,0.4,0);
+  P(g,new THREE.CylinderGeometry(0.3,0.3,0.5,28),M.metal,0.35,0.15,0,0,0,Math.PI/2);
+  P(g,new THREE.CylinderGeometry(0.34,0.34,0.1,28),M.dark,0.12,0.15,0,0,0,Math.PI/2);
+  const belt=P(g,new THREE.CylinderGeometry(0.16,0.16,0.06,24),new THREE.MeshStandardMaterial({color:0x1c1c1e,metalness:.1,roughness:.9}),-0.05,0.42,0.12,Math.PI/2,0,0);
+  const beltNew=P(g,new THREE.CylinderGeometry(0.16,0.16,0.06,24),M.dark,-0.05,0.42,0.12,Math.PI/2,0,0);beltNew.visible=false;
+  const bolt=P(g,new THREE.CylinderGeometry(0.045,0.045,0.08,6),M.metal,-0.45,-0.08,0.12);
+  const stain=P(g,new THREE.CircleGeometry(0.22,20),new THREE.MeshBasicMaterial({color:0x150e06,transparent:true,opacity:.75}),-0.45,-0.12,0.12,-Math.PI/2,0,0);
+  const A={};anchor(g,'main',A,0,0.3,0);anchor(g,'drain',A,-0.45,-0.2,0.12);anchor(g,'filler',A,-0.6,0.62,0);anchor(g,'belt',A,-0.05,0.75,0.12);anchor(g,'body',A,0,0.1,0.9);
+  return {g,A,live:true,smokeOn:true,smokeAt:'drain',
+    drainOut:()=>{bolt.position.y=-0.14;stain.scale.setScalar(1.5)},
+    swapBelt:()=>{belt.visible=false;beltNew.visible=true},
+    tight:()=>{bolt.position.y=-0.08},
+  };
+ },
+},
+{
+ id:'rex_gen',name:'增程发电机',color:'#0284c7',no:'专项',
+ title:'增程器 · 发电机不发电',
+ introP:'客户反映电量低时增程器启动失败、仪表报「增程系统故障」，车辆纯电续航耗尽后抛锚。读码显示「发电机输出电压异常」。拆检发现发电机绕组局部烧焦、碳刷磨短，滑环烧蚀发黑。',
+ order:'车型：增程式 SUV<br>现象：<b>增程器启动失败、系统故障报警</b><br>读码：<b>发电机输出电压异常</b><br>判断：<b>发电机绕组烧焦、碳刷/滑环烧蚀</b>',
+ tools:[
+  {id:'diag',obj:'读取增程系统故障码'},
+  {id:'poweroff',obj:'高压下电熄火'},
+  {id:'gloves',obj:'穿戴防护装备'},
+  {id:'wrench',obj:'拆发电机后端盖'},
+  {id:'meter',obj:'测量绕组阻值与碳刷长度'},
+  {id:'wrench',obj:'更换绕组与碳刷组件'},
+  {id:'cleaner',obj:'清洁烧蚀滑环'},
+  {id:'megger',obj:'复测绝缘验收'},
+ ],
+ steps:[
+  {tool:'diag',say:'读码：增程器启动 3 次失败，发电机输出 0V——发电单元彻底不干活了。',done:()=>addOrderDone('故障码已确认')},
+  {tool:'poweroff',at:'main',say:'下电熄火。增程器舱空间小，防烫防夹。',done:(c)=>{c.live=false;addOrderDone('已下电熄火')}},
+  {tool:'gloves',at:'body',say:'防护到位。',done:()=>addOrderDone('防护到位')},
+  {tool:'wrench',at:'cover',say:'后端盖拆开——绕组有三处烧焦变色，绝缘漆都鼓泡了。',done:(c)=>{c.openCover();addOrderDone('端盖已拆')}},
+  {tool:'meter',say:'绕组三相阻值不平衡（0.8/2.4/∞Ω），碳刷磨到 3mm（限值 5mm）——都得换。',done:()=>{showMeter('0.8 / 2.4 / ∞ Ω','三相绕组阻值 · 应平衡 ≤1Ω → 烧损',false);addOrderDone('绕组与碳刷已确认损坏')}},
+  {tool:'wrench',at:'disc',say:'新绕组与碳刷组件更换到位——转子轴承顺带检查了，旷量在范围内。',done:(c)=>{c.swapParts();addOrderDone('绕组与碳刷已更换')}},
+  {tool:'cleaner',at:'disc',say:'滑环烧蚀层打磨清洁到镜面——接触面不干净，新碳刷照样快速磨损。',done:()=>addOrderDone('滑环已清洁')},
+  {tool:'megger',say:'摇表复测：绕组对壳绝缘 30MΩ，完全合格。',done:()=>{showMeter('30 MΩ','发电机绕组绝缘复测 → 合格',true);addOrderDone('绝缘复测合格')}},
+  {tool:'diag',say:'启动增程器：发电功率 45kW 稳定输出——这台「移动电源」复活了。',done:()=>addOrderDone('发电验证通过')},
+ ],
+ build(){
+  const g=new THREE.Group();g.position.y=1.0;scene.add(g);
+  P(g,new THREE.CylinderGeometry(0.32,0.32,0.7,32),M.metal,0,0.15,0,0,0,Math.PI/2);
+  const cover=P(g,new THREE.CylinderGeometry(0.34,0.34,0.14,32),M.dark,-0.42,0.15,0,0,0,Math.PI/2);
+  const wind=[];
+  for(let i=0;i<10;i++){const a=i/10*Math.PI*2;
+    const w=P(g,new THREE.BoxGeometry(0.26,0.1,0.08),i>=3&&i<=5?M.copperBurnt:M.copper,-0.3,0.15+Math.cos(a)*0.2,Math.sin(a)*0.2,-a);
+    wind.push(w)}
+  const ring=P(g,new THREE.CylinderGeometry(0.1,0.1,0.06,20),M.copperBurnt,-0.5,0.15,0,0,0,Math.PI/2);
+  const A={};anchor(g,'main',A,0,0.3,0);anchor(g,'cover',A,-0.42,0.8,0);anchor(g,'disc',A,-0.42,0.15,0.45);anchor(g,'body',A,0,0.1,0.95);
+  return {g,A,live:true,glowOn:true,glowColor:0xd04030,glowAt:'disc',smokeOn:true,smokeAt:'disc',sparkAt:'disc',
+    openCover:()=>{cover.position.x=-0.9},
+    swapParts:()=>{wind.forEach(w=>w.material=M.copper);ring.material=M.metal},
+  };
+ },
+},
+{
+ id:'stack_leak',name:'燃料电池堆',color:'#10b981',no:'专项',
+ title:'燃料电池堆 · 氢气泄漏',
+ introP:'车辆仪表报「氢系统泄漏警告」，车载氢浓度传感器读数异常。燃料电池堆氢气入口接头泄漏——氢气无色无味，必须靠仪器检测，作业区已做防爆通风。',
+ order:'车型：氢燃料电池轿车<br>现象：<b>氢系统泄漏警告，传感器读数偏高</b><br>判断：<b>电堆氢气入口接头密封失效</b>',
+ tools:[
+  {id:'diag',obj:'读取氢浓度与故障码'},
+  {id:'poweroff',obj:'关氢瓶阀并高压下电'},
+  {id:'gloves',obj:'穿戴防静电防护'},
+  {id:'meter',obj:'氢检仪扫检定位'},
+  {id:'wrench',obj:'更换入口密封组件'},
+  {id:'torque',obj:'力矩紧固接头'},
+ ],
+ steps:[
+  {tool:'diag',say:'氢浓度 380ppm（报警阈 100ppm），故障码指向电堆入口——先关氢再动手。',done:()=>{showMeter('380 ppm','舱内氢浓度 · 报警阈 100 ppm → 超标',false);addOrderDone('泄漏报警已确认')}},
+  {tool:'poweroff',at:'main',say:'氢瓶阀关闭、高压下电。氢气作业第一原则：断源、通风、禁火。',done:(c)=>{c.live=false;addOrderDone('氢源已切断')}},
+  {tool:'gloves',at:'body',say:'防静电手套+护目镜。氢气扩散极快，但聚积就有爆燃风险。',done:()=>addOrderDone('防护到位')},
+  {tool:'meter',at:'port',say:'氢检仪沿管路扫检——入口接头处读数飙升，漏点锁定。',done:()=>{showMeter('920 ppm','漏点氢浓度 → 锁定入口接头',false);addOrderDone('漏点已定位')}},
+  {tool:'wrench',at:'port',say:'接头拆开：密封垫圈压溃变形——更换新垫圈，密封面检查无划痕。',done:(c)=>{c.fixPort();addOrderDone('密封组件已更换')}},
+  {tool:'torque',at:'port',say:'接头力矩 18N·m 紧固——氢系统接头力矩都有专门规定，不能凭手感。',done:()=>addOrderDone('接头已力矩紧固')},
+  {tool:'diag',say:'开阀复检：氢浓度归零，泄漏警告消除——燃料电池重新并网发电。',done:()=>{showMeter('0 ppm','复检氢浓度 → 正常',true);addOrderDone('复检通过')}},
+ ],
+ build(){
+  const g=new THREE.Group();g.position.y=1.0;scene.add(g);
+  P(g,new THREE.BoxGeometry(0.9,0.5,0.6),M.metal,0,0.1,0);
+  for(let i=0;i<6;i++)P(g,new THREE.BoxGeometry(0.86,0.02,0.56),M.dark,0,-0.08+i*0.075,0);
+  P(g,new THREE.CylinderGeometry(0.07,0.07,0.3,18),M.orange,-0.55,0.15,0,0,0,Math.PI/2);
+  const nut=P(g,new THREE.CylinderGeometry(0.1,0.1,0.12,6),M.dark,-0.42,0.15,0,0,0,Math.PI/2);
+  const A={};anchor(g,'main',A,0,0.3,0);anchor(g,'port',A,-0.5,0.5,0);anchor(g,'body',A,0,0.1,0.85);
+  return {g,A,live:true,leakOn:true,leakAt:'port',
+    fixPort:()=>{nut.material=M.metal},
+  };
+ },
+},
+{
+ id:'stack_maint',name:'电堆巡检',color:'#34d399',no:'专项',
+ title:'燃料电池堆 · 单片电压巡检',
+ introP:'车辆报「燃料电池性能下降」，功率输出受限。诊断显示电堆第 17 片单池电压明显偏低——巡检线束端子接触不良。台上是拆检的燃料电池堆与巡检线束。',
+ order:'车型：氢燃料电池轿车<br>现象：<b>功率受限，性能下降警告</b><br>读码：<b>单池电压偏低（Cell#17）</b><br>判断：<b>巡检端子接触不良</b>',
+ tools:[
+  {id:'diag',obj:'读取单池电压数据'},
+  {id:'poweroff',obj:'关氢下电，残余泄放'},
+  {id:'gloves',obj:'穿戴防护装备'},
+  {id:'wrench',obj:'拆开巡检端盖'},
+  {id:'meter',obj:'逐片复测定位异常片'},
+  {id:'clamp',obj:'更换巡检端子'},
+  {id:'wrench',obj:'复装端盖'},
+ ],
+ steps:[
+  {tool:'diag',say:'单池电压巡检：第 17 片只有 0.21V，相邻片 0.68V——这片几乎不发电。',done:()=>{showMeter('0.21 V','Cell#17 单池电压 · 正常 0.6~0.8 V → 过低',false);addOrderDone('异常片已锁定')}},
+  {tool:'poweroff',at:'main',say:'关氢、下电，电容残余电压泄放 5 分钟——电堆内部电容能存电。',done:(c)=>{c.live=false;addOrderDone('残余已泄放')}},
+  {tool:'gloves',at:'body',say:'防护到位。',done:()=>addOrderDone('防护到位')},
+  {tool:'wrench',at:'cover',say:'巡检端盖拆开——第 17 片端子发黑氧化，弹片压力不足。',done:(c)=>{c.openCover();addOrderDone('巡检端盖已拆')}},
+  {tool:'meter',at:'cell',say:'片间电阻复测：故障端子接触电阻 4.7Ω，正常应小于 0.1Ω——接触不良实锤。',done:()=>{showMeter('4.7 Ω','巡检端子接触电阻 · 正常 <0.1 Ω → 超标',false);addOrderDone('接触不良已确认')}},
+  {tool:'clamp',at:'cell',say:'新端子压接换线——压线钳一遍成型，拉力测试合格才算压好。',done:(c)=>{c.fixCell();addOrderDone('巡检端子已更换')}},
+  {tool:'wrench',at:'cover',say:'端盖复装，密封圈换新——电堆最怕进水进灰。',done:(c)=>{c.closeCover();addOrderDone('端盖已复装')}},
+  {tool:'diag',say:'开机巡检：第 17 片电压回到 0.66V，全片电压差收窄——功率满血恢复。',done:()=>{showMeter('0.66 V','Cell#17 复测电压 → 正常',true);addOrderDone('复测正常')}},
+ ],
+ build(){
+  const g=new THREE.Group();g.position.y=1.0;scene.add(g);
+  P(g,new THREE.BoxGeometry(0.9,0.44,0.56),M.dark,0,0.05,0);
+  const cells=[];
+  for(let i=0;i<8;i++)cells.push(P(g,new THREE.BoxGeometry(0.84,0.015,0.5),i===2?M.red:M.metal,0,-0.1+i*0.05,0));
+  const cover=P(g,new THREE.BoxGeometry(0.94,0.08,0.6),M.metal,0,0.34,0);
+  const A={};anchor(g,'main',A,0,0.2,0);anchor(g,'cover',A,0,0.6,0);anchor(g,'cell',A,0,0.1,0.45);anchor(g,'body',A,0,0,0.85);
+  return {g,A,live:true,glowOn:true,glowColor:0xd04030,glowAt:'cell',
+    openCover:()=>{cover.position.y=0.62},
+    fixCell:()=>{cells[2].material=M.metal},
+    closeCover:()=>{cover.position.y=0.34},
+  };
+ },
+},
+{
+ id:'h2line_leak',name:'供氢管路',color:'#14b8a6',no:'专项',
+ title:'供氢管路 · 卡套接头泄漏',
+ introP:'车辆报「氢系统压力下降过快」，停车后供氢管路保压失败。分段保压测试锁定中压管路卡套接头泄漏。台上是拆下的供氢不锈钢管路总成。',
+ order:'车型：氢燃料电池轿车<br>现象：<b>氢压下降过快，保压失败</b><br>判断：<b>卡套接头密封失效</b>',
+ tools:[
+  {id:'diag',obj:'分段保压测试定位'},
+  {id:'poweroff',obj:'关氢泄压至零表压'},
+  {id:'gloves',obj:'穿戴防护装备'},
+  {id:'meter',obj:'氢检仪确认漏点'},
+  {id:'wrench',obj:'更换卡套接头'},
+  {id:'cleaner',obj:'清洁密封锥面'},
+  {id:'torque',obj:'力矩紧固并复测'},
+ ],
+ steps:[
+  {tool:'diag',say:'分段保压：中压段 10 分钟掉压 15bar——漏点在供氢管路中段。',done:()=>{showMeter('-15 bar','中压段 10 分钟压降 · 合格 ≤1 bar → 不合格',false);addOrderDone('泄漏段已锁定')}},
+  {tool:'poweroff',at:'main',say:'关氢瓶阀，泄压到零表压——管路作业零压力是底线。',done:(c)=>{c.live=false;addOrderDone('已泄压至零表压')}},
+  {tool:'gloves',at:'body',say:'防护到位。',done:()=>addOrderDone('防护到位')},
+  {tool:'meter',at:'fit2',say:'氢检仪确认：二号卡套接头渗漏——卡套刃口已咬伤，密封失效。',done:()=>addOrderDone('漏点已确认')},
+  {tool:'wrench',at:'fit2',say:'旧接头报废，新卡套接头预装到位——不锈钢管不能反复拆装，切口要平。',done:(c)=>{c.swapFit();addOrderDone('卡套接头已更换')}},
+  {tool:'cleaner',at:'fit2',say:'密封锥面清洁，无划痕无颗粒——氢气分子小，微尘都能漏。',done:()=>addOrderDone('密封面已清洁')},
+  {tool:'torque',at:'fit2',say:'接头力矩 22N·m 紧固。',done:()=>addOrderDone('接头已力矩紧固')},
+  {tool:'diag',say:'保压复测：10 分钟压降 0.2bar——合格！供氢管路恢复气密。',done:()=>{showMeter('-0.2 bar','保压复测压降 → 合格',true);addOrderDone('保压复测通过')}},
+ ],
+ build(){
+  const g=new THREE.Group();g.position.y=1.0;scene.add(g);
+  P(g,new THREE.CylinderGeometry(0.04,0.04,1.5,16),M.metal,0,0.1,0,0,0,Math.PI/2);
+  const f1=P(g,new THREE.CylinderGeometry(0.07,0.07,0.12,6),M.metal,-0.4,0.1,0,0,0,Math.PI/2);
+  const f2=P(g,new THREE.CylinderGeometry(0.07,0.07,0.12,6),M.copperBurnt,0.35,0.1,0,0,0,Math.PI/2);
+  P(g,new THREE.BoxGeometry(0.3,0.2,0.24),M.dark,-0.75,0.1,0);
+  const A={};anchor(g,'main',A,0,0.3,0);anchor(g,'fit2',A,0.35,0.4,0);anchor(g,'body',A,0,0.1,0.7);
+  return {g,A,live:true,leakOn:true,leakAt:'fit2',
+    swapFit:()=>{f2.material=M.metal},
+  };
+ },
+},
+{
+ id:'h2pump',name:'氢循环泵',color:'#0d9488',no:'专项',
+ title:'氢循环泵 · 卡滞检修',
+ introP:'车辆报「氢循环系统流量低」，燃料电池效率下降。拆检氢循环泵：泵腔内有颗粒物卡滞，电机线圈受潮绝缘下降。台上是拆下的氢循环泵总成。',
+ order:'车型：氢燃料电池轿车<br>现象：<b>氢循环流量低，效率下降警告</b><br>判断：<b>循环泵卡滞 + 电机绝缘下降</b>',
+ tools:[
+  {id:'diag',obj:'读取氢循环流量数据'},
+  {id:'poweroff',obj:'关氢下电泄压'},
+  {id:'gloves',obj:'穿戴防护装备'},
+  {id:'wrench',obj:'拆下循环泵总成'},
+  {id:'meter',obj:'测量电机线圈绝缘'},
+  {id:'vac',obj:'泵腔抽真空置换'},
+  {id:'wrench',obj:'更换新泵'},
+ ],
+ steps:[
+  {tool:'diag',say:'氢循环流量只有 12g/s，正常 45g/s——循环泵出力严重不足。',done:()=>{showMeter('12 g/s','氢循环流量 · 正常 ≈45 g/s → 过低',false);addOrderDone('流量异常已确认')}},
+  {tool:'poweroff',at:'main',say:'关氢、下电、泄压——泵体拆装前确认零表压。',done:(c)=>{c.live=false;addOrderDone('已泄压')}},
+  {tool:'gloves',at:'body',say:'防护到位。',done:()=>addOrderDone('防护到位')},
+  {tool:'wrench',at:'pump',say:'循环泵拆下——泵腔滤网处有金属颗粒，转子已经磨出拉痕。',done:(c)=>{c.pullPump();addOrderDone('循环泵已拆下')}},
+  {tool:'meter',say:'电机线圈对壳绝缘 0.4MΩ，远低于 5MΩ——受潮了，泵体密封也失效。',done:()=>{showMeter('0.4 MΩ','泵电机绝缘 · 合格 ≥5 MΩ → 不合格',false);addOrderDone('绝缘不合格已确认')}},
+  {tool:'vac',at:'pump',say:'新泵接入前，管路抽真空置换——把残余氢气和水汽抽干净。',done:()=>addOrderDone('管路已抽真空')},
+  {tool:'wrench',at:'pump',say:'新循环泵就位，密封圈全部换新——这台泵没有修的价值，直接换总成。',done:(c)=>{c.hangNew();addOrderDone('新泵已装复')}},
+  {tool:'diag',say:'开机：循环流量回到 44g/s——氢气循环顺畅，电堆工作效率恢复。',done:()=>{showMeter('44 g/s','氢循环流量复测 → 正常',true);addOrderDone('复测正常')}},
+ ],
+ build(){
+  const g=new THREE.Group();g.position.y=1.0;scene.add(g);
+  P(g,new THREE.CylinderGeometry(0.16,0.16,0.4,26),M.metal,0.1,0.1,0,0,0,Math.PI/2);
+  P(g,new THREE.CylinderGeometry(0.12,0.12,0.24,22),M.dark,-0.22,0.1,0,0,0,Math.PI/2);
+  const debris=P(g,new THREE.BoxGeometry(0.05,0.05,0.05),M.copperBurnt,0.12,0.02,0.08);
+  const A={};anchor(g,'main',A,0,0.3,0);anchor(g,'pump',A,0.1,0.45,0);anchor(g,'body',A,0,0.1,0.8);
+  return {g,A,live:true,glowOn:true,glowColor:0xd04030,glowAt:'pump',smokeOn:true,smokeAt:'pump',
+    pullPump:()=>{debris.visible=false},
+    hangNew:()=>{},
+  };
+ },
+},
+{
+ id:'airmotor',name:'空压机',color:'#22d3ee',no:'专项',
+ title:'空压机 · 供气不足检修',
+ introP:'车辆报「燃料电池空气供给压力低」，输出功率受限。拆检空压机：进气空滤严重堵塞、轴承磨损异响、润滑油乳化。台上是拆下的空压机总成。',
+ order:'车型：氢燃料电池轿车<br>现象：<b>供气压力低，功率受限</b><br>判断：<b>空滤堵塞 + 润滑不良</b>',
+ tools:[
+  {id:'diag',obj:'读取供气压力数据'},
+  {id:'poweroff',obj:'高压下电'},
+  {id:'gloves',obj:'穿戴防护装备'},
+  {id:'wrench',obj:'拆下空滤与进气管'},
+  {id:'cleaner',obj:'清洁进气道'},
+  {id:'fill',obj:'加注专用润滑油'},
+  {id:'wrench',obj:'装复并检查'},
+ ],
+ steps:[
+  {tool:'diag',say:'供气压力 0.9bar，正常 1.8~2.2bar——空气供给跟不上，电堆「喘不过气」。',done:()=>{showMeter('0.9 bar','空压供气压力 · 正常 1.8~2.2 bar → 过低',false);addOrderDone('供气不足已确认')}},
+  {tool:'poweroff',at:'main',say:'下电。空压机叶片转速高，停机完全降速后再拆。',done:(c)=>{c.live=false;addOrderDone('已下电')}},
+  {tool:'gloves',at:'body',say:'防护到位。',done:()=>addOrderDone('防护到位')},
+  {tool:'wrench',at:'filter',say:'空滤拆下——滤芯黑得看不见滤纸纹路，完全堵死了。',done:(c)=>{c.pullFilter();addOrderDone('空滤已拆下')}},
+  {tool:'cleaner',at:'filter',say:'进气道清洁干净——空压机吸进粉尘会磨叶片，这台已经有点异响。',done:()=>addOrderDone('进气道已清洁')},
+  {tool:'fill',at:'oil',say:'旧油放出，新专用润滑油加注到刻度线——乳化的油润滑性全无。',done:(c)=>{c.fillOil();addOrderDone('润滑油已更换')}},
+  {tool:'wrench',at:'filter',say:'新空滤装复，卡箍锁紧。',done:(c)=>{c.hangNew();addOrderDone('空滤已装复')}},
+  {tool:'diag',say:'启动：供气压力 2.0bar 稳定——电堆吃饱空气，满功率输出。',done:()=>{showMeter('2.0 bar','供气压力复测 → 正常',true);addOrderDone('复测正常')}},
+ ],
+ build(){
+  const g=new THREE.Group();g.position.y=1.0;scene.add(g);
+  P(g,new THREE.CylinderGeometry(0.2,0.2,0.44,26),M.metal,0,0.1,0,0,0,Math.PI/2);
+  P(g,new THREE.CylinderGeometry(0.14,0.14,0.2,22),M.dark,0.32,0.1,0,0,0,Math.PI/2);
+  const filter=P(g,new THREE.CylinderGeometry(0.11,0.11,0.22,20),new THREE.MeshStandardMaterial({color:0x2c2418,metalness:.2,roughness:.9}),-0.4,0.1,0,0,0,Math.PI/2);
+  const filterNew=P(g,new THREE.CylinderGeometry(0.11,0.11,0.22,20),M.white,-0.4,0.1,0,0,0,Math.PI/2);filterNew.visible=false;
+  const oil=P(g,new THREE.CircleGeometry(0.09,16),new THREE.MeshBasicMaterial({color:0x4a3a1a,transparent:true,opacity:.8}),0,-0.02,0.14,-Math.PI/2,0,0);
+  const A={};anchor(g,'main',A,0,0.3,0);anchor(g,'filter',A,-0.4,0.4,0);anchor(g,'oil',A,0,-0.02,0.14);anchor(g,'body',A,0,0.1,0.8);
+  return {g,A,live:true,smokeOn:true,smokeAt:'filter',
+    pullFilter:()=>{filter.visible=false},
+    fillOil:()=>{oil.material.opacity=0},
+    hangNew:()=>{filterNew.visible=true},
+  };
+ },
+},
+{
+ id:'humid',name:'加湿器',color:'#67e8f9',no:'专项',
+ title:'加湿器 · 排水堵塞除垢',
+ introP:'车辆报「燃料电池湿度异常」，电堆输出波动。拆检加湿器：排水阀被水垢卡死、加湿膜表面积垢严重、水位开关失灵。台上是拆下的加湿器总成。',
+ order:'车型：氢燃料电池轿车<br>现象：<b>湿度异常，输出波动</b><br>判断：<b>排水阀堵塞 + 加湿膜积垢</b>',
+ tools:[
+  {id:'diag',obj:'读取湿度与水位数据'},
+  {id:'poweroff',obj:'高压下电，关闭水路'},
+  {id:'gloves',obj:'穿戴防护装备'},
+  {id:'wrench',obj:'拆下排水阀'},
+  {id:'cleaner',obj:'清除水垢清洁膜面'},
+  {id:'vac',obj:'腔体抽真空干燥'},
+  {id:'fill',obj:'加注去离子水'},
+ ],
+ steps:[
+  {tool:'diag',say:'读数：出堆气体湿度 95%（正常 70~80%），水位开关卡在高水位——排水阀嫌疑最大。',done:()=>addOrderDone('湿度异常已确认')},
+  {tool:'poweroff',at:'main',say:'下电、关闭水路阀门——去离子水系统也要按规程隔离。',done:(c)=>{c.live=false;addOrderDone('水路已隔离')}},
+  {tool:'gloves',at:'body',say:'防护到位。',done:()=>addOrderDone('防护到位')},
+  {tool:'wrench',at:'drain',say:'排水阀拆下——阀芯全是白色水垢，彻底卡死，根本排不动水。',done:(c)=>{c.pullValve();addOrderDone('排水阀已拆下')}},
+  {tool:'cleaner',at:'tank',say:'加湿膜腔体除垢清洁——水垢糊满膜面，气体都透不过去。',done:(c)=>{c.descale();addOrderDone('腔体已除垢')}},
+  {tool:'vac',at:'tank',say:'腔体抽真空干燥——残水不净，冬天结冰会把膜胀裂。',done:()=>addOrderDone('腔体已干燥')},
+  {tool:'fill',at:'tank',say:'新排水阀装好后，腔体加注去离子水到刻度——普通自来水离子超标，绝对不能用。',done:(c)=>{c.refill();addOrderDone('去离子水已加注')}},
+  {tool:'diag',say:'运行复检：出堆湿度回到 74%，水位控制正常——电堆输出稳定了。',done:()=>{showMeter('74 %','出堆湿度复测 · 正常 70~80% → 正常',true);addOrderDone('复测正常')}},
+ ],
+ build(){
+  const g=new THREE.Group();g.position.y=1.0;scene.add(g);
+  P(g,new THREE.CylinderGeometry(0.19,0.19,0.5,26),M.white,0,0.12,0,0,0,Math.PI/2);
+  const scale=P(g,new THREE.CylinderGeometry(0.13,0.13,0.34,20),new THREE.MeshStandardMaterial({color:0xcfc8b0,metalness:.1,roughness:.9}),0.05,0.12,0,0,0,Math.PI/2);
+  const valve=P(g,new THREE.CylinderGeometry(0.05,0.05,0.12,12),M.copperBurnt,0,-0.14,0.14);
+  const A={};anchor(g,'main',A,0,0.3,0);anchor(g,'drain',A,0,-0.32,0.14);anchor(g,'tank',A,0.05,0.5,0);anchor(g,'body',A,0,0.1,0.8);
+  return {g,A,live:true,
+    pullValve:()=>{valve.position.y=-0.34},
+    descale:()=>{scale.material=M.white},
+    refill:()=>{valve.position.y=-0.14;valve.material=M.metal},
+  };
+ },
+},
+{
+ id:'h2tank_check',name:'储氢罐安检',color:'#e2e8f0',no:'专项',
+ title:'储氢罐 · 定期安全检查',
+ introP:'氢燃料车每 12 个月需对储氢系统进行安全检查。本车例行安检发现瓶口阀轻微渗漏、罐体表面有划伤。台上是拆下的 70MPa 储氢罐（含瓶口阀）。',
+ order:'车型：氢燃料电池轿车<br>任务：<b>储氢罐年度安全检查</b><br>发现：<b>瓶口阀轻微渗漏、罐体表面划伤</b>',
+ tools:[
+  {id:'diag',obj:'读取车载氢系统状态'},
+  {id:'poweroff',obj:'关闭瓶阀并确认零表压'},
+  {id:'gloves',obj:'穿戴防护装备'},
+  {id:'meter',obj:'氢检仪+压力表检查瓶阀'},
+  {id:'cleaner',obj:'清洁罐体检查表面'},
+  {id:'wrench',obj:'更换瓶阀密封组件'},
+  {id:'torque',obj:'力矩紧固并气密试验'},
+ ],
+ steps:[
+  {tool:'diag',say:'车载氢系统年检模式：瓶口阀处氢浓度 45ppm，高于背景值——渗漏预警。',done:()=>{showMeter('45 ppm','瓶口阀氢浓度 · 背景 <5 ppm → 渗漏预警',false);addOrderDone('渗漏预警已确认')}},
+  {tool:'poweroff',at:'main',say:'关闭瓶阀，系统泄压到零表压——氢罐作业必须先隔离再验证。',done:(c)=>{c.live=false;addOrderDone('瓶阀已关闭泄压')}},
+  {tool:'gloves',at:'body',say:'防护到位。70MPa 瓶不是闹着玩的，护目镜戴好。',done:()=>addOrderDone('防护到位')},
+  {tool:'meter',at:'valve',say:'氢检仪复核：瓶阀根部 210ppm 渗漏——瓶阀密封组件寿命到期，划痕深度未超标，罐体可继续使用。',done:()=>{showMeter('210 ppm','瓶阀根部氢浓度 → 确认渗漏',false);addOrderDone('瓶阀渗漏已定位')}},
+  {tool:'cleaner',at:'body2',say:'罐体表面清洁后检查：划伤未超过 0.7mm 深度限值，纤维缠绕层无分层——罐体合格。',done:()=>addOrderDone('罐体外观检查合格')},
+  {tool:'wrench',at:'valve',say:'瓶阀密封组件整体更换——高压密封件每次拆装必换，没有 reuse 的说法。',done:(c)=>{c.fixValve();addOrderDone('瓶阀密封已更换')}},
+  {tool:'torque',at:'valve',say:'瓶阀力矩 60N·m 紧固，做气密试验。',done:()=>addOrderDone('瓶阀已力矩紧固')},
+  {tool:'diag',say:'气密试验：保压 30 分钟零泄漏，氢浓度归零——本罐体继续服役，下次年检见。',done:()=>{showMeter('0 ppm','气密试验氢浓度 → 合格',true);addOrderDone('气密试验通过')}},
+ ],
+ build(){
+  const g=new THREE.Group();g.position.y=1.0;scene.add(g);
+  P(g,new THREE.CylinderGeometry(0.3,0.3,1.15,32),M.white,0,0.05,0,0,0,Math.PI/2);
+  for(let i=0;i<7;i++)P(g,new THREE.TorusGeometry(0.305,0.012,8,40),M.metal,-0.45+i*0.15,0.05,0,0,Math.PI/2,0);
+  const valve=P(g,new THREE.CylinderGeometry(0.09,0.11,0.3,18),M.dark,-0.68,0.05,0,0,0,Math.PI/2);
+  const scratch=P(g,new THREE.BoxGeometry(0.18,0.01,0.02),new THREE.MeshBasicMaterial({color:0x8a8a8a}),0.1,0.36,0.05,0,0,0.3);
+  const A={};anchor(g,'main',A,0,0.3,0);anchor(g,'valve',A,-0.68,0.5,0);anchor(g,'body2',A,0.1,0.55,0);anchor(g,'body',A,0,0,0.95);
+  return {g,A,live:true,leakOn:true,leakAt:'valve',
+    fixValve:()=>{valve.material=M.metal},
+  };
+ },
+},
+{
+ id:'h2valve',name:'瓶阀更换',color:'#cbd5e1',no:'专项',
+ title:'储氢罐 · 瓶阀（TPRD）更换',
+ introP:'储氢罐瓶阀的热熔安全泄压装置（TPRD）已到 10 年设计寿命，且瓶阀手动开关操作卡涩。按法规必须整体更换瓶阀。台上是拆下的储氢罐与备用新瓶阀。',
+ order:'车型：氢燃料电池轿车<br>任务：<b>瓶阀寿命到期整体更换</b><br>风险：<b>TPRD 超期失效风险、残余压力</b>',
+ tools:[
+  {id:'poweroff',obj:'关阀泄压至零表压'},
+  {id:'meter',obj:'确认残余压力为零'},
+  {id:'gloves',obj:'穿戴防护装备'},
+  {id:'wrench',obj:'拆下瓶阀护罩'},
+  {id:'wrench',obj:'拆下旧瓶阀'},
+  {id:'vac',obj:'罐内抽真空置换'},
+  {id:'torque',obj:'装新瓶阀并力矩紧固'},
+ ],
+ steps:[
+  {tool:'poweroff',at:'main',say:'关闭旧瓶阀，接入泄压管路缓慢泄压——速度不能快，防止静电与低温冻伤。',done:(c)=>{c.live=false;addOrderDone('已关阀泄压')}},
+  {tool:'meter',say:'残余压力表读数 0MPa，确认零表压才能拆瓶阀。',done:()=>{showMeter('0.0 MPa','罐内残余压力 · 必须为零',true);addOrderDone('零表压已确认')}},
+  {tool:'gloves',at:'body',say:'防护到位。瓶阀拆装全程禁油禁脂——油脂与高压氢气接触有燃爆风险。',done:()=>addOrderDone('防护到位（无油作业）')},
+  {tool:'wrench',at:'cap',say:'护罩拆下——旧瓶阀表面已经氧化发白，TPRD 铅封超期。',done:(c)=>{c.openCap();addOrderDone('护罩已拆')}},
+  {tool:'wrench',at:'valve',say:'旧瓶阀专用工具拆下——接口螺纹完好，密封面重点检查。',done:(c)=>{c.pullValve();addOrderDone('旧瓶阀已拆下')}},
+  {tool:'vac',at:'valve',say:'罐内抽真空置换三遍——把残余氢气抽干净，为装新阀做准备。',done:()=>addOrderDone('罐内已抽真空')},
+  {tool:'torque',at:'valve',say:'新瓶阀（含新 TPRD）按规定力矩 120N·m 紧固——这道力矩直接决定高压密封可靠性。',done:(c)=>{c.hangNew();addOrderDone('新瓶阀已力矩紧固')}},
+  {tool:'meter',say:'气密性试验 35MPa 保压合格——新瓶阀服役开始，旧件按危废流程回收。',done:()=>{showMeter('35 MPa','气密试验压力 → 合格',true);addOrderDone('气密试验通过')}},
+ ],
+ build(){
+  const g=new THREE.Group();g.position.y=1.0;scene.add(g);
+  P(g,new THREE.CylinderGeometry(0.3,0.3,1.15,32),M.white,0,0.05,0,0,0,Math.PI/2);
+  const cap=P(g,new THREE.CylinderGeometry(0.14,0.14,0.22,20),M.dark,-0.68,0.05,0,0,0,Math.PI/2);
+  const valve=P(g,new THREE.CylinderGeometry(0.09,0.11,0.28,18),M.copperBurnt,-0.62,0.05,0,0,0,Math.PI/2);
+  const valveNew=P(g,new THREE.CylinderGeometry(0.09,0.11,0.28,18),M.metal,-0.62,0.05,0,0,0,Math.PI/2);valveNew.visible=false;
+  const A={};anchor(g,'main',A,0,0.3,0);anchor(g,'cap',A,-0.68,0.5,0);anchor(g,'valve',A,-0.62,0.5,0);anchor(g,'body',A,0,0,0.95);
+  return {g,A,live:true,
+    openCap:()=>{cap.position.x=-0.95},
+    pullValve:()=>{valve.visible=false},
+    hangNew:()=>{valveNew.visible=true;cap.position.x=-0.68;cap.material=M.metal},
+  };
+ },
+},
+{
+ id:'h2fill_cap',name:'加氢口检修',color:'#38bdf8',no:'专项',
+ title:'加氢口 · 密封检修',
+ introP:'客户反映加氢时加氢枪插拔费力、偶有氢气泄放声。拆检加氢口：防尘盖密封圈老化变形、接口内密封垫圈磨损、过滤网有异物。台上是拆下的加氢口总成。',
+ order:'车型：氢燃料电池轿车<br>现象：<b>加氢插拔费力、偶发泄放声</b><br>判断：<b>加氢口密封件老化磨损</b>',
+ tools:[
+  {id:'diag',obj:'读取氢系统状态'},
+  {id:'poweroff',obj:'关闭供氢回路'},
+  {id:'gloves',obj:'穿戴防护装备'},
+  {id:'cleaner',obj:'清洁接口与滤网'},
+  {id:'meter',obj:'氢检仪检漏确认'},
+  {id:'wrench',obj:'更换密封垫圈'},
+  {id:'torque',obj:'力矩紧固'},
+ ],
+ steps:[
+  {tool:'diag',say:'读数：加氢口温度传感器正常，最近三次加氢记录有中断——密封件嫌疑最大。',done:()=>addOrderDone('故障背景已确认')},
+  {tool:'poweroff',at:'main',say:'关闭供氢回路并确认无压——加氢口虽在车外，一样按高压件规程办。',done:(c)=>{c.live=false;addOrderDone('供氢回路已隔离')}},
+  {tool:'gloves',at:'body',say:'防护到位。',done:()=>addOrderDone('防护到位')},
+  {tool:'cleaner',at:'cap',say:'接口与过滤网清洁——滤网上卡着塑料碎屑，插拔费力的祸首之一。',done:()=>addOrderDone('接口已清洁')},
+  {tool:'meter',at:'cap',say:'氢检仪扫检：接口根部 130ppm 渗漏——密封垫圈确实磨损了。',done:()=>{showMeter('130 ppm','加氢口氢浓度 · 背景 <5 ppm → 渗漏',false);addOrderDone('渗漏已确认')}},
+  {tool:'wrench',at:'cap',say:'密封垫圈与防尘盖密封圈全部更换——小垫圈大安全，氢气泄漏大多从这种小件开始。',done:(c)=>{c.fixSeal();addOrderDone('密封件已更换')}},
+  {tool:'torque',at:'cap',say:'加氢口固定螺栓力矩 15N·m 紧固。',done:()=>addOrderDone('已力矩紧固')},
+  {tool:'diag',say:'模拟加注：插枪顺畅、密封确认无泄放声，检漏归零——加氢口恢复如新。',done:()=>{showMeter('0 ppm','模拟加注检漏 → 合格',true);addOrderDone('模拟加注通过')}},
+ ],
+ build(){
+  const g=new THREE.Group();g.position.y=1.05;scene.add(g);
+  const body=P(g,new THREE.CylinderGeometry(0.16,0.18,0.24,24),M.metal,0,0.2,0);
+  const nozzle=P(g,new THREE.CylinderGeometry(0.1,0.1,0.16,20),M.dark,0,0.4,0);
+  const ring=P(g,new THREE.TorusGeometry(0.105,0.018,10,30),M.copperBurnt,0,0.48,0,Math.PI/2,0,0);
+  const cap=P(g,new THREE.CylinderGeometry(0.13,0.13,0.08,20),M.rubber,0,0.55,0);
+  P(g,new THREE.BoxGeometry(0.4,0.2,0.3),M.dark,0,-0.02,0);
+  const A={};anchor(g,'main',A,0,0.3,0);anchor(g,'cap',A,0,0.75,0);anchor(g,'body',A,0,0.1,0.85);
+  return {g,A,live:true,leakOn:true,leakAt:'cap',
+    fixSeal:()=>{ring.material=M.metal},
+  };
+ },
+},
+{
+ id:'h2vent',name:'氢系统泄压',color:'#7dd3fc',no:'专项',
+ title:'氢燃料系统 · 安全泄压操作',
+ introP:'车辆氢系统检修前必须执行标准泄压流程。台架上是带手动泄压阀的供氢演示系统，当前管路压力 35MPa（满压状态）。按规程完成「关阀—泄压—验证」全流程。',
+ order:'任务：<b>供氢系统检修前安全泄压</b><br>当前：<b>管路压力 35MPa</b><br>目标：<b>零表压并验证</b>',
+ tools:[
+  {id:'diag',obj:'读取系统当前压力'},
+  {id:'poweroff',obj:'停机并关闭供氢主阀'},
+  {id:'gloves',obj:'穿戴防护装备'},
+  {id:'wrench',obj:'缓开泄压阀'},
+  {id:'meter',obj:'监测压力下降过程'},
+  {id:'vac',obj:'残余气体抽真空'},
+  {id:'meter',obj:'确认零表压并关闭泄压阀'},
+ ],
+ steps:[
+  {tool:'diag',say:'确认当前压力 35MPa——满压系统，泄压操作必须按流程走，一步都不能省。',done:()=>{showMeter('35.0 MPa','供氢管路压力 → 满压',false);addOrderDone('初始压力已确认')}},
+  {tool:'poweroff',at:'main',say:'停机、关闭供氢主阀——先断源，泄压阀只放存量。',done:(c)=>{c.live=false;addOrderDone('供氢主阀已关闭')}},
+  {tool:'gloves',at:'body',say:'防护到位。泄压噪声大、流速快，护目镜必戴。',done:()=>addOrderDone('防护到位')},
+  {tool:'wrench',at:'vent',say:'泄压阀缓开两圈——流速不能猛，静电和温降都是风险。',done:(c)=>{c.openVent();addOrderDone('泄压阀已开启')}},
+  {tool:'meter',say:'压力正在下降：12MPa……缓慢均匀，没有剧烈温降——泄压速率合格。',done:()=>{showMeter('12 MPa','泄压过程压力 → 下降中',true);addOrderDone('泄压速率正常')}},
+  {tool:'vac',at:'vent',say:'接近零压后用真空泵抽残余——管路死角的气靠泄压阀放不净。',done:()=>addOrderDone('残余已抽除')},
+  {tool:'meter',say:'零表压确认！关闭泄压阀——系统现在可以安全拆检了。',done:(c)=>{c.closeVent();showMeter('0.0 MPa','管路压力 → 零表压',true);addOrderDone('零表压已验证')}},
+  {tool:'diag',say:'泄压流程完整走一遍：关阀、缓泄、抽残、验证——规程背熟，关键时刻保命。',done:()=>addOrderDone('泄压流程完成')},
+ ],
+ build(){
+  const g=new THREE.Group();g.position.y=1.0;scene.add(g);
+  P(g,new THREE.CylinderGeometry(0.3,0.3,1.0,32),M.white,0,0.05,0,0,0,Math.PI/2);
+  P(g,new THREE.CylinderGeometry(0.05,0.05,0.7,14),M.metal,-0.6,0.05,0.2,0,0,Math.PI/2);
+  const vent=P(g,new THREE.CylinderGeometry(0.07,0.07,0.16,14),M.copperBurnt,-0.85,0.18,0.2);
+  const gauge=P(g,new THREE.CylinderGeometry(0.11,0.11,0.05,24),M.dark,-0.35,0.42,0.2,Math.PI/2,0,0);
+  const dial=P(g,new THREE.CircleGeometry(0.09,24),new THREE.MeshStandardMaterial({color:0xffd9d9,emissive:0xd04030,emissiveIntensity:.7}),-0.35,0.45,0.2,-Math.PI/2,0,0);
+  const A={};anchor(g,'main',A,0,0.3,0);anchor(g,'vent',A,-0.85,0.45,0.2);anchor(g,'body',A,0,0,0.9);
+  return {g,A,live:true,
+    openVent:()=>{dial.material.emissiveIntensity=.3;dial.material.color.setHex(0xd9ffd9);dial.material.emissive.setHex(0x2ea36a)},
+    closeVent:()=>{},
+  };
+ },
+}
+];
+/* ================= 游戏引擎 ================= */
+const $=id=>document.getElementById(id);
+let cur=null,ctx=null,lvIdx=0,stepIdx=0,mistakes=0,t0=0,finished=false,busy=false,selected=null;
+const tray=$('tray');
+const icons={};
+/* 道具显示名（关卡数据只有工序描述 obj，这里给每个道具一个名称） */
+const TN={poweroff:'验电笔',gloves:'绝缘手套',wrench:'扳手',torque:'力矩扳手',meter:'万用表',diag:'诊断仪',heatgun:'热风枪',paint:'绝缘漆',megger:'兆欧表',fill:'加注器',vac:'真空泵',clamp:'压线钳',cleaner:'清洁剂'};
+Object.keys({poweroff:1,gloves:1,wrench:1,torque:1,meter:1,diag:1,heatgun:1,paint:1,megger:1,fill:1,vac:1,clamp:1,cleaner:1}).forEach(id=>icons[id]=toolIcon(id));
+const helpBtn=document.createElement('button');
+helpBtn.id='helpBtn';helpBtn.textContent='师傅帮助';
+helpBtn.onclick=()=>demo();
+let toastT=null;
+function toast(msg,good){const t=$('toast');t.innerHTML=msg;t.className='toast show'+(good?' good':'');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2600)}
+function showMeter(val,lbl,ok){$('meter').classList.add('show');$('meterVal').textContent=val;$('meterVal').className='val'+(ok?' ok':'');$('meterLbl').textContent=lbl}
+function addOrderDone(t){const d=document.createElement('div');d.className='done-step';d.textContent=t;$('orderDone').appendChild(d)}
+function setObjective(){
+  const s=cur&&cur.steps[stepIdx];
+  const tt=s?cur.tools[toolIdxForStep(stepIdx)]:null;
+  $('objective').innerHTML=s?('第 <b>'+(stepIdx+1)+'</b>/'+cur.steps.length+' 工序：'+(s.obj||(tt?tt.obj:''))):'全部工序完成';
+}
+function toolIdxForStep(i){return cur._toolSeq?cur._toolSeq[i]:0}
+function wrongSay(id){
+  const map={poweroff:'高压电还没断就上手？先验电确认无电！',gloves:'防护没做好就拆高压件，不要命了？',wrench:'现在还不到拆装的时候。',torque:'力矩复紧是收尾活，别抢跑。',meter:'还没确认条件就测？按工序来。',heatgun:'没确认受潮就烘？先测量。',paint:'还没烘干就刷漆，漆会起泡！',megger:'最后一步才用兆欧表验收。',diag:'情况还没摸清就先诊断？按流程一步步来。',fill:'没排空气就加注？会气堵。',vac:'管路没处理就抽真空？会进气。',clamp:'端子还没查清楚就压接？先测量。',cleaner:'状况不明就清洁？先检查。'};
+  return map[id]||'按工序来，别跳步。';
+}
+/* 关卡装载 */
+function clearLevel(){
+  if(ctx){scene.remove(ctx.g);ctx.g.traverse(o=>{if(o.geometry)o.geometry.dispose()})}
+  ctx=null;cur=null;finished=false;busy=false;selected=null;t0=0;stepIdx=0;mistakes=0;
+  $('mist').textContent='0';$('timer').textContent='00:00';$('orderDone').innerHTML='';$('meter').classList.remove('show');
+  $('stepDots').innerHTML='';
+}
+function loadLevel(idx){
+  clearLevel();
+  lvIdx=idx;cur=LEVELS[idx];
+  /* 工序对应的工具序号（同名工具多次出现时按出现顺序匹配） */
+  const cnt={};cur._toolSeq=cur.steps.map(s=>{const list=cur.tools.map((t,i)=>i).filter(i=>cur.tools[i].id===s.tool);const k=(cnt[s.tool]||0);cnt[s.tool]=k+1;return list[k]!==undefined?list[k]:0});
+  ctx=cur.build();
+  cur.steps.forEach(()=>{const d=document.createElement('span');d.className='dot';$('stepDots').appendChild(d)});
+  $('orderBody').innerHTML=cur.order;
+  $('lvLabel').textContent=cur.no+' · '+cur.name;
+  $('backBtn').style.display='';
+  $('statusChip').textContent='故障待修';$('statusChip').className='chip bad';$('statusChip').style.color='';$('statusChip').style.borderColor='';
+  $('result').classList.add('hide');$('hub').classList.add('hide');
+  $('introTitle').innerHTML=cur.no+' · <span class="em">'+cur.title+'</span>';
+  $('introBody').innerHTML=cur.introP;
+  $('intro').classList.remove('hide');
+  $('objective').textContent='阅读工单后开始维修';
+  $('hint').innerHTML='高压作业讲规程：从道具栏挑工具，拖到零件上使用。卡住就点「师傅帮助」。';
+  /* 道具栏（乱序） */
+  [...tray.querySelectorAll('.tool')].forEach(e=>e.remove());
+  const seq=cur._toolSeq.map(i=>i); /* 按工序顺序取工具，再乱序 */
+  const uniq=[];seq.forEach(i=>{if(!uniq.includes(i))uniq.push(i)});
+  uniq.sort(()=>Math.random()-0.5);
+  uniq.forEach(i=>{
+    const t=cur.tools[i];
+    const el=document.createElement('div');el.className='tool';el.draggable=true;el.id='tool-'+i;
+    el.innerHTML=`<img src="${icons[t.id]}" alt="${t.nm||TN[t.id]||''}"><div class="nm">${t.nm||TN[t.id]||''}</div>`;
+    el.addEventListener('dragstart',e=>{e.dataTransfer.setData('text/tool',i);selectTool(i)});
+    el.addEventListener('click',()=>selectTool(i));
+    tray.appendChild(el);
+  });
+  tray.appendChild(helpBtn);
+}
+function showHub(){
+  clearLevel();
+  $('intro').classList.add('hide');$('result').classList.add('hide');
+  $('hub').classList.remove('hide');
+  $('lvLabel').textContent='3D 维修实训 · 15 大部件';
+  $('backBtn').style.display='none';
+  $('objective').textContent='选择一个关卡开始维修';
+}
+function selectTool(i){
+  if(busy||finished||!t0)return;
+  selected=i;
+  document.querySelectorAll('.tool').forEach(e=>e.classList.toggle('sel',e.id==='tool-'+i));
+  const s=cur.steps[stepIdx];
+  $('hint').innerHTML=(s&&cur._toolSeq[stepIdx]===i)?'选对了——<b>点击零件</b>即可使用。':'已选「'+(cur.tools[i].nm||TN[cur.tools[i].id])+'」——再点击零件使用。';
+}
+stage.addEventListener('dragover',e=>e.preventDefault());
+stage.addEventListener('drop',e=>{e.preventDefault();const i=e.dataTransfer.getData('text/tool');if(i!=='')useTool(+i)});
+stage.addEventListener('click',()=>{if(selected!==null)useTool(selected)});
+/* 实操动画引擎 */
+let fxList=[];
+function spawnTool(id,target){
+  const m=buildTool(id);m.scale.setScalar(1.15);
+  m.position.copy(target).add(new THREE.Vector3(1.8,1.2,1.8));
+  m.userData.from=m.position.clone();
+  scene.add(m);return m;
+}
+function fxDur(id){return {poweroff:2.4,gloves:1.8,wrench:2.6,torque:2.2,meter:2.8,diag:2.4,heatgun:2.8,paint:3.0,megger:2.8,fill:2.6,vac:2.4,clamp:2.0,cleaner:2.2}[id]||2.4}
+function runFx(step){
+  return new Promise(res=>{
+    const A=ctx.A||{};
+    const an=A[step.at||'main'];if(!an){res();return}
+    const target=wp(an);
+    const m=spawnTool(cur.tools[cur._toolSeq[stepIdx]].id,target);
+    const probes=new THREE.Group();
+    if(step.tool==='meter'&&A.probeA&&A.probeB){
+      [[A.probeA],[A.probeB]].forEach(([o])=>{
+        const pr=new THREE.Mesh(new THREE.CylinderGeometry(0.012,0.012,1,6),M.red);
+        probes.add(pr);
+      });
+      scene.add(probes);
+    }
+    /* 流体/气流粒子（fill/vac/cleaner 专用） */
+    let jet=null;
+    if(step.tool==='fill'||step.tool==='vac'||step.tool==='cleaner'){
+      jet=[];
+      const col=step.tool==='fill'?0x38b6e8:(step.tool==='vac'?0x9fd0ff:0xd8f0e0);
+      for(let i=0;i<10;i++){const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:puffTex,color:col,transparent:true,opacity:0,depthWrite:false}));sp.userData={t:Math.random()};scene.add(sp);jet.push(sp)}
+    }
+    fxList.push({step,idx:stepIdx,m,target,probes,jet,t:0,dur:fxDur(step.tool),res});
+  });
+}
+function updateFx(f,dt){
+  f.t+=dt;const u=Math.min(1,f.t/f.dur);const m=f.m;
+  if(u<0.35){const k=ease(u/0.35);m.position.lerpVectors(f.m.userData.from,f.target,k);m.rotation.y+=dt*6}
+  else{
+    m.position.copy(f.target);
+    const lu=(u-0.35)/0.65;
+    const A=ctx.A||{};
+    switch(f.step.tool){
+      case 'poweroff':
+        m.rotation.z=Math.PI/2;
+        if(lu<0.55)arcFlash(f.target);
+        break;
+      case 'gloves':
+        m.rotation.y+=dt*3;m.position.y=f.target.y+Math.sin(lu*Math.PI)*0.4;
+        break;
+      case 'wrench':
+        m.rotation.z=Math.PI/2;m.rotation.y+=dt*8;
+        break;
+      case 'torque':{
+        m.rotation.z=Math.PI/2;
+        const seg=Math.floor(lu*4);
+        m.rotation.y=seg*0.5+((lu*4)%1)*0.4;
+        break;}
+      case 'meter':{
+        m.rotation.y=-0.5;
+        const pts=A.probeA&&A.probeB?[wp(A.probeA),wp(A.probeB)]:[f.target.clone().add(V3(0.2,0,0)),f.target.clone().add(V3(-0.2,0,0))];
+        f.probes.children.forEach((pr,i)=>{
+          const tgt=pts[i],org=m.position.clone().add(V3(i?-0.3:0.3,-0.1,0));
+          const mid=org.clone().lerp(tgt,Math.min(1,lu*1.6));
+          pr.position.copy(org.clone().lerp(mid,0.5));
+          pr.scale.y=Math.max(0.001,org.distanceTo(mid));
+          pr.lookAt(mid);pr.rotateX(Math.PI/2);
+          pr.visible=lu>0.1;
+        });
+        break;}
+      case 'diag':
+        m.rotation.y=0.3+Math.sin(lu*Math.PI*2)*0.15;
+        m.position.y=f.target.y+Math.sin(lu*Math.PI)*0.15;
+        m.scale.setScalar(1.15+Math.sin(lu*Math.PI*6)*0.03);
+        break;
+      case 'heatgun':
+        m.rotation.z=Math.PI/2;m.lookAt(f.target);m.rotateX(Math.PI/2);
+        heatOn=lu>0.15&&lu<0.9;heatLight(f.target,heatOn?2:0);
+        break;
+      case 'paint':{
+        const ang=-0.9+lu*1.9;
+        m.position.set(f.target.x+Math.cos(ang)*0.3,f.target.y+Math.sin(ang)*0.4,f.target.z+Math.cos(ang)*0.3);
+        m.rotation.z=-ang*0.7;
+        break;}
+      case 'megger':
+        m.rotation.y=0.4;
+        if(m.userData.crank)m.userData.crank.rotation.z+=dt*10;
+        if(lu>0.6)m.position.y=f.target.y+Math.sin(lu*10)*0.02;
+        break;
+      case 'fill':
+        m.rotation.z=0.9;m.rotation.x=0.2;
+        if(f.jet)f.jet.forEach(sp=>{sp.userData.t+=dt;const k=(sp.userData.t%0.5)/0.5;sp.position.set(f.target.x+(Math.random()-.5)*.05,f.target.y+0.3-k*0.55,f.target.z+(Math.random()-.5)*.05);sp.scale.setScalar(0.1+k*0.15);sp.material.opacity=0.7*(1-k)});
+        break;
+      case 'vac':
+        m.rotation.z=Math.PI/2;
+        if(f.jet)f.jet.forEach(sp=>{sp.userData.t+=dt;const k=(sp.userData.t%0.7)/0.7;sp.position.set(f.target.x+(Math.random()-.5)*.4*(1-k),f.target.y+k*0.5,f.target.z+(Math.random()-.5)*.4*(1-k));sp.scale.setScalar(0.15+k*0.2);sp.material.opacity=0.5*k});
+        break;
+      case 'clamp':{
+        const c=Math.abs(Math.sin(lu*Math.PI*3));
+        m.scale.set(1.15*(1-c*0.4),1.15,1.15);
+        m.rotation.z=c*0.2;
+        break;}
+      case 'cleaner':
+        m.rotation.y+=dt*4;
+        if(f.jet)f.jet.forEach(sp=>{sp.userData.t+=dt;const k=(sp.userData.t%0.4)/0.4;sp.position.set(f.target.x+(Math.random()-.5)*.25,f.target.y+0.2-k*0.1,f.target.z+(Math.random()-.5)*.25);sp.scale.setScalar(0.08+k*0.2);sp.material.opacity=0.5*(1-k)});
+        break;
+    }
+    if(cur.stepFx)cur.stepFx(f.idx,lu,dt,f);
+  }
+  if(u>=1){
+    scene.remove(m);m.traverse(o=>{if(o.geometry)o.geometry.dispose()});
+    if(f.probes){scene.remove(f.probes);f.probes.children.forEach(p=>p.geometry.dispose())}
+    if(f.jet)f.jet.forEach(sp=>{scene.remove(sp);sp.material.dispose()});
+    heatOn=false;if(ctx&&ctx.A)heatLight(f.target,0);
+    f.res();return true;
+  }
+  return false;
+}
+/* 使用道具 / 师傅演示 */
+/* 游戏错题收录：错用工具时写入全站错题集（同源 localStorage，键格式与主站一致） */
+function recordGameMistake(i){
+  try{
+    const ls=window.localStorage;
+    let u=null;try{const sv=ls.getItem('et_session');u=sv?JSON.parse(sv):null}catch(e){}
+    const key=u?('et_wrong:'+u):'et_wrong';
+    let w={};try{const wv=ls.getItem(key);w=wv?JSON.parse(wv):{}}catch(e){}
+    const want=cur.tools[cur._toolSeq[stepIdx]],used=cur.tools[i];
+    const wname=want.nm||TN[want.id]||want.id,uname=used.nm||TN[used.id]||used.id;
+    const q='[游戏实操] '+cur.no+'「'+cur.name+'」：此工序错用了「'+uname+'」';
+    if(!w[q])w[q]={q:q,opts:['本工序应使用「'+wname+'」——'+(want.obj||'')],ans:0,exp:wrongSay(used.id)+'（正确工序：'+(want.obj||('使用「'+wname+'」'))+'）',from:'维修实训游戏',n:0};
+    w[q].n++;w[q].last=Date.now();
+    ls.setItem(key,JSON.stringify(w));
+  }catch(e){}
+}
+async function useTool(i,demo){
+  if(busy||finished||!t0)return;
+  const s=cur.steps[stepIdx];
+  if(!s)return;
+  if(cur._toolSeq[stepIdx]!==i&&!demo){
+    mistakes++;$('mist').textContent=mistakes;
+    toast('师傅：不对！'+wrongSay(cur.tools[i].id));
+    recordGameMistake(i);
+    if(ctx)ctx.g.position.x=0.14;setTimeout(()=>{if(ctx)ctx.g.position.x=0},120);
+    return;
+  }
+  busy=true;selected=null;
+  document.querySelectorAll('.tool').forEach(e=>e.classList.remove('sel'));
+  const tt=cur.tools[cur._toolSeq[stepIdx]];
+  $('hint').innerHTML='<b>实操中：</b>'+(s.obj||tt.obj)+'…';
+  await runFx(s);
+  try{s.done&&s.done(ctx)}catch(err){console.error('step done error',err)}
+  $('hint').innerHTML=(demo?'师傅演示：':'')+s.say;
+  document.querySelectorAll('#stepDots .dot')[stepIdx].classList.add('on');
+  stepIdx++;
+  document.querySelectorAll('#stepDots .dot').forEach((d,k)=>d.classList.toggle('cur',k===stepIdx));
+  setObjective();
+  if(stepIdx>=cur.steps.length)finish();
+  busy=false;
+}
+function demo(){
+  if(busy||finished||!t0)return;
+  const s=cur.steps[stepIdx];
+  if(!s)return;
+  helpBtn.disabled=true;
+  $('hint').innerHTML='师傅：看好了，这一步该用「'+(cur.tools[cur._toolSeq[stepIdx]].nm||TN[cur.tools[cur._toolSeq[stepIdx]].id])+'」。';
+  useTool(cur._toolSeq[stepIdx],true).then(()=>{
+    helpBtn.disabled=false;
+    $('hint').innerHTML='师傅：'+s.say+'<br>轮到你了，剩下的工序自己试试。';
+  });
+}
+function finish(){
+  finished=true;
+  if(ctx){ctx._setFin&&ctx._setFin();ctx.live=false;ctx.smokeOn=false;ctx.leakOn=false;ctx.glowOn=false}
+  const chip=$('statusChip');chip.textContent='维修合格';chip.className='chip';chip.style.color='#35d07f';chip.style.borderColor='#1d7a4c';
+  const secs=Math.floor((Date.now()-t0)/1000);
+  const sc=mistakes===0?3:(mistakes<=2?2:1);
+  try{const rec=+(localStorage.getItem('rg_star_'+cur.id)||0);if(sc>rec)localStorage.setItem('rg_star_'+cur.id,sc)}catch(e){}
+  setTimeout(()=>{
+    $('resultTitle').textContent=cur.name+'修复完成';
+    document.querySelectorAll('#stars .s').forEach((s,i)=>s.classList.toggle('on',i<sc));
+    $('rTime').textContent=String(Math.floor(secs/60)).padStart(2,'0')+':'+String(secs%60).padStart(2,'0');
+    $('rMist').textContent=mistakes;
+    $('rSteps').textContent=cur.steps.length+'/'+cur.steps.length;
+    $('resultText').innerHTML=sc===3?'完美！安全规程一步不差，师傅给你五星好评！':sc===2?'合格！流程走通了，下次注意按提示来，少返工。':'修好了，但工序有点乱。高压作业讲规范，建议重练一次拿满星。';
+    $('result').classList.remove('hide');
+  },1600);
+}
+function startGame(){
+  $('intro').classList.add('hide');
+  t0=Date.now();
+  document.querySelectorAll('#stepDots .dot')[0].classList.add('cur');
+  setObjective();
+  $('hint').innerHTML='第一工序：<b>'+(cur.steps[0].obj||cur.tools[cur._toolSeq[0]].obj)+'</b>。道具栏是乱序的，自己找工具。不会就点「师傅帮助」。';
+}
+$('startBtn').onclick=startGame;
+$('retryBtn').onclick=()=>loadLevel(lvIdx);
+setInterval(()=>{
+  if(!t0||finished)return;
+  const s=Math.floor((Date.now()-t0)/1000);
+  $('timer').textContent=String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
+},500);
+/* 关卡选择面板 */
+(function buildHub(){
+  const grid=$('lvGrid');
+  LEVELS.forEach((L,i)=>{
+    const rec=(()=>{try{return +localStorage.getItem('rg_star_'+L.id)||0}catch(e){return 0}})();
+    const card=document.createElement('div');card.className='lv-card';
+    card.innerHTML=`<div class="bar" style="background:${L.color}"></div><h4>${L.no} ${L.name}</h4><p>${L.title.split('·')[1]||''}</p><div class="rec">${rec?'★'.repeat(rec):''}</div>`;
+    card.onclick=()=>loadLevel(i);
+    grid.appendChild(card);
+  });
+})();
+/* 动画循环 */
+const clock=new THREE.Clock();
+function animate(){
+  requestAnimationFrame(animate);
+  const dt=Math.min(clock.getDelta(),0.05),t=clock.elapsedTime;
+  if(ctx){
+    if(!busy&&!finished)ctx.g.rotation.y+=dt*0.25;
+    ctx.tick&&ctx.tick(dt,t);
+    const A=ctx.A||{};
+    if(ctx.live){
+      const p=wp(A[ctx.sparkAt||'main']||A.main);
+      arcL.position.copy(p);
+      if(Math.random()<0.1){arcL.intensity=2+Math.random()*2;const s=sparks[3+Math.floor(Math.random()*5)];if(s){s.position.set(p.x+(Math.random()-.5)*.15,p.y+(Math.random()-.5)*.15,p.z+(Math.random()-.5)*.15);s.material.opacity=1;s.scale.setScalar(0.12+Math.random()*0.1)}}
+    } else sparks.forEach((sp,i)=>{if(i>=3)sp.material.opacity=0});
+    arcL.intensity*=0.8;
+    if(ctx.smokeOn){
+      const p=wp(A[ctx.smokeAt||'main']||A.main);
+      smokes.forEach(sp=>{sp.userData.t+=dt;const u=sp.userData.t%2.4,k=u/2.4;
+        sp.position.set(p.x+Math.sin(u*2+sp.id)*0.12,p.y+k*1.3,p.z+Math.cos(u*1.6)*0.1);
+        sp.scale.setScalar(0.3+k*1.1);sp.material.opacity=0.45*(1-k)*(k<0.1?k/0.1:1)});
+    } else smokes.forEach(sp=>sp.material.opacity*=0.94);
+    if(ctx.leakOn){
+      const p=wp(A[ctx.leakAt||'main']||A.main);
+      drops.forEach((sp,i)=>{sp.userData.t+=dt;const k=(sp.userData.t%0.9)/0.9;
+        sp.position.set(p.x+(i%3-1)*0.03,p.y-k*0.8,p.z+((i*7)%3-1)*0.03);
+        sp.scale.setScalar(0.06);sp.material.opacity=0.9*(1-k*0.5)});
+    } else drops.forEach(sp=>sp.material.opacity*=0.9);
+    if(ctx.glowOn){
+      const p=wp(A[ctx.glowAt||'main']||A.main);
+      glowL.color.setHex(ctx.glowColor||0xff5030);
+      glowL.position.copy(p);
+      glowL.intensity=1.2+Math.sin(t*7)*0.5+Math.random()*0.4;
+    } else glowL.intensity*=0.9;
+    if(heatOn){} 
+    if(finished&&ctx.finishTick)ctx.finishTick(dt);
+  }
+  fxList=fxList.filter(f=>!updateFx(f,dt));
+  sparks.forEach(sp=>{if(sp.material.opacity>0)sp.material.opacity*=0.92});
+  renderer.render(scene,camera);
+}
+animate();
+/* 入口：URL 参数直进关卡 */
+(function boot(){
+  const q=new URLSearchParams(location.search).get('level');
+  if(q){const i=LEVELS.findIndex(L=>L.id===q);if(i>=0){loadLevel(i);return}}
+  showHub();
+})();
+window.__game={ready:true,LEVELS:LEVELS.map(l=>({id:l.id,name:l.name,steps:l.steps.length,tools:l.tools.length})),get step(){return stepIdx},get mistakes(){return mistakes},get level(){return cur?cur.id:null},get seq(){return cur?cur._toolSeq.slice():null},useTool,demo,startGame,loadLevel:(i)=>loadLevel(i)};
+window.__dbg={get frame(){return renderer.info.render.frame},get fx(){return fxList.length},get t(){return clock.elapsedTime},kick(){animate()}};
+window.startGame=startGame;window.showHub=showHub;
+</script>
+</body>
+</html>

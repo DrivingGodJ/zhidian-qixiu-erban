@@ -1,0 +1,14 @@
+# 敏感信息（永远不要提交）
+keys.json
+data/db.json
+
+# 运行时产物
+*.log
+site-run.log
+site-err.log
+
+# 系统与编辑器
+Thumbs.db
+.DS_Store
+__pycache__/
+node_modules/

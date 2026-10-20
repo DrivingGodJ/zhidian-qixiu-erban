@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>新能源汽车3D拆解</title>
+    <script type="module" crossorigin src="./nev3d.js?v=10"></script>
+    <link rel="stylesheet" crossorigin href="./nev3d.css?v=3">
+    <style>
+      /* 按键灵动效果：悬浮弹起 + 点击回弹 + 光晕 */
+      #root button{
+        transition:transform .18s cubic-bezier(.34,1.56,.64,1),box-shadow .18s ease,filter .18s ease;
+        will-change:transform;
+      }
+      #root button:hover{
+        transform:translateY(-2px) scale(1.07);
+        box-shadow:0 6px 18px rgba(61,127,224,.45),0 0 12px rgba(120,180,255,.35);
+        filter:brightness(1.12);
+      }
+      #root button:active{transform:scale(.92)}
+      @media (max-width:640px){
+        #root div[style*="max-width: 150px"]{max-width:118px!important;padding:2px 6px!important}
+        #root div[style*="max-width: 150px"]>div{font-size:10px!important;white-space:normal!important}
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script>
+    /* ===== 部件课配套维修实训游戏（每个部件 2 关） ===== */
+    (function(){
+      var GAMES={
+        '动力电池包':[['battery','动力电池包拆装'],['module','电池模组维修']],
+        '电池管理系统':[['bms','BMS 故障排查'],['imd','绝缘监测检修']],
+        '驱动电机':[['motor','驱动电机维修'],['resolver','旋变传感器检测']],
+        '电机控制器':[['inverter','逆变器维修'],['hvil','高压互锁回路']],
+        '减速器':[['reducer','减速器维修'],['gearoil','减速器油更换']],
+        '车载充电机':[['obc','OBC 维修'],['relay','主继电器检测']],
+        'DC-DC':[['dcdc','DC-DC 维修'],['lvbat','12V 蓄电池检测']],
+        '高压配电盒':[['pdu','PDU 维修'],['msd','维修开关 MSD']],
+        '整车控制器':[['vcu','VCU 故障诊断'],['canbus','CAN 总线排查']],
+        '电动压缩机':[['compressor','电动压缩机维修'],['ptc','PTC 加热器检修']],
+        '热管理系统':[['thermal','热管理系统维修'],['pump','电子水泵更换']],
+        '充电口':[['chargeport','充电口维修'],['fastgun','快充握手故障']],
+        '座舱内饰':[['cabin','座舱电气维修'],['wiper','雨刮电机更换']],
+        '车轮与制动':[['wheel','车轮制动维修'],['brake','制动能量回收']],
+        '车身壳体':[['body','车身壳体拆装'],['elock','充电电子锁维修']]
+      };
+      var GN={battery:'动力电池包',module:'电池模组',bms:'电池管理系统',imd:'绝缘监测',motor:'驱动电机',resolver:'旋变传感器',inverter:'电机控制器',hvil:'高压互锁',reducer:'减速器',gearoil:'减速器油',obc:'车载充电机',relay:'主继电器',dcdc:'DC-DC',lvbat:'12V 蓄电池',pdu:'高压配电盒',msd:'维修开关',vcu:'整车控制器',canbus:'CAN 总线',compressor:'电动压缩机',ptc:'PTC 加热器',thermal:'热管理系统',pump:'电子水泵',chargeport:'充电口',fastgun:'快充握手',cabin:'座舱电气',wiper:'雨刮电机',wheel:'车轮制动',brake:'制动能量回收',body:'车身壳体',elock:'充电电子锁'};
+      function star(lv){try{var s=+(localStorage.getItem('rg_star_'+lv)||0);return s>0?('★'.repeat(s)):'未通关'}catch(e){return '未通关'}}
+      function inject(){
+        try{
+          var h=[...document.querySelectorAll('h1')].find(function(x){
+            var t=x.textContent;return Object.keys(GAMES).some(function(k){return t.indexOf(k)>=0});
+          });
+          if(!h)return;
+          var box=h.closest('div.max-w-4xl');
+          if(!box||box.querySelector('.inj-games'))return;
+        var key=Object.keys(GAMES).find(function(k){return h.textContent.indexOf(k)>=0});
+        var gs=GAMES[key];
+        var d=document.createElement('div');
+        d.className='inj-games';
+        d.style.cssText='margin-top:26px;border:2px solid #3d7fe0;border-radius:14px;padding:18px 18px 14px;background:linear-gradient(135deg,#0b1c33,#10264a)';
+        d.innerHTML='<div style="font-size:16px;font-weight:800;color:#eaf3ff;margin-bottom:4px">🎮 维修实训游戏（2 关）</div>'
+          +'<div style="font-size:12.5px;color:#7fa8d9;line-height:1.8;margin-bottom:12px">同款零件、同款故障现象搬到 3D 维修实训台：自己选工具、按安全工序亲手修一遍；卡壳时道具栏最右侧有「师傅帮助」演示实操。</div>'
+          +gs.map(function(g,i){
+            var done=star(g[0])!=='未通关';
+            return '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#0a1628;border:1px solid #1e3a5f;border-radius:10px;padding:10px 14px;margin-bottom:10px">'
+              +'<b style="font-size:14.5px;color:#ffd28a">实训第'+(i+1)+'关 · '+GN[g[0]]+'</b>'
+              +'<span style="font-size:12px;color:'+(done?'#34d399':'#8aa3c7')+';border:1px solid '+(done?'#34d39955':'#8aa3c755')+';border-radius:20px;padding:2px 10px">'+star(g[0])+'</span>'
+              +'<span style="flex:1"></span>'
+              +'<a href="repair-game.html?level='+g[0]+'" target="_blank" style="display:inline-block;padding:7px 18px;border-radius:9px;background:linear-gradient(135deg,#1266f1,#0b3d91);border:1px solid #3d7fe0;color:#fff;font-size:13px;font-weight:700;text-decoration:none;font-family:inherit">'+(done?'再修一次':'▶ 开始实训')+'</a></div>';
+          }).join('');
+        box.appendChild(d);
+        }catch(e){window.__injErr=String(e)}
+      }
+      var mo=new MutationObserver(function(){inject();setTimeout(inject,150)});
+      mo.observe(document.getElementById('root'),{childList:true,subtree:true});
+      setInterval(inject,700);
+      window.__injectNow=inject;
+    })();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,7 @@
+{
+  "ADMIN_TOKEN": "请修改为强密码（仅服务端持有，用于教师申请审核、部署等管理接口）",
+  "DEEPSEEK_API_KEY": "可选：DeepSeek 文字问答接口 Key",
+  "DASHSCOPE_API_KEY": "可选：阿里云百炼 DashScope Key（qwen-vl 视觉识别用）",
+  "VISION_MODEL": "qwen-vl-max",
+  "VISION_BASE_URL": "https://dashscope.aliyuncs.com/compatible-mode/v1"
+}

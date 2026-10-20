@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover">
+<title>部件详解 | 智电汽修二班</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{min-height:100vh;background:radial-gradient(1200px 600px at 70% -10%,#12233f 0%,#070d1a 60%);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;color:#e8f1ff}
+  .wrap{max-width:860px;margin:0 auto;padding:22px 18px 60px;display:flex;flex-direction:column;gap:0}
+  .topbar{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+  .back{font-size:13px;color:#9fc2ef;text-decoration:none;border:1px solid #274264;border-radius:10px;padding:8px 14px;background:#16263f;transition:.15s;cursor:pointer}
+  .back:hover{background:#1d3355}
+  .dot{width:16px;height:16px;border-radius:50%;flex:0 0 auto}
+  h1{font-size:24px;font-weight:800;color:#eaf3ff}
+  .mtag{margin-left:auto;font-size:11px;color:#9fc2ef;border:1px solid #2b4a7f;border-radius:20px;padding:2px 10px;background:rgba(18,40,80,.5)}
+  .tagline{font-size:15px;color:#7fa8d9;margin-bottom:22px;line-height:1.7}
+  .scenebox{position:relative;border-radius:14px;overflow:hidden;background:linear-gradient(180deg,#0b1730,#070d1a);border:1px solid #1e3450;margin-bottom:30px}
+  .scenebox .stage{width:100%;height:340px}
+  .chip{position:absolute;font-size:11px;color:#bcd7ff;background:rgba(7,13,26,.85);border:1px solid #2b4a7f;border-radius:9px;padding:2px 9px}
+  .chip.tl{top:10px;left:10px}
+  .chip.br{bottom:10px;right:10px;color:#7fa8d9}
+  section{margin-bottom:30px}
+  h2{font-size:17px;font-weight:800;color:#eaf3ff;margin-bottom:12px}
+  p.role{font-size:14.5px;line-height:2;color:#c4d8f2}
+  ul.struct{list-style:none}
+  ul.struct li{display:flex;gap:10px;font-size:14px;line-height:2;color:#c4d8f2}
+  ul.struct li::before{content:"▸";flex:0 0 auto;font-weight:800}
+  .fault{background:#101d33;border:1px solid #1e3450;border-radius:12px;padding:14px 16px;margin-bottom:12px}
+  .fault h4{font-size:14px;color:#ffd28a;margin-bottom:6px}
+  .fault p{font-size:13.5px;line-height:1.9;color:#a9c4e4}
+  .fault p b{color:#7fa8d9;font-weight:600}
+  .safety{background:rgba(180,60,50,.12);border:1px solid rgba(220,90,70,.35);border-radius:12px;padding:14px 16px;font-size:14px;line-height:2;color:#f0c0b4}
+  .course{background:#101d33;border-radius:14px;overflow:hidden;border:1px solid rgba(61,127,224,.25)}
+  .course .chead{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 14px;background:rgba(61,127,224,.08);border-bottom:1px solid rgba(61,127,224,.13)}
+  .course .chead .t{font-size:14px;font-weight:700;color:#eaf3ff}
+  .course .chead .m{font-size:11.5px;color:#7fa8d9}
+  .course .cbody{padding:14px 16px;font-size:13.5px;line-height:2;color:#c4d8f2}
+  .course .cbody p{margin-bottom:8px}
+  .course .cbody b{color:#eaf4ff}
+  .diff{margin-top:12px;font-size:12.5px;color:#ffd166;line-height:1.8;border-top:1px dashed #2b4a7f;padding-top:10px}
+  .quiz{margin-top:14px;border-top:1px dashed #2b4a7f;padding-top:14px}
+  .quiz h3{font-size:14px;color:#7db4ff;margin-bottom:4px}
+  .q{font-size:13.5px;line-height:1.8;color:#eaf3ff;margin:14px 0 8px;font-weight:600}
+  .opt{display:block;width:100%;text-align:left;font-size:13px;padding:8px 13px;margin:6px 0;border-radius:10px;border:1px solid #2b4a7f;background:rgba(18,40,80,.4);color:#c4d6f2;cursor:pointer;transition:.15s;font-family:inherit}
+  .opt:hover{border-color:#3d7fe0;transform:translateX(3px)}
+  .opt.right{background:rgba(20,80,50,.5);border-color:#2ea36a;color:#b9f4d4}
+  .opt.wrong{background:rgba(80,26,20,.5);border-color:#d93a2e;color:#ffd3c9}
+  .exp{display:none;font-size:12.5px;color:#9fc2ef;line-height:1.8;margin:4px 0 10px;padding:8px 12px;background:rgba(18,40,80,.35);border-radius:8px}
+  .exp.show{display:block}
+  .games{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+  .game{display:block;text-decoration:none;background:linear-gradient(150deg,rgba(18,40,80,.9),rgba(10,20,40,.95));border:1px solid #2b4a7f;border-radius:14px;padding:18px 20px;transition:.18s;position:relative;overflow:hidden}
+  .game:hover{transform:translateY(-4px);border-color:#3d7fe0;box-shadow:0 10px 26px rgba(18,102,241,.35)}
+  .game .bar{height:4px;border-radius:2px;margin-bottom:12px}
+  .game h4{font-size:16px;color:#fff;margin-bottom:8px}
+  .game p{font-size:12.5px;color:#9fc2ef;line-height:1.8}
+  .game .play{display:inline-block;margin-top:12px;font-size:13px;font-weight:700;color:#fff;background:linear-gradient(135deg,#1266f1,#0b3d91);padding:8px 20px;border-radius:20px}
+  .glabel{font-size:14px;color:#7db4ff;font-weight:700}
+  .cta{margin-top:8px;border-radius:12px;padding:18px 20px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;background:#101d33;border:1px solid #22406a}
+  .cta p{font-size:13px;color:#9fc2ef;line-height:1.8}
+  .cta a{padding:10px 22px;border-radius:10px;font-size:14px;font-weight:700;color:#081120;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <a class="back" id="backBtn" href="./index.html">← 返回 3D 拆解</a>
+    <span class="dot" id="pDot"></span>
+    <h1 id="pName"></h1>
+    <span class="mtag" id="mTag"></span>
+  </div>
+  <p class="tagline" id="pTag"></p>
+
+  <div class="scenebox">
+    <div class="stage" id="stage"></div>
+    <span class="chip tl" id="sceneChip">部件 3D 模型 · 可自由旋转</span>
+    <span class="chip br">拖拽旋转 · 滚轮缩放</span>
+  </div>
+
+  <section><h2>⚙️ 作用</h2><p class="role" id="dRole"></p></section>
+  <section><h2>🔩 结构与原理</h2><ul class="struct" id="dStruct"></ul></section>
+  <section><h2>🛠️ 常见故障与排查</h2><div id="dFaults"></div></section>
+  <section><h2>⚠️ 安全提示</h2><div class="safety" id="dSafety"></div></section>
+  <section><h2>📖 配套课程学习（带教师傅 · 体系课）</h2><div id="dCourse"></div></section>
+  <section><h2>🎓 考证要点</h2><p class="role" id="dExam"></p></section>
+  <section>
+    <h2 class="glabel">🎮 配套实训游戏（每个部件两个，与网站同款）</h2>
+    <div class="games" id="games"></div>
+  </section>
+  <div class="cta">
+    <p id="ctaText"></p>
+    <a id="ctaBtn" href="/" target="_blank" rel="noreferrer">进入带教师傅网站 →</a>
+  </div>
+</div>
+
+<script src="../lessons.js"></script>
+<script src="courses.js"></script>
+<script src="pdetail.js"></script>
+<script id="cfgLoader"></script>
+<script>
+// 先按车型加载 cfg，再启动 3D 模块
+(function(){
+  const q=new URLSearchParams(location.search);
+  const m=q.get('m')||'phev';
+  const s=document.createElement('script');
+  s.src='cfg-'+m+'.js';
+  s.onload=()=>{ window.__MODEL_READY=true; };
+  document.head.appendChild(s);
+})();
+</script>
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { BUILDERS } from './detail.js';
+
+const ACCENT={phev:'#3d7fe0',erev:'#0ea5e9',fcev:'#10b981'};
+const MNAME={phev:'插电混动 PHEV',erev:'增程式 EREV',fcev:'氢燃料 FCEV'};
+const q=new URLSearchParams(location.search);
+const m=q.get('m')||'phev', pi=parseInt(q.get('p')||'0',10);
+const accent=ACCENT[m]||'#3d7fe0';
+
+// 等 cfg 加载完成
+await new Promise(r=>{ const t=()=>window.MODEL_CFG?r():setTimeout(t,30); t(); });
+const CFG=window.MODEL_CFG, part=CFG.parts[pi]||{};
+const D=(window.PART_DETAIL[m]||[])[pi]||{};
+
+/* ---------- 文本区 ---------- */
+document.getElementById('backBtn').href='./'+m+'.html';
+document.getElementById('pName').textContent=part.name||'部件';
+document.getElementById('pTag').textContent=D.tagline||part.desc||'';
+document.getElementById('mTag').textContent=MNAME[m]||'';
+document.getElementById('pDot').style.background=accent;
+document.getElementById('pDot').style.boxShadow='0 0 12px '+accent;
+document.getElementById('dRole').textContent=D.role||part.desc||'';
+const ul=document.getElementById('dStruct');
+(D.structure||[]).forEach(s=>{ const li=document.createElement('li'); li.textContent=s; ul.appendChild(li); });
+// 给 ▸ 着色
+const styleFix=document.createElement('style');
+styleFix.textContent='ul.struct li::before{color:'+accent+'}';
+document.head.appendChild(styleFix);
+const fb=document.getElementById('dFaults');
+(D.faults||[]).forEach(f=>{
+  const d=document.createElement('div'); d.className='fault';
+  d.innerHTML='<h4>'+f.name+'</h4><p><b>原因：</b>'+f.cause+'</p><p><b>排查：</b>'+f.fix+'</p>';
+  fb.appendChild(d);
+});
+document.getElementById('dSafety').textContent=D.safety||'';
+document.getElementById('dExam').textContent=D.exam||'';
+document.getElementById('ctaText').textContent='想系统学习 '+(part.name||'该部件')+' 的拆装与诊断？去「智电汽修二班」网站学习对应课程与故障码带教。';
+const cta=document.getElementById('ctaBtn'); cta.style.background=accent;
+
+/* ---------- 配套课程（与网站体系课同源） ---------- */
+(function(){
+  const course=(window.MODEL_COURSES||{})[m][pi];
+  const box=document.getElementById('dCourse');
+  let title,body,quiz=null;
+  if(course.lesson){
+    const L=(window.DATA.lessons||[]).find(x=>x.id===course.lesson);
+    if(L){title=L.title;body=L.body;quiz=L.quiz}
+  }
+  if(course.custom){title=course.custom.title;body=course.custom.body}
+  if(course.custom&&course.custom.quiz)quiz=course.custom.quiz;
+  const card=document.createElement('div');card.className='course';
+  let mins='';
+  if(course.lesson){const L=(window.DATA.lessons||[]).find(x=>x.id===course.lesson);if(L&&L.mins)mins='约'+L.mins+'分钟'}
+  else mins='专属部件课';
+  card.innerHTML='<div class="chead"><span class="t">📖 '+(title||'部件课')+'</span><span class="m">'+mins+'</span></div><div class="cbody">'+(body||'<p>课程内容建设中。</p>')+(part.diff?'<div class="diff">能源类型差异：'+part.diff+'</div>':'')+'</div>';
+  box.appendChild(card);
+  if(quiz&&quiz.length){
+    const qz=document.createElement('div');qz.className='quiz';
+    qz.innerHTML='<h3>📝 随堂考核 <span id="vpartPass" style="font-size:12px;color:#2ea36a;font-weight:400"></span></h3>';
+    const VKEY='et_vpart:'+m+':'+pi;
+    quiz.forEach((Q,qi)=>{
+      const div=document.createElement('div');
+      div.innerHTML='<div class="q">'+(qi+1)+'. '+Q.q+'</div>';
+      Q.opts.forEach((o,oi)=>{
+        const b=document.createElement('button');b.className='opt';b.textContent=o;
+        b.onclick=()=>{
+          if(b.dataset.done)return;
+          div.querySelectorAll('.opt').forEach(x=>x.dataset.done=1);
+          div.dataset.done='1';div.dataset.ok=(oi===Q.ans)?'1':'0';
+          if(oi===Q.ans)b.classList.add('right');
+          else{b.classList.add('wrong');div.querySelectorAll('.opt')[Q.ans].classList.add('right')}
+          const e=document.createElement('div');e.className='exp show';e.textContent='解析：'+Q.exp;div.appendChild(e);
+          // 全部作答且全对 → 记录该部件课通过（学习看板统计用）
+          const allDiv=[...qz.querySelectorAll('.q')].map(x=>x.parentElement);
+          if(allDiv.every(x=>x.dataset.done==='1')){
+            const okc=allDiv.filter(x=>x.dataset.ok==='1').length;
+            const tag=qz.querySelector('#vpartPass')||qz.querySelector('h3 span');
+            if(okc===allDiv.length){
+              try{localStorage.setItem(VKEY,'1')}catch(_){}
+              if(tag)tag.textContent=' · ✅ 本部件课已通过（看板已记录）';
+            }else if(tag){tag.textContent=' · 答对 '+okc+'/'+allDiv.length+'，全对即记通过';}
+          }
+        };
+        div.appendChild(b);
+      });
+      qz.appendChild(div);
+    });
+    // 已通过标记（进入页面时显示）
+    (function(){const tag=qz.querySelector('h3 span');if(tag&&localStorage.getItem(VKEY)==='1')tag.textContent=' · ✅ 本部件课已通过（看板已记录）';})();
+    card.querySelector('.cbody').appendChild(qz);
+  }
+})();
+
+/* ---------- 配套游戏 ---------- */
+const GN={motor:'驱动电机',battery:'动力电池包',bms:'电池管理系统',reducer:'减速器',inverter:'电机控制器',obc:'车载充电机',dcdc:'DC-DC',pdu:'高压配电盒',vcu:'整车控制器',compressor:'电动压缩机',thermal:'热管理系统',chargeport:'充电口',cabin:'座舱电气',wheel:'车轮制动',body:'车身壳体',hvil:'高压互锁',imd:'绝缘监测',module:'电池模组',elock:'充电电子锁',canbus:'CAN总线',msd:'维修开关',relay:'主继电器',ptc:'PTC加热器',brake:'制动回收',gearoil:'减速器油',lvbat:'12V蓄电池',pump:'电子水泵',wiper:'雨刮电机',fastgun:'快充握手',resolver:'旋变传感器',engine_oil:'发动机 · 机油保养',engine_ign:'发动机 · 点火失火',dht_oil:'DHT · 油液更换',dht_clutch:'DHT · 离合器打滑',tank_leak:'油箱 · 渗油检修',tank_pump:'油箱 · 燃油泵更换',exhaust_rust:'排气 · 锈蚀补焊',exhaust_hanger:'排气 · 吊耳消音器',rex_maint:'增程器 · 例行保养',rex_gen:'增程器 · 发电机检修',stack_leak:'燃料电池堆 · 氢泄漏',stack_maint:'电堆 · 单片电压巡检',h2line_leak:'供氢管路 · 检漏',h2pump:'氢循环泵 · 检修',airmotor:'空压机 · 供气检修',humid:'加湿器 · 排水除垢',h2tank_check:'储氢罐 · 定期安检',h2valve:'储氢罐 · 瓶阀更换',h2fill_cap:'加氢口 · 密封检修',h2vent:'氢系统 · 安全泄压'};
+const GT={motor:'#f97316',battery:'#3b82f6',bms:'#06b6d4',reducer:'#a855f7',inverter:'#ef4444',obc:'#eab308',dcdc:'#22c55e',pdu:'#f472b6',vcu:'#14b8a6',compressor:'#fb923c',thermal:'#38bdf8',chargeport:'#c084fc',engine_oil:'#f97316',engine_ign:'#ef4444',dht_oil:'#8b5cf6',dht_clutch:'#a855f7',tank_leak:'#eab308',tank_pump:'#ca8a04',exhaust_rust:'#78716c',exhaust_hanger:'#57534e',rex_maint:'#0ea5e9',rex_gen:'#0284c7',stack_leak:'#10b981',stack_maint:'#34d399',h2line_leak:'#14b8a6',h2pump:'#0d9488',airmotor:'#22d3ee',humid:'#67e8f9',h2tank_check:'#e2e8f0',h2valve:'#cbd5e1',h2fill_cap:'#38bdf8',h2vent:'#7dd3fc',module:'#3b82f6',relay:'#f472b6',msd:'#f43f5e',lvbat:'#84cc16',canbus:'#14b8a6',resolver:'#fb923c',fastgun:'#c084fc',elock:'#a78bfa',ptc:'#f97316',thermal:'#38bdf8'};
+const GDESC={engine_oil:'放油→清洁→加注→力矩复紧，走完标准发动机保养工艺。',engine_ign:'从失火故障码到点火线圈、火花塞更换的完整诊断链。',dht_oil:'油底壳拆装、滤网清洁、专用油加注，DHT 保养全流程。',dht_clutch:'拆解离合器端盖，定位液压压力异常，更换烧蚀组件。',tank_leak:'EVAP 诊断、护板拆检、密封修复，油箱渗漏标准处置。',tank_pump:'从油压过低到燃油泵总成更换的供油系统检修。',exhaust_rust:'打磨除锈、更换卡箍、喷涂耐温层，排气修复工艺。',exhaust_hanger:'拆旧换新排气悬挂件，恢复排气系统固定。',rex_maint:'增程器机油更换、皮带检查、发电机绝缘测试一体化保养。',rex_gen:'发电机绕组烧焦故障：拆解、测量、更换、复测全链路。',stack_leak:'氢检仪扫检定位，更换电堆入口密封组件。',stack_maint:'逐片电压巡检定位异常单池，端子压接修复工艺。',h2line_leak:'分段保压定位，卡套接头更换与密封面处理。',h2pump:'循环泵拆解检修，抽真空置换后换新泵。',airmotor:'空滤更换、进气清洁、润滑加注，恢复供气压力。',humid:'排水阀拆洗除垢、腔体抽真空干燥、去离子水加注。',h2tank_check:'70MPa 储氢罐年度安检：检漏、外观测量、瓶阀密封更换。',h2valve:'瓶阀（TPRD）寿命到期整体更换，含抽真空与气密试验。',h2fill_cap:'加氢口密封件更换，模拟加注验证密封。',h2vent:'关阀—泄压—抽残—验证，氢系统标准泄压流程演练。'};
+(function(){
+  const course=(window.MODEL_COURSES||{})[m][pi];
+  const g=document.getElementById('games');
+  (course.games||[]).forEach(gid=>{
+    const a=document.createElement('a');a.className='game';a.target='_blank';
+    a.href='../videos/repair-game.html?level='+gid;
+    a.innerHTML='<div class="bar" style="background:'+(GT[gid]||'#1266f1')+'"></div><h4>🎮 '+GN[gid]+'</h4><p>'+(GDESC[gid]||'高压安全规范下的标准维修工艺实训。')+'</p><span class="play">开始实训 →</span>';
+    g.appendChild(a);
+  });
+})();
+
+/* ---------- 单部件 3D 迷你场景 ---------- */
+(function(){
+  const stage=document.getElementById('stage');
+  const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+  renderer.setSize(stage.clientWidth,stage.clientHeight);
+  renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+  stage.appendChild(renderer.domElement);
+  const scene=new THREE.Scene();
+  const camera=new THREE.PerspectiveCamera(40,stage.clientWidth/stage.clientHeight,.01,100);
+  const controls=new OrbitControls(camera,renderer.domElement);
+  controls.enableDamping=true;controls.dampingFactor=.08;controls.autoRotate=true;controls.autoRotateSpeed=1.4;
+  let lastTouch=performance.now();
+  controls.addEventListener('start',()=>{controls.autoRotate=false;lastTouch=performance.now()});
+  controls.addEventListener('end',()=>{lastTouch=performance.now()});
+  scene.add(new THREE.AmbientLight(0x8899bb,.7));
+  const key=new THREE.DirectionalLight(0xffffff,2.0);key.position.set(3,5,3);key.castShadow=true;key.shadow.mapSize.set(1024,1024);scene.add(key);
+  const rim=new THREE.PointLight(new THREE.Color(accent),20,20);rim.position.set(-4,2,-3);scene.add(rim);
+  // 构建单部件（与整车同一套 BUILDERS / boxes / cyl 配置）
+  const p=part, g=new THREE.Group();
+  if(p.b&&BUILDERS[p.b]){
+    g.add(BUILDERS[p.b](p.opt||{}));
+  }else{
+    (p.boxes||[]).forEach(b=>{
+      const mesh=new THREE.Mesh(new THREE.BoxGeometry(b.s[0],b.s[1],b.s[2]),new THREE.MeshStandardMaterial({color:b.c||p.color||0x4a7dbf,roughness:.45,metalness:.4}));
+      mesh.position.set(b.p[0],b.p[1],b.p[2]);
+      if(b.r)mesh.rotation.set(b.r[0]||0,b.r[1]||0,b.r[2]||0);
+      mesh.castShadow=true;g.add(mesh);
+    });
+    (p.cyl||[]).forEach(c=>{
+      const mesh=new THREE.Mesh(new THREE.CylinderGeometry(c.r,c.r,c.h,22),new THREE.MeshStandardMaterial({color:c.c||p.color||0x4a7dbf,roughness:.45,metalness:.4}));
+      if(c.axis==='x')mesh.rotation.z=Math.PI/2;else if(c.axis==='z')mesh.rotation.x=Math.PI/2;
+      mesh.position.set(c.p[0],c.p[1],c.p[2]);mesh.castShadow=true;g.add(mesh);
+    });
+  }
+  // 居中到底面
+  const bb=new THREE.Box3().setFromObject(g);
+  const size=bb.getSize(new THREE.Vector3()), center=bb.getCenter(new THREE.Vector3());
+  g.position.sub(center);g.position.y+=size.y/2;
+  scene.add(g);
+  // 展台
+  const ground=new THREE.Mesh(new THREE.CircleGeometry(Math.max(size.x,size.z,size.y)*1.1,48),new THREE.MeshStandardMaterial({color:0x0c1830,roughness:.9}));
+  ground.rotation.x=-Math.PI/2;ground.position.y=-size.y/2-.02;ground.receiveShadow=true;scene.add(ground);
+  const R=Math.max(size.x,size.y,size.z,.2);
+  camera.position.set(R*1.6,R*1.1,R*1.6);controls.target.set(0,0,0);
+  controls.minDistance=R*.6;controls.maxDistance=R*6;controls.update();
+  window.addEventListener('resize',()=>{
+    camera.aspect=stage.clientWidth/stage.clientHeight;camera.updateProjectionMatrix();
+    renderer.setSize(stage.clientWidth,stage.clientHeight);
+  });
+  (function loop(){
+    requestAnimationFrame(loop);
+    if(!controls.autoRotate&&performance.now()-lastTouch>4000)controls.autoRotate=true;
+    controls.update();renderer.render(scene,camera);
+  })();
+})();
+
+document.title=(part.name||'部件详解')+' · '+MNAME[m]+' | 智电汽修二班';
+</script>
+</body>
+</html>
