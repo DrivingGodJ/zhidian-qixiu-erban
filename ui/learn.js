@@ -40,11 +40,13 @@ function mergeProgress(latest){
  // explicit redo in another tab, or erase the newest attempt's partial answers.
  return latestAttempt>attempt?{...record,quizAttempt:latestAttempt,answers:answers(latest),quizReview:latest.quizReview===true}:{...record};
 }
-function save(){if(CourseProgress.key(vehicle,course.partId,course.lessonId)!==storageKey){location.reload();return;}record.updatedAt=Date.now();record.quizTotal=course.quiz.length;const snapshot=mergeProgress(CourseProgress.get(vehicle,course.partId,course.lessonId));try{localStorage.setItem(storageKey,JSON.stringify(snapshot))}catch{}updateProgress()}
+function courseAccessible(){return !course?.paid||!window.DemoAccess||DemoAccess.allowed('courses')}
+function ensureCourseOwner(){if(CourseProgress.key(vehicle,course.partId,course.lessonId)!==storageKey){location.reload();return false;}return true;}
+function save(){if(!courseAccessible())return;if(CourseProgress.key(vehicle,course.partId,course.lessonId)!==storageKey){location.reload();return;}record.updatedAt=Date.now();record.quizTotal=course.quiz.length;const snapshot=mergeProgress(CourseProgress.get(vehicle,course.partId,course.lessonId));try{localStorage.setItem(storageKey,JSON.stringify(snapshot))}catch{}updateProgress()}
 function names(){return course.games.length?['学原理','做练习','维修实训','学习结果']:['学原理','做练习','学习结果']}
 function steps(){const list=names();return '<ol id="lessonSteps" style="--step-count:'+list.length+'" aria-label="课程进度">'+list.map((name,i)=>'<li class="'+(i===record.stage?'active':i<record.stage?'completed':'')+'"'+(i===record.stage?' aria-current="step"':'')+'><span class="step-number">'+String(i+1)+'</span><span>'+name+'</span></li>').join('')+'</ol>'}
 function title(text){document.getElementById('courseTitle').textContent=course.title;document.getElementById('courseMeta').textContent=text;document.title=course.title+' · '+text+' | 智电汽修'}
-function model(){return course.builder?'<div class="lesson-model"><iframe src="/models/component.html?part='+encodeURIComponent(course.builder)+'&title='+encodeURIComponent(course.title)+'" title="'+esc(course.title)+' 3D 教学示意" loading="lazy"></iframe></div><p class="model-note">3D 教学示意，用于认识结构。</p>':''}
+function model(){return course.builder?'<div class="lesson-model"><iframe src="/models/component.html?part='+encodeURIComponent(course.builder)+'&title='+encodeURIComponent(course.title)+'" title="'+esc(course.title)+' 3D 模型" loading="lazy"></iframe></div><p class="model-note">旋转、缩放，查看部件结构。</p>':''}
 function section(name,body){return body?'<section class="lesson-section"><h2>'+esc(name)+'</h2>'+body+'</section>':''}
 function mountReadingVisuals(host,hasBrands){
  if(!hasBrands||LESSON_VISUALS[course.lessonId]?.kind!=='whole')return hasBrands?mountBrandComparisons(host,course):mountLessonVisuals(host,course.lessonId);
@@ -63,6 +65,7 @@ function setStage(stage){record.stage=guardStage(stage);if(record.stage===0)reco
 function resetPractice(){const latest=CourseProgress.get(vehicle,course.partId,course.lessonId);record.quizAttempt=Math.max(Date.now(),quizAttempt(record)+1,quizAttempt(latest)+1);record.answers=[];record.question=0;record.quizReview=false;setStage(1)}
 function buttonState(label,action,disabled=false){next.textContent=label;next.disabled=disabled;next.onclick=action}
 function render(){
+ if(!courseAccessible()){if(unmountVisuals){unmountVisuals();unmountVisuals=null}frame=null;DemoAccess.mountLearnGate(course.title);return;}
  const token=++renderToken;if(unmountVisuals){unmountVisuals();unmountVisuals=null;}frame=null;record.stage=guardStage(record.stage);content.classList.remove('game-mode');content.innerHTML=steps();updateProgress();
  const resultStage=names().length-1;prev.hidden=record.stage===0;prev.disabled=false;prev.textContent='上一步';prev.onclick=()=>setStage(record.stage-1);
  if(record.stage===0){
@@ -89,8 +92,9 @@ function render(){
   frame.onload=()=>{if(renderToken!==token)return;try{frame.contentWindow.postMessage({type:'studio:game-command',action:'status'},location.origin)}catch{}};
  }
 }
-function rememberWrong(q){const session=read('et_session',null),key='et_wrong'+(session?':'+session:''),items=read(key,{});items[q.q]??={q:q.q,opts:q.opts,ans:q.ans,exp:q.exp,from:course.title,n:0};items[q.q].n++;items[q.q].last=Date.now();try{localStorage.setItem(key,JSON.stringify(items))}catch{}}
+function rememberWrong(q){if(!ensureCourseOwner()||!courseAccessible())return;const session=read('et_session',null),key='et_wrong'+(session?':'+session:''),items=read(key,{});items[q.q]??={q:q.q,opts:q.opts,ans:q.ans,exp:q.exp,from:course.title,n:0};items[q.q].n++;items[q.q].last=Date.now();try{localStorage.setItem(key,JSON.stringify(items))}catch{}}
 function markPassed(){
+ if(!ensureCourseOwner()||!courseAccessible())return;
  if(!course.quiz.length||record.answers.some((a,i)=>a!==course.quiz[i].ans)||record.answers.length!==course.quiz.length)return;
  const session=read('et_session',null),key='et_lessons'+(session?':'+session:'');
  const old=read(key,[]);for(const id of course.progressLessonIds||[])if(!old.includes(id))old.push(id);try{localStorage.setItem(key,JSON.stringify(old));if(course.partIndex>=0)localStorage.setItem('et_vpart:'+vehicle+':'+course.partIndex,'1')}catch{}
@@ -123,6 +127,8 @@ function renderResult(){
  document.getElementById('resultRetry').onclick=resetPractice;hint.textContent='结果已保存在当前设备。';buttonState('返回课程目录',()=>location.href='/?vehicle='+vehicle+'#course');prev.textContent=course.games.length?'返回实训':'返回练习';prev.onclick=()=>setStage(names().length-2);
 }
 function finishTraining(data){
+ if(!ensureCourseOwner())return;
+ if(!courseAccessible()){render();return;}
  gameStatus='complete';const stored=CourseProgress.recordTraining(vehicle,course.partId,{level:data.level,stars:data.stars,mistakes:data.mistakes,seconds:data.seconds,demo:!!data.demo});
  if(!stored){hint.textContent='实训记录暂时未能保存。';buttonState('重试保存',()=>finishTraining(data));return;}
  record.gameResults=stored.gameResults;save();hint.textContent=data.demo?'本项已演示完成。':'本项实训已完成，记录已保存。';
@@ -156,6 +162,14 @@ try{
   const quiz=vehicle==='bev'?(window.BEV_QUIZZES[partId]||[]).map(q=>({q:q.q,opts:q.o,ans:q.a,exp:q.e})):(custom?.quiz||matched[0]?.quiz||[]);
   course={title:part.name.replace(/（.*?）/g,''),description:part.desc,body:custom?.body||contextualBrandBody(matched[0]?.body||'',matched[0]?.id),extraBody:matched.slice(1).map(l=>contextualBrandBody(l.body,l.id)).join(''),quiz,games:CourseProgress.meta(vehicle,partId)?.games||[],partId,lessonIds:ids,progressLessonIds:vehicle!=='bev'&&!custom?ids:[],partIndex,builder:part.b==='port'?'chargeport':part.b,detail:vehicle==='bev'?window.BEV_DETAILS[partId]:window.PART_DETAIL[vehicle]?.[partIndex]};
  }
+ course.paid=!!course.partId||!!lessons.find(l=>l.id===course.lessonId&&l.title.includes('部件课'));
+ document.getElementById('backCourse').href='/?vehicle='+vehicle+'#course';
+ const accessAtOpen=courseAccessible(),ownerAtOpen=window.DemoBilling?.owner();
+ const refreshAccess=()=>{if(window.DemoBilling?.owner()!==ownerAtOpen||courseAccessible()!==accessAtOpen)location.reload()};
+ document.addEventListener('demo-billing:change',refreshAccess);window.addEventListener('focus',refreshAccess);
+ const onSessionChange=event=>{if(event.key==='et_session')location.reload()};window.addEventListener('storage',onSessionChange);
+ if(!accessAtOpen){DemoAccess.mountLearnGate(course.title);window.__LEARN_READY=true;}
+ else{
  courseInfo=CourseProgress.meta(vehicle,course.partId,course.lessonId);storageKey=CourseProgress.key(vehicle,course.partId,course.lessonId);
  const saved=CourseProgress.get(vehicle,course.partId,course.lessonId);
  record={stage:0,question:0,answers:[],quizReview:false,gameIndex:0,gameResults:[],readingPercent:0,...(saved||{})};
@@ -168,4 +182,5 @@ try{
  window.addEventListener('storage',event=>{if(event.key==='et_session')location.reload();else if(event.key===storageKey){mergeProgress(CourseProgress.get(vehicle,course.partId,course.lessonId));updateProgress();}});
  history.replaceState({stage:record.stage},'',location.href);window.addEventListener('popstate',event=>{const step=Number.isInteger(event.state?.stage)?event.state.stage:+(new URLSearchParams(location.search).get('step')||'0');record.stage=guardStage(step);save();render()});
  window.learningStudio={get course(){return course},get progress(){return record},get gameStatus(){return gameStatus}};
+ }
 }catch(error){content.classList.remove('game-mode');content.innerHTML='<div class="error-state"><h2>课程暂时无法打开</h2><p>'+esc(error.message)+'</p><a href="/#course">返回课程目录</a></div>';prev.hidden=true;hint.textContent='';buttonState('返回课程目录',()=>location.href='/?vehicle='+vehicle+'#course');console.error(error)}

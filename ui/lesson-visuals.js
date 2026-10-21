@@ -52,7 +52,7 @@ export const LESSON_VISUALS = Object.freeze({
   26: parts('诊断仪通过控制器读取故障码和数据流；此处用于认识控制单元。', 'vcu'),
   27: whole('本课讲解高压动力与低压控制系统，以及 DC-DC 的供电转换；整车对比用于观察电池与电驱位置。'),
   29: parts('把诊断对象落实到控制单元，再按问诊、验证、读码、定位、复验形成闭环。', 'vcu', 'bms'),
-  30: parts('把整车状态与电池采集数据对应起来；模型只帮助认识数据来源。', 'vcu', 'bms'),
+  30: parts('把整车状态与电池采集数据对应起来，认识控制单元与数据来源。', 'vcu', 'bms'),
   31: parts('先区分BMS采集管理问题与电池本体问题，再按数据流定位。', 'bms', 'battery'),
   32: parts('观察配电与接口连接；高压互锁使用低压信号回路监测连接完整性。', 'pdu', 'chargeport'),
   33: parts('以配电支路和驱动电机为观察对象，理解绝缘故障需要分段定位。', 'pdu', 'motor'),
@@ -65,7 +65,7 @@ export const LESSON_VISUALS = Object.freeze({
   40: parts('对照压缩机与PTC，先区分制冷故障和电加热故障涉及的执行部件。', 'compressor', 'ptc'),
   42: parts('把图上的电源、控制器与连接器对应到实物；针脚定义仍以本课电路图和资料为准。', 'pdu', 'vcu'),
   43: parts('先从外部结构认识电池包的检修层级，再阅读本课开包条件与流程。', 'battery'),
-  44: parts('把电池单体一致性与BMS均衡管理对应起来；模型不显示实时压差或SOC。', 'battery', 'bms'),
+  44: parts('把电池单体一致性与BMS均衡管理对应起来，理解压差与SOC数据的来源。', 'battery', 'bms'),
   45: parts('认识BMS与电池包的连接关系，再理解更换后的参数匹配与标定。', 'bms', 'battery'),
   46: parts('区分电池本体与管理数据来源，再用课程中的容量、内阻和温升方法评估。', 'battery', 'bms'),
   49: parts('分别找到案例中的充电接口与电池包，再回到课程核对分段测量和修复验证。', 'chargeport', 'battery'),
@@ -112,11 +112,10 @@ export function mountLessonVisuals(container, lessonId, options = {}) {
     frame.setAttribute('referrerpolicy', 'same-origin');
     const caption = node('figcaption', 'lesson-visual-caption');
     const note = node('p', 'lesson-visual-model-note');
-    const profileScope = kind === 'whole' ? node('p', 'lesson-profile-scope') : null;
     const profileLayout = kind === 'whole' ? node('ul', 'lesson-profile-layout') : null;
     const profileSources = kind === 'whole' ? node('details', 'lesson-profile-sources') : null;
-    if (profileSources) profileSources.append(node('summary', '', '车型资料与已确认位置'));
-    const status = node('p', 'lesson-visual-status', '正在准备 3D 示意…');
+    if (profileSources) profileSources.append(node('summary', '', '车型资料与来源'));
+    const status = node('p', 'lesson-visual-status', '正在准备 3D 模型…');
     status.setAttribute('role', 'status');
     const interact = node('button', 'lesson-visual-interact', '操作模型');
     interact.type = 'button';
@@ -131,14 +130,14 @@ export function mountLessonVisuals(container, lessonId, options = {}) {
       interact.textContent = interactive ? '结束操作' : '操作模型';
       interact.setAttribute('aria-pressed', String(interactive));
       interact.setAttribute('aria-label', interact.textContent + '：' + frame.title);
-      status.textContent = failed ? '示意暂时无法加载，可继续阅读本课讲解。'
+      status.textContent = failed ? '模型暂时无法加载，可继续阅读本课讲解。'
         : interactive ? '拖动旋转，滚轮或双指缩放；完成后点“结束操作”继续阅读。'
         : loaded ? '模型预览中，可继续滚动阅读。'
-        : '正在准备 3D 示意，可继续滚动阅读。';
+        : '正在准备 3D 模型，可继续滚动阅读。';
     }
     interact.addEventListener('click', () => setInteractive(!interactive));
     caption.append(note);
-    if (profileLayout) caption.append(profileLayout, profileScope, profileSources);
+    if (profileLayout) caption.append(profileLayout, profileSources);
     caption.append(status);
     function show(key) {
       const model = catalog[key];
@@ -147,9 +146,8 @@ export function mountLessonVisuals(container, lessonId, options = {}) {
       readinessObserver?.disconnect();
       frameObservers.delete(readinessObserver);
       frame.title = (kind === 'whole' ? model.year + ' · ' : '') + model.name + ' · 本课结构观察';
-      note.textContent = kind === 'whole' ? model.year + ' · ' + VEHICLES[model.powertrain].name + '。' + model.shellScope : model.note;
+      note.textContent = kind === 'whole' ? model.year + ' · ' + VEHICLES[model.powertrain].name : model.note;
       if (profileLayout) {
-        profileScope.textContent = model.scope;
         profileSources.hidden = !model.sources.length;
         profileLayout.replaceChildren(...model.confirmedLayout.map(text => node('li', '', text)));
         while (profileSources.children.length > 1) profileSources.lastChild.remove();
@@ -157,7 +155,7 @@ export function mountLessonVisuals(container, lessonId, options = {}) {
         for (const source of model.sources) {
           const item = node('li'), link = node('a', '', source.title);
           link.href = source.url; link.target = '_blank'; link.rel = 'noopener noreferrer';
-          item.append(link); if (source.details) item.append(node('span', '', source.details));
+          item.append(link);
           list.append(item);
         }
         profileSources.append(list);
@@ -244,7 +242,7 @@ export function mountLessonVisuals(container, lessonId, options = {}) {
     addPane([config.models[0]], 'parts');
     if (config.models.length > 1) addPane(config.models.slice(1), 'parts');
   }
-  section.append(grid, node('p', 'lesson-visual-disclaimer', config.kind === 'whole' ? '通用模式集中展示完整教学配件；品牌模式依据资料展示已确认的主总成位置。内部尺寸与细部均为教学示意，非原厂 CAD；适用范围见各卡片。' : '通用结构教学示意，用于本课观察；不代表具体车型的原厂布局或诊断测量结果。'));
+  section.append(grid);
   container.append(section);
   let active = true;
   const unmount = () => {

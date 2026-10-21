@@ -15,6 +15,10 @@ const learningDoneSource = learnSource.match(/^function learningDone\(\).*$/m)[0
 const resetSource = learnSource.match(/^function resetPractice\(\).*$/m)[0];
 const storageSource = learnSource.match(/^ window\.addEventListener\('storage'.*$/m)[0];
 const testedSource = [learningDoneSource, learnSource.slice(mergeStart, mergeEnd), resetSource, storageSource].join('\n');
+const trainingStart = learnSource.indexOf('function finishTraining(');
+const trainingEnd = learnSource.indexOf("window.addEventListener('message'", trainingStart);
+assert(trainingStart >= 0 && trainingEnd > trainingStart, 'Locate the actual training completion handler');
+const trainingSource = learnSource.slice(trainingStart, trainingEnd);
 const plain = value => JSON.parse(JSON.stringify(value));
 const initial = () => ({stage: 0, question: 0, answers: [], quizReview: false, gameIndex: 0,
   gameResults: [], readingPercent: 0, readingOffset: 0});
@@ -48,6 +52,20 @@ function tab(store) {
 const stored = store => JSON.parse(store.get(key));
 const passed = [];
 function check(name, test) { test(); passed.push(name); }
+
+function trainingTab(store, allowed = true) {
+  const learner = tab(store), context = learner.context;
+  const ui = {reloads: 0, renders: 0};
+  context.course.paid = true;
+  context.DemoAccess = context.window.DemoAccess = {allowed: () => allowed};
+  context.location.reload = () => { ui.reloads++; };
+  context.gameStatus = 'loading';
+  context.hint = {textContent: ''};
+  context.render = () => { ui.renders++; };
+  context.buttonState = () => {};
+  vm.runInContext(trainingSource, context);
+  return {learner, context, ui, finish: result => context.finishTraining(result)};
+}
 
 check('A partial quiz survives a stale B reading save without moving B', () => {
   const store = new Map(), a = tab(store), b = tab(store);
@@ -127,6 +145,46 @@ check('Storage notification merges evidence without a write loop or page jump', 
   assert.equal(b.writes, writes); assert.equal(b.record.learningCompleted, true);
   assert.equal(b.record.gameResults[0].demo, false);
   assert.deepEqual([b.record.stage, b.record.question, b.record.readingOffset], [0, 2, 321]);
+});
+
+check('A late training message after an account switch cannot write into B', () => {
+  const learned = {...initial(), read: true, learningCompleted: true, readingPercent: 100};
+  const store = new Map([['et_session', JSON.stringify('A')],
+    [key + ':A', JSON.stringify(learned)], [key + ':B', JSON.stringify(learned)]]);
+  const page = trainingTab(store), recordBefore = plain(page.learner.record);
+  store.set('et_session', JSON.stringify('B'));
+  const storedBefore = [...store], writesBefore = page.learner.writes;
+  page.finish(training('motor'));
+  assert.deepEqual([...store], storedBefore, 'Neither account may receive the late result');
+  assert.deepEqual(plain(page.learner.record), recordBefore);
+  assert.equal(page.learner.writes, writesBefore);
+  assert.equal(page.ui.reloads, 1); assert.equal(page.context.gameStatus, 'loading');
+});
+
+check('Normal same-account training still saves real completion', () => {
+  const store = new Map([['et_session', JSON.stringify('A')], [key + ':A', JSON.stringify({
+    ...initial(), read: true, learningCompleted: true, readingPercent: 100})]]);
+  const page = trainingTab(store);
+  page.finish(training('motor'));
+  const value = JSON.parse(store.get(key + ':A'));
+  assert.equal(value.gameResults[0].level, 'motor'); assert.equal(value.gameResults[0].demo, false);
+  assert.equal(page.context.CourseProgress.status('bev', 'motor').trainingDone, 1);
+  assert.equal(page.learner.record.gameResults[0].level, 'motor');
+  assert.equal(page.context.gameStatus, 'complete'); assert.equal(page.ui.reloads, 0);
+});
+
+check('A paid course locked by free preview cannot alter learning records', () => {
+  const store = new Map([[key, JSON.stringify({...initial(), read: true,
+    learningCompleted: true, answers: [1, 2], gameResults: [training('resolver')]})]]);
+  // Only the access interface is stubbed: preview enabled, no active membership.
+  const page = trainingTab(store, false), storedBefore = [...store];
+  const recordBefore = plain(page.learner.record), writesBefore = page.learner.writes;
+  page.finish(training('motor')); page.learner.save();
+  assert.deepEqual([...store], storedBefore);
+  assert.deepEqual(plain(page.learner.record), recordBefore);
+  assert.equal(page.learner.writes, writesBefore);
+  assert.equal(page.context.gameStatus, 'loading');
+  assert.equal(page.ui.renders, 1); assert.equal(page.ui.reloads, 0);
 });
 
 console.log(passed.map(name => 'PASS ' + name).join('\n'));

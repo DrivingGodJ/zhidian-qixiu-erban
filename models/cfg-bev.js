@@ -3,7 +3,7 @@
 // 下列配件与车体均为通用 BEV 教学示意，不对应具体品牌车型。
 window.MODEL_CFG = {
   key: 'bev', title: '纯电动 · BEV', tag: 'Battery Electric Vehicle',
-  summary: '从动力电池到驱动电机，沿着能量流认识纯电动汽车。通用车体与完整配件教学布局，非原厂维修数据。',
+  summary: '从动力电池到驱动电机，沿着能量流认识纯电动汽车。',
   parts: [
     { id:'battery', b:'battery', name:'动力电池包', color:'#6fa6d8', p: [-.05, .285, 0], opt: { len: 2.3, modules: 8 }, desc:'位于底盘中央的高压储能总成。包含电芯模组、冷却板、维修开关与电池管理单元。' },
     { id:'bms', b:'bms', name:'电池管理系统 BMS', color:'#72c7bc', p: [.65, .58, -.34], desc:'采集单体电压、温度与电流，估算 SOC / SOH，并管理电池保护和均衡。' },
@@ -19,6 +19,6 @@ window.MODEL_CFG = {
     { id:'chargeport', b:'port', name:'充电接口', color:'#b1a0ce', p: [1.18, .84, -.83], rot: [0, Math.PI, 0], desc:'连接外部电源，完成连接确认、充电通信与安全互锁。' },
     { id:'cabin', b:'cabin', name:'座舱内饰', color:'#b5bcb3', p:[-.15,.63,0], desc:'仪表、座椅和交互系统构成人机交互与驾乘空间。', shellPart:true },
     { id:'wheel', b:'wheel', name:'车轮与制动', color:'#b9bec5', p:[-1.45,.42,.86], desc:'轮胎、轮毂、制动盘和卡钳组成行驶与制动机构。', shellPart:true },
-    { id:'body', b:'body', name:'车身壳体', color:'#a6c3d5', p:[0,.65,0], desc:'覆盖件、玻璃、灯组与车体骨架用于说明通用车身结构；外形与内饰为教学示意。', shellPart:true }
+    { id:'body', b:'body', name:'车身壳体', color:'#a6c3d5', p:[0,.65,0], desc:'覆盖件、玻璃、灯组与车体骨架共同构成车身结构。', shellPart:true }
   ]
 };

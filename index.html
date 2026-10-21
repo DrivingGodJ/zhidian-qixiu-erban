@@ -10,6 +10,8 @@
 <link rel="apple-touch-icon" href="/videos/app-icon-192.png">
 <link rel="stylesheet" href="/ui/studio.css">
 <link rel="stylesheet" href="/ui/lesson-visuals.css">
+<link rel="stylesheet" href="/ui/membership.css">
+<link rel="stylesheet" href="/ui/demo-access.css">
 </head>
 <body class="studio-app">
 
@@ -29,6 +31,7 @@
   </div>
   <div class="sidebar-bottom">
     <div class="sidebar-caption"><i class="status-dot"></i>从结构认知，到维修实操</div>
+    <button data-p="membership"><span data-icon="shield"></span>会员与方案<span class="demo-nav-label">DEMO</span></button>
     <button data-p="app"><span data-icon="download"></span>安装应用</button>
     <a href="/teacher.html"><span data-icon="users"></span>教师工作台</a>
     <div class="sidebar-version">ZHIDIAN · EV EDUCATION</div>
@@ -36,7 +39,7 @@
 </nav>
 <header class="studio-topbar">
   <nav class="breadcrumbs" aria-label="当前位置"><button class="menu-toggle" aria-label="展开导航" aria-controls="sidebar" aria-expanded="false"><span data-icon="menu"></span></button><div id="routeBreadcrumbs"><span class="current" id="currentPage">学习总览</span></div></nav>
-  <div class="topbar-actions"><span class="guest-status"><span data-icon="user"></span><span id="sessionStatus">游客模式</span></span><button class="auth-button" id="userChip" onclick="openAuth()">登录 / 注册</button></div>
+  <div class="topbar-actions"><a class="membership-status" id="membershipStatus" href="/#membership">会员方案</a><span class="guest-status"><span data-icon="user"></span><span id="sessionStatus">游客模式</span></span><button class="auth-button" id="userChip" onclick="openAuth()">登录 / 注册</button></div>
 </header>
 
 <div class="mask" id="authMask" role="dialog" aria-modal="true" aria-labelledby="authTitle">
@@ -75,7 +78,7 @@
       <button class="hero-secondary" onclick="go('course')">探索体系课程<span data-icon="chevron"></span></button>
       <div class="hero-meta"><span><span data-icon="shield"></span>四大动力车型</span><span><span data-icon="cube"></span>互动拆解演示</span><span><span data-icon="tool"></span>对应维修实操</span></div>
     </div>
-    <div class="hero-stage"><iframe id="homeModel" src="/models/bev.html?profile=su7-rwd-2024&amp;embed=1&amp;hero=1&amp;shell=solid&amp;rotate=0" title="无品牌标识 SU7 造型 3D 教学模型" loading="eager"></iframe><div class="model-caption"><span>LIVE 3D</span>去标 SU7 外观 · 实时渲染</div></div>
+    <div class="hero-stage"><iframe id="homeModel" src="/models/bev.html?profile=su7-rwd-2024&amp;embed=1&amp;hero=1&amp;shell=xray&amp;rotate=1" title="半透明 SU7 动态 3D 模型" loading="eager"></iframe><button class="hero-motion-control" id="heroMotionControl" type="button" aria-pressed="false" aria-label="暂停首页模型旋转">暂停旋转</button><div class="model-caption"><span>LIVE 3D</span>SU7 · 透视结构</div></div>
   </div>
   <div class="home-section-heading"><h2>开启你的学习旅程</h2><span>EXPLORE · LEARN · PRACTICE</span></div>
   <div class="feature-grid">
@@ -94,8 +97,8 @@
 <section class="page models-page" id="p-models" aria-label="3D 拆解台">
   <header class="page-header"><div><h2 class="sec">3D 拆解台</h2><p class="page-description">选择通用模型或具体车型，直接查看对应的配件与内部结构。</p></div></header>
   <div class="models-switch" id="modelSwitch" role="group" aria-label="选择拆解模型"><button class="model-choice on" data-profile="generic-bev" aria-pressed="true"><strong>通用纯电</strong><span>完整配件 · BEV</span></button></div>
+  <section class="model-profile-context" id="modelProfileInfo" aria-label="车型特点"><header class="model-profile-heading"><span>车型特点</span><h3>通用纯电</h3></header><ul class="model-profile-layout"><li>动力电池、驱动电机与减速器。</li><li>充电、配电与热管理系统。</li></ul></section>
   <div class="inline-model-stage" id="modelSingleStage"><iframe id="modelFrame" src="/models/bev.html?profile=generic-bev&amp;embed=1&amp;explore=1&amp;shell=xray" title="通用纯电动 BEV · 全配件教学拆解台" loading="eager"></iframe></div>
-  <section class="model-profile-context" id="modelProfileInfo" aria-label="当前模型说明"><h3>纯电动 BEV · 全配件通用模型</h3><p>部件位置、尺寸和车体为通用教学示意，不对应具体品牌车型。</p></section>
 </section>
 
 <!-- ============ 安装应用 ============ -->
@@ -107,6 +110,11 @@
 </section>
 
 <!-- ============ 课程：实操与部件学习为主体 ============ -->
+<section class="page" id="p-membership" aria-label="会员与方案">
+  <header class="page-header"><div><h2 class="sec">会员与方案</h2><p class="page-description">选择适合个人学习或院校教学的方案，体验未来的付费流程。</p></div></header>
+  <div id="membershipRoot"></div>
+</section>
+
 <section class="page" id="p-course" aria-label="体系课程">
 <div class="view-navigation" hidden><button class="section-back" onclick="studioBack()"><span aria-hidden="true">←</span><span>学习总览</span></button><span class="view-context">学习中心</span></div>
 <header class="page-header"><div><h2 class="sec">体系课程</h2><p class="page-description">从结构与高压安全开始，再按车型学习部件；学习和实训进度会分别保存。</p></div><div class="page-actions" id="courseActions"></div></header>
@@ -169,6 +177,8 @@
 <script src="lessons.js"></script>
 <script src="cloud.js"></script>
 <script src="/ui/course-progress.js"></script>
+<script src="/ui/demo-billing.js"></script>
+<script src="/ui/demo-access.js"></script>
 <script>
 /* ==================== 数据（内嵌为默认库，data.js 存在时自动覆盖） ==================== */
 var LESSONS=(window.DATA&&window.DATA.lessons&&window.DATA.lessons.length)?window.DATA.lessons:[];;
@@ -239,6 +249,7 @@ function refreshUserUI(){
   var u=curUser();
   if(u){chip.textContent=u+' · 退出登录';chip.onclick=function(){if(confirm('退出登录？'))doLogout()}}
   else{chip.textContent='登录 / 注册';chip.onclick=openAuth}
+  document.dispatchEvent(new CustomEvent('demo-billing:change'));
 }
 
 /* ==================== 导航 ==================== */
@@ -349,7 +360,7 @@ function rememberCourseVehicle(vehicle){if(!COURSE_CATALOG[vehicle])return;cours
 function selectCourseVehicle(vehicle){if(!COURSE_CATALOG[vehicle])return;rememberCourseVehicle(vehicle);renderVehicleCourses()}
 function courseLearnUrl(vehicle,part,lesson){return '/learn.html?vehicle='+vehicle+(part?'&part='+encodeURIComponent(part):'&lesson='+lesson)}
 function courseStatus(vehicle,part,lesson){return window.CourseProgress?CourseProgress.status(vehicle,part,lesson):{label:'未开始',percent:0,learningCompleted:false,completed:false,started:false}}
-function courseButtonLabel(vehicle,part,lesson,status){status=status||courseStatus(vehicle,part,lesson);return status.completed?'再学一次':status.started?'继续课程':'开始课程'}
+function courseButtonLabel(vehicle,part,lesson,status){if(part&&window.DemoAccess&&!DemoAccess.allowed('courses'))return '会员课程';status=status||courseStatus(vehicle,part,lesson);return status.completed?'再学一次':status.started?'继续课程':'开始课程'}
 function courseDisplayTitle(title){return String(title||'').replace(/^第\s*[0-9０-９一二三四五六七八九十百]+\s*[课章节]\s*/, '').replace(/^部件课\s*[①-⑳0-9０-９]*\s*[·:：-]?\s*/, '').trim()}
 function courseSummary(items){var statuses=items.map(function(item){return courseStatus(item.vehicle,item.part,item.lesson)});return {total:items.length,learned:statuses.filter(function(status){return status.learningCompleted}).length,completed:statuses.filter(function(status){return status.completed}).length,trainingDone:statuses.reduce(function(total,status){return total+(+status.trainingDone||0)},0),trainingTotal:statuses.reduce(function(total,status){return total+(+status.trainingTotal||0)},0),percent:statuses.length?Math.round(statuses.reduce(function(total,status){return total+Math.max(0,Math.min(100,+status.percent||0))},0)/statuses.length):0}}
 function courseProgressBar(percent,label){return '<span class="course-progress-track" role="progressbar" aria-label="'+esc(label)+'" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+percent+'"><i style="width:'+percent+'%"></i></span>'}
@@ -800,6 +811,7 @@ function mediaTyping(txt){
   chat.appendChild(t);chat.scrollTop=chat.scrollHeight;
 }
 function askWithMedia(){
+  if(window.DemoAccess&&!DemoAccess.require('ai'))return;
   if(!pendingMedia.length){askByText();return}
   var v=document.getElementById('fInput').value.trim();
   var imgs=0,vids=0,frames=[];
@@ -827,6 +839,7 @@ function askWithMedia(){
   .catch(function(){var tp=document.querySelector('#chat .typing');if(tp)tp.remove();botSay('网络异常，分析失败，请稍后再试。')});
 }
 function askByText(){
+  if(window.DemoAccess&&!DemoAccess.require('ai'))return;
   var v=document.getElementById('fInput').value.trim();if(!v)return;
   meSay(v);document.getElementById('fInput').value='';
   var best=null,bs=0;
@@ -906,6 +919,7 @@ function qTag(Q){
 }
 function typeCount(b,t){return b.qs.filter(function(q){return qType(q)===t}).length}
 function renderExamHome(){
+ if(window.DemoAccess&&!DemoAccess.allowed('exam')){document.getElementById('examBox').innerHTML=DemoAccess.gateHtml('exam');return;}
  document.getElementById('examBox').innerHTML='<div class="certificate-grid">'+BANKS.map(function(b,i){var best=get(ukey(PEXAMB+':'+b.id),0);return '<article class="card certificate-card"><span class="case-category">路径 '+String(i+1).padStart(2,'0')+'</span><h3>'+b.name+'</h3><p>'+b.desc+'</p><dl><div><dt>颁证单位</dt><dd>'+b.issuer+'</dd></div><div><dt>试卷规则</dt><dd>'+b.examcfg.paper.rule+'</dd></div></dl><footer class="certificate-footer"><div><strong>'+(best||'—')+'</strong><span class="meta">我的最高分</span></div><button class="btn gray" onclick="openBank(\''+b.id+'\')">进入备考 →</button></footer></article>'}).join('')+'</div>';
 }
 function openBank(id){
@@ -1467,6 +1481,7 @@ if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then
 </script>
 <script src="study.js"></script>
 <script src="/ui/studio.js"></script>
+<script src="/ui/membership.js"></script>
 <script src="/ui/navigation.js" defer></script>
 </body>
 </html>

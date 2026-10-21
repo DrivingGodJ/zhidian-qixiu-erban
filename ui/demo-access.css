@@ -1,0 +1,16 @@
+.demo-nav-label{font-size:8px;letter-spacing:.5px;padding:1px 4px;border:1px solid #53613f;border-radius:3px;color:#b7ca94}
+.membership-status{font-size:11px;white-space:nowrap;color:var(--muted);padding:7px 0}
+.membership-status.preview-active{color:var(--lime)}
+.demo-access-notice{padding:13px 17px;margin-bottom:20px;border:1px solid #4f613d;border-radius:8px;background:#202b1b;color:#d2dfbf;font-size:12px;line-height:1.8}
+.demo-access-gate{max-width:850px;margin:30px auto;padding:40px;border:1px solid #49583e;border-radius:14px;background:linear-gradient(140deg,#222e1b,#181e19);color:var(--text)}
+.demo-access-eyebrow{display:block;margin-bottom:20px;color:var(--lime);font-size:12px;letter-spacing:2px}
+.demo-access-gate h2{font-size:25px;line-height:1.5;margin:0 0 14px}
+.demo-access-gate>p{max-width:620px;color:var(--muted);line-height:1.9;font-size:14px;margin:0 0 25px}
+.demo-access-actions{display:flex;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:20px}
+.demo-access-actions>a,.demo-access-actions>button{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:10px 16px;font:inherit;font-size:13px;border:1px solid #526346;border-radius:7px;color:var(--text);background:transparent;text-decoration:none;cursor:pointer}
+.demo-access-actions>.demo-access-primary{background:var(--lime);border-color:var(--lime);color:#19210f;font-weight:650}
+.demo-access-gate small{display:block;font-size:11px;color:var(--muted);line-height:1.8}
+.demo-access-gate>.demo-access-error{color:#ffaaa1;margin:14px 0 0;font-size:12px}
+#trainerDemoGate[hidden],.demo-access-notice[hidden],#lessonFooter[hidden],.course-progress-summary[hidden]{display:none!important}
+@media(max-width:760px){.demo-access-gate{padding:25px 21px;margin:20px auto}.demo-access-gate h2{font-size:21px}.demo-access-gate>p{font-size:13px}.demo-access-actions{align-items:stretch;flex-direction:column}.demo-access-actions>a,.demo-access-actions>button{width:100%;font-size:12px}.membership-status{font-size:10px}.topbar-actions{gap:10px}}
+@media(max-width:420px){.membership-status{display:none}}

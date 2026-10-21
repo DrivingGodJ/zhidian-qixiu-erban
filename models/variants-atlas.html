@@ -14,7 +14,7 @@ try{
   let index=0;
   for(const[id,spec]of Object.entries(COMPONENT_VARIANTS)){
     const column=index%3,row=Math.floor(index/3),cell=document.createElement('section');cell.className='cell';cell.style.left=column*500+'px';cell.style.top=row*400+'px';
-    const h=document.createElement('h2');h.textContent=spec.name;const note=document.createElement('p');note.textContent='品牌架构参考 · 教学结构示意，非原厂CAD';const small=document.createElement('small');small.textContent=id;cell.append(h,note,small);root.append(cell);
+    const h=document.createElement('h2');h.textContent=spec.name;const note=document.createElement('p');note.textContent='品牌结构对照';const small=document.createElement('small');small.textContent=id;cell.append(h,note,small);root.append(cell);
     const scene=new THREE.Scene();scene.background=new THREE.Color('#111512');scene.environment=environment;
     scene.add(new THREE.HemisphereLight(0xe6eedb,0x151c17,.42));
     const key=new THREE.DirectionalLight(0xf0f2ed,1.8);key.position.set(-3,5,4);scene.add(key);const fill=new THREE.DirectionalLight(0xbdd4e2,.65);fill.position.set(3,2,-3);scene.add(fill);

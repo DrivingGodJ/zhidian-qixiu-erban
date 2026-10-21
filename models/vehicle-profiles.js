@@ -7,9 +7,9 @@ const HALF_PI=Math.PI/2;
 const S=(id,title,url,details,kind='official')=>({id,title,url,details,kind});
 const P=(id,b,name,p,desc,evidence,extra={})=>({id,b,name,p,desc,evidence,confidence:'confirmed',...extra});
 const motor=(id,x,z,evidence,extra={})=>P(id,'motor',x<0?'前桥驱动电机':'后桥驱动电机',[x,.52,z],'电机轴横跨车宽，机械输出经减速与差速机构驱动本桥车轮。',evidence,{opt:{r:.18,len:.4},...extra});
-const reducer=(id,x,z,evidence,extra={})=>P(id,'reducer','单速减速与差速机构',[x,.53,z],'与驱动电机同属电驱总成；拆分外壳仅用于观察功能区。',evidence,{rot:[0,HALF_PI,0],...extra});
-const inverter=(id,x,z,evidence,extra={})=>P(id,'inverter','电驱功率电子功能区',[x,1.0,z],'逆变器随电驱总成布置；本图用分层外壳显示其功能，不表示原厂拆件坐标。',evidence,extra);
-const flatPack=(p,len,evidence,extra={})=>P('battery','battery','地板下动力电池包',p,'平铺于乘员舱地板下方；外形与电芯仅表达布置形式。',evidence,{opt:{len,modules:8},...extra});
+const reducer=(id,x,z,evidence,extra={})=>P(id,'reducer','单速减速与差速机构',[x,.53,z],'与驱动电机同属电驱总成，完成减速与差速。',evidence,{rot:[0,HALF_PI,0],...extra});
+const inverter=(id,x,z,evidence,extra={})=>P(id,'inverter','电驱功率电子功能区',[x,1.0,z],'逆变器随电驱总成布置，控制驱动电机。',evidence,extra);
+const flatPack=(p,len,evidence,extra={})=>P('battery','battery','地板下动力电池包',p,'平铺于乘员舱地板下方。',evidence,{opt:{len,modules:8},...extra});
 
 export const VEHICLE_PROFILES=Object.freeze({
   'su7-rwd-2024':{
@@ -78,12 +78,12 @@ export const VEHICLE_PROFILES=Object.freeze({
       S('volvo-xc60-transmission','Volvo XC60 Recharge · Transmission','https://www.volvocars.com/en-ca/support/car/xc60-recharge-plug-in-hybrid/20w46/article/f1df148bc7f01a62c0a81f6f0b6b960e/38c6be44c7f4a3bec0a81f6f02df3f94/82619c168e5ba7c4c0a8015116fd8e74/','前发动机机械传动由自动变速器完成；外形是横置自动变速机构教学剖示。')
     ],
     parts:[
-      {...P('engine','phevEngine','前置横向发动机',[-1.45,.74,.25],'发动机经前部自动变速器驱动前轮；该外壳为四缸发动机结构示意。',['volvo-xc60-drive'],{rot:[0,HALF_PI,0]}),geometry:'volvoFourCylinder'},
-      {...P('transmission','dht','前桥自动变速器',[-1.45,.65,-.42],'与前发动机相邻的机械自动变速器；不是 DM-i/THS 的功率分流教学模型。',['volvo-xc60-transmission'],{geometry:'transverseAutomatic',rot:[0,HALF_PI,0]}),geometry:'volvoEightAT'},
-      {...P('battery','battery','中央隧道高压电池',[-.2,.46,0],'窄长电池沿乘员舱中央隧道布置；层数与模块仅作抽样。',['volvo-xc60-drive','volvo-er-2022'],{geometry:'tunnelBattery',opt:{len:1.72,width:.31,height:.26,modules:8}}),geometry:'volvoTunnelPack'},
+      {...P('engine','phevEngine','前置横向发动机',[-1.45,.74,.25],'前置四缸发动机经前部自动变速器驱动前轮。',['volvo-xc60-drive'],{rot:[0,HALF_PI,0]}),geometry:'volvoFourCylinder'},
+      {...P('transmission','dht','前桥自动变速器',[-1.45,.65,-.42],'与前发动机相邻的机械自动变速器。',['volvo-xc60-transmission'],{geometry:'transverseAutomatic',rot:[0,HALF_PI,0]}),geometry:'volvoEightAT'},
+      {...P('battery','battery','中央隧道高压电池',[-.2,.46,0],'窄长电池沿乘员舱中央隧道布置。',['volvo-xc60-drive','volvo-er-2022'],{geometry:'tunnelBattery',opt:{len:1.72,width:.31,height:.26,modules:8}}),geometry:'volvoTunnelPack'},
       {...motor('motor',1.55,-.15,['volvo-xc60-drive','volvo-er-2022'],{name:'后桥 ERAD 电机',opt:{r:.16,len:.34}}),geometry:'volvoEradMotor'},
       {...reducer('reducer',1.55,.37,['volvo-xc60-drive'],{scale:[.8,.8,.8],name:'ERAD 后桥减速机构'}),geometry:'volvoEradReducer'},
-      {...inverter('inverter',1.55,-.15,['volvo-xc60-drive'],{p:[1.55,.98,-.15],scale:[.85,.85,.85],confidence:'schematic',name:'后电驱功率电子功能示意'}),geometry:'volvoEradInverter'}
+      {...inverter('inverter',1.55,-.15,['volvo-xc60-drive'],{p:[1.55,.98,-.15],scale:[.85,.85,.85],confidence:'schematic',name:'后电驱功率电子功能区'}),geometry:'volvoEradInverter'}
     ]
   },
   'li-l7-2023':{
@@ -97,11 +97,11 @@ export const VEHICLE_PROFILES=Object.freeze({
       S('li-l7-rescue','理想 L7 Max 2023款 · 官方高压系统/救援图','https://manuals.lixiang.com/zh-cn/X032023MAX/20250916140032/topic-2022-C91C882F-001.html','已核对官方 X03-OM-058 / X03-OM-078 俯视与侧视图：地板电池、包后燃油箱、前后高压动力区。')
     ],
     parts:[
-      {...P('rex','rex','前置增程器',[-1.43,.94,.05],'前舱发动机与发电机负责发电；本模型不画通向车轮的机械传动轴。',['li-l7-launch-2023','li-l7-rescue'],{rot:[0,HALF_PI,0]}),geometry:'liL7Rex'},
+      {...P('rex','rex','前置增程器',[-1.43,.94,.05],'前舱发动机与发电机负责发电，电机驱动车轮。',['li-l7-launch-2023','li-l7-rescue'],{rot:[0,HALF_PI,0]}),geometry:'liL7Rex'},
       {...motor('motor-front',-1.45,-.28,['li-l7-launch-2023','li-l7-rescue'],{name:'前桥五合一电驱 · 电机',p:[-1.45,.32,-.28],opt:{r:.13,len:.26}}),geometry:'liL7FrontMotor'},
       {...reducer('reducer-front',-1.45,.25,['li-l7-launch-2023'],{p:[-1.45,.36,.25],scale:[.6,.6,.6],name:'前电驱减速功能区'}),geometry:'liL7FrontReducer'},
       {...flatPack([-.35,.285,0],1.5,['li-l7-rescue'],{opt:{len:1.5,modules:6}}),geometry:'liL7Pack'},
-      {...P('fuelTank','fuelTank','电池后方燃油箱',[.92,.5,0],'燃油箱位于平铺电池后部与后桥动力区之前；不把它放在前舱或车尾保险杠后。',['li-l7-rescue'],{opt:{len:.5,w:.82}}),geometry:'liL7FuelTank'},
+      {...P('fuelTank','fuelTank','电池后方燃油箱',[.92,.5,0],'燃油箱位于平铺电池后部与后桥动力区之前。',['li-l7-rescue'],{opt:{len:.5,w:.82}}),geometry:'liL7FuelTank'},
       {...motor('motor',1.58,-.13,['li-l7-launch-2023','li-l7-rescue'],{name:'后桥三合一电驱 · 电机',opt:{r:.18,len:.4}}),geometry:'liL7RearMotor'},
       {...reducer('reducer',1.58,.43,['li-l7-launch-2023'],{name:'后电驱减速功能区'}),geometry:'liL7RearReducer'},
       {...inverter('inverter',1.58,-.13,['li-l7-launch-2023'],{name:'后电驱逆变功能区'}),geometry:'liL7RearInverter'}
@@ -118,7 +118,7 @@ export const VEHICLE_PROFILES=Object.freeze({
       S('toyota-mirai2-tech','Toyota Technical Review · 第二代 Mirai','https://global.toyota/pages/global_toyota/mobility/technology/toyota-technical-review/TTR_Vol66_E.pdf','第二代燃料电池与储氢系统的技术布置参考。')
     ],
     parts:[
-      {...P('fuelStack','fuelStack','前舱燃料电池系统',[-1.42,.83,0],'电堆与燃料电池功率转换/辅助系统集中在前舱；板片数量为抽样示意。',['toyota-mirai2-layout']),geometry:'mirai2FuelSystem'},
+      {...P('fuelStack','fuelStack','前舱燃料电池系统',[-1.42,.83,0],'电堆与燃料电池功率转换及辅助系统集中在前舱。',['toyota-mirai2-layout']),geometry:'mirai2FuelSystem'},
       {...P('h2tanks','h2tanks','T 形三储氢罐',[.05,.46,0],'中央长罐沿车身纵向；后排下与行李厢下各有一只横向罐。',['toyota-mirai2-layout','toyota-mirai2-tech'],{geometry:'miraiTankSet'}),geometry:'mirai2TankSet'},
       {...motor('motor',1.52,-.18,['toyota-mirai2-layout'],{opt:{r:.16,len:.34}}),geometry:'mirai2RearMotor'},
       {...reducer('reducer',1.52,.37,['toyota-mirai2-layout'],{scale:[.8,.8,.8]}),geometry:'mirai2Reducer'},

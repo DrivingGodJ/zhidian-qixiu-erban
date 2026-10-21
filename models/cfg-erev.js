@@ -5,7 +5,7 @@ window.MODEL_CFG = {
   key: 'erev',
   title: '增程式 · EREV',
   tag: 'EREV · Extended Range EV',
-  summary: '车轮永远由电机驱动，发动机只当发电机烧油发电——「自带发电机的电动车」。没有变速箱，结构介于纯电与插混之间。 外观仅作载体，内部为通用动力结构教学示意，非原厂维修数据。',
+  summary: '车轮永远由电机驱动，发动机只当发电机烧油发电——「自带发电机的电动车」。没有变速箱，结构介于纯电与插混之间。',
   shell: { suv: true, color: 0x4a5f8a },
   parts: [
     { b: 'rex', color: '#0ea5e9', p: [-1.44, .69, 0], rot: [0, Math.PI / 2, 0],
@@ -63,6 +63,6 @@ window.MODEL_CFG = {
     { b: 'thermal', visualOnly: true, color: '#78aebc', p: [-2.08, .65, 0], rot: [0, Math.PI / 2, 0],
       name: '前舱散热与热管理',
       desc: '散热器横跨车宽，换热面朝车辆纵向，双风扇位于散热器后侧。冷却液回路服务动力总成与高压部件。',
-      diff: '此处为通用冷却系统布置示意，风扇轴沿车身纵向，不代表具体品牌的原厂管路。' }
+      diff: '冷却系统包括散热器与风扇，风扇轴沿车身纵向。' }
   ]
 };

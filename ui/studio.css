@@ -71,3 +71,26 @@
 .models-switch .model-choice:focus-visible{outline:2px solid var(--lime);outline-offset:2px}
 @media(max-width:1200px){.models-switch{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media(max-width:760px){.models-switch{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding:10px}.models-switch .model-choice{padding:9px 8px;min-height:72px}.models-switch .model-choice strong{font-size:12px}.models-switch .model-choice span{font-size:9px}}
+
+/* Model choice, horizontal characteristics, then a single shared 3D canvas. */
+.models-page#p-models .model-profile-context{display:grid;grid-template-columns:180px minmax(0,1fr);column-gap:25px;row-gap:3px;align-items:center;margin:0;padding:20px 22px 13px;border:1px solid var(--line);border-top:0;border-radius:0;background:#1b241b}
+.model-profile-heading{min-width:0;grid-row:1/3;align-self:center}
+.model-profile-heading>span{display:block;color:var(--lime);font-size:10px;letter-spacing:2px;margin-bottom:7px}
+.models-page#p-models .model-profile-heading h3{font-size:17px;margin:0 0 6px;line-height:1.45}
+.model-profile-heading small{color:var(--muted);font-size:10px;line-height:1.6}
+.models-page#p-models .model-profile-layout{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:22px;min-width:0;padding:0;margin:0;list-style:none;counter-reset:feature;color:#ccd8c6;font-size:12px;line-height:1.8}
+.models-page#p-models .model-profile-layout li{min-width:0;padding:0 0 0 15px;margin:0;border-left:1px solid #4e6141}
+.models-page#p-models .model-profile-layout li::before{counter-increment:feature;content:'0' counter(feature);display:block;margin-bottom:5px;color:#92ac7d;font-size:9px;letter-spacing:1px}
+.models-page#p-models .model-profile-sources{grid-column:2;min-width:0;border-top:0;margin:0;font-size:11px}
+.models-page#p-models .model-profile-sources summary{width:max-content;margin-left:auto;min-height:30px;padding:4px 0;color:#9fb68c;font-size:10px}
+.models-page#p-models .model-profile-sources ul{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 22px;list-style:none;padding:12px 0 3px;margin:0;border-top:1px solid var(--line)}
+.models-page#p-models .model-profile-sources li+li{margin-top:0}
+.models-page#p-models .inline-model-stage{border-top:0;height:calc(100dvh - 520px);min-height:470px}
+.home-hero .hero-stage{margin-right:0}
+.hero-motion-control{position:absolute;right:20px;top:15px;z-index:2;display:inline-flex;align-items:center;gap:7px;min-height:36px;padding:6px 11px;border:1px solid #4c5d43;border-radius:6px;background:#111a12d9;color:#b7c9a8;font:inherit;font-size:10px;cursor:pointer;backdrop-filter:blur(6px)}
+.hero-motion-control::before{content:'Ⅱ';color:var(--lime);font-size:12px}
+.hero-motion-control[aria-pressed="true"]::before{content:'▶';font-size:9px}
+.hero-motion-control:hover{background:#283820;color:var(--text);border-color:#a3bc77}
+@media(max-width:1100px){.models-page#p-models .model-profile-context{grid-template-columns:150px minmax(0,1fr);column-gap:20px}.models-page#p-models .model-profile-layout{gap:15px;font-size:11px}}
+@media(max-width:760px){.models-page#p-models .inline-model-stage{height:max(440px,55dvh);min-height:440px}}
+@media(max-width:760px){.models-page#p-models .model-profile-context{display:block;padding:17px 15px 9px}.model-profile-heading{display:grid;grid-template-columns:1fr auto;column-gap:12px;align-items:baseline;margin-bottom:16px}.model-profile-heading>span{grid-column:1/-1;margin-bottom:6px;font-size:9px}.models-page#p-models .model-profile-heading h3{font-size:16px;margin:0}.model-profile-heading small{text-align:right;font-size:9px}.models-page#p-models .model-profile-layout{display:grid;grid-auto-columns:minmax(215px,76%);gap:14px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x proximity;padding-bottom:8px;font-size:11px;scrollbar-width:thin;scrollbar-color:#6b8153 transparent}.models-page#p-models .model-profile-layout li{scroll-snap-align:start;padding-left:12px}.models-page#p-models .model-profile-sources{margin-top:2px}.models-page#p-models .model-profile-sources ul{grid-template-columns:1fr}.hero-motion-control{right:18px;top:22px;min-height:38px}}

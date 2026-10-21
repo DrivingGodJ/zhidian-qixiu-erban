@@ -12,8 +12,8 @@ const names={phevEngine:'混动发动机',dht:'混动变速箱',fuelTank:'燃油
 const spec=variantId?COMPONENT_VARIANTS[variantId]:null;
 const name=spec?.name||(id==='body'?names.body:(query.get('title')||names[id]||'部件结构')).slice(0,60);
 document.getElementById('componentName').textContent=name;
-document.getElementById('componentScope').textContent=variantId?'品牌架构参考 · 教学结构示意，非原厂CAD':'通用教学结构示意';
-document.title=name+' · 教学结构示意';
+document.getElementById('componentScope').textContent=variantId?'品牌结构':'部件结构';
+document.title=name+' · 3D 部件结构';
 const loader=document.getElementById('modelLoading');
 let renderer,scene,controls,model,resizeObserver,intersectionObserver;
 let ready=false,onScreen=true,loopRunning=false;
@@ -40,7 +40,7 @@ try{
   const fullBounds=new THREE.Box3().setFromObject(raw),fullSize=fullBounds.getSize(new THREE.Vector3());
   const focus=raw.userData.focusRole&&raw.getObjectByName(raw.userData.focusRole);
   const fitBounds=focus?new THREE.Box3().setFromObject(focus).expandByScalar(fullSize.length()*.075):fullBounds;
-  if(focus)document.getElementById('componentScope').textContent='集成总成功能区：'+names[id]+' · 非原厂CAD';
+  if(focus)document.getElementById('componentScope').textContent='集成总成功能区：'+names[id];
   model=id==='body'?raw:batchStaticAssembly(raw);scene.add(model);
   const center=fitBounds.getCenter(new THREE.Vector3()),size=fitBounds.getSize(new THREE.Vector3());
   function reset(){

@@ -5,7 +5,7 @@ window.MODEL_CFG = {
   key: 'phev',
   title: '插电混动 · PHEV',
   tag: 'PHEV · Plug-in Hybrid',
-  summary: '发动机与电机两套动力源并存：可充电、可加油，亏电时发动机直驱车轮。结构最复杂，等于「油车+电车」叠加。 外观仅作载体，内部为通用动力结构教学示意，非原厂维修数据。',
+  summary: '发动机与电机两套动力源并存：可充电、可加油，亏电时发动机直驱车轮。结构最复杂，等于「油车+电车」叠加。',
   shell: { suv: false, color: 0x2f5d8a },
   parts: [
     { b: 'phevEngine', color: '#f97316', p: [-1.43, .7, .19], rot: [0, Math.PI / 2, 0],
@@ -63,6 +63,6 @@ window.MODEL_CFG = {
     { b: 'thermal', visualOnly: true, color: '#78aebc', p: [-2.08, .65, 0], rot: [0, Math.PI / 2, 0],
       name: '前舱散热与热管理',
       desc: '散热器横跨车宽，换热面朝车辆纵向，双风扇位于散热器后侧。冷却液回路服务动力总成与高压部件。',
-      diff: '此处为通用冷却系统布置示意，风扇轴沿车身纵向，不代表具体品牌的原厂管路。' }
+      diff: '冷却系统包括散热器与风扇，风扇轴沿车身纵向。' }
   ]
 };

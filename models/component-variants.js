@@ -20,18 +20,18 @@ const SOURCE = {
 };
 const entry = (part, name, features, source, create, extraParts=[]) => ({part,parts:[part,...extraParts],name,features,source,create});
 export const COMPONENT_VARIANTS = Object.freeze({
-  'byd-blade':entry('battery','BYD 刀片电池结构参考','长而薄的方形电芯直接成组，剖开上盖观察长电芯与端部连接。',SOURCE.blade,()=>batteryVariant('blade')),
-  'catl-ctp':entry('battery','CATL 麒麟 CTP 3.0 结构参考','方形电芯直接成组，相邻电芯间布置冷却功能层；不是传统模组箱。',SOURCE.catl,()=>batteryVariant('prismatic')),
-  'tesla-4680':entry('battery','Tesla 4680 圆柱电芯结构参考','圆柱阵列、顶部集流与电芯间连接；不代表所有 Tesla 车型。',SOURCE.teslaBattery,()=>batteryVariant('cylindrical')),
-  'byd-pmsm':entry('motor','BYD 永磁电驱与八合一架构参考','永磁转子、平行轴减速与扁平集成电力电子功能区。',SOURCE.bydDrive,()=>driveVariant('byd'),['inverter','reducer','obc','dcdc','pdu']),
-  'tesla-induction':entry('motor','Tesla 历史交流感应电驱参考','参考早期 Model S：铜鼠笼转子、感应电机与独立逆变器。',SOURCE.teslaMotor,()=>driveVariant('induction'),['inverter','reducer']),
-  'huawei-driveone':entry('motor','Huawei 2020 DriveONE 七合一参考','电机、减速器与分层功率电子功能区集成，剖示连接关系。',SOURCE.huawei,()=>driveVariant('huawei'),['inverter','reducer','obc','dcdc','pdu']),
-  'byd-dmi-ehs':entry('dht','BYD DM-i EHS 架构参考','平行轴电机与发电机、单速传动和直接耦合机构。',SOURCE.dmi,()=>hybridVariant('dmi')),
+  'byd-blade':entry('battery','BYD 刀片电池结构','长而薄的方形电芯直接成组，剖开上盖观察长电芯与端部连接。',SOURCE.blade,()=>batteryVariant('blade')),
+  'catl-ctp':entry('battery','CATL 麒麟 CTP 3.0 结构','方形电芯直接成组，相邻电芯间布置冷却功能层；不是传统模组箱。',SOURCE.catl,()=>batteryVariant('prismatic')),
+  'tesla-4680':entry('battery','Tesla 4680 圆柱电芯结构','圆柱阵列、顶部集流与电芯间连接。',SOURCE.teslaBattery,()=>batteryVariant('cylindrical')),
+  'byd-pmsm':entry('motor','BYD 永磁电驱与八合一架构','永磁转子、平行轴减速与扁平集成电力电子功能区。',SOURCE.bydDrive,()=>driveVariant('byd'),['inverter','reducer','obc','dcdc','pdu']),
+  'tesla-induction':entry('motor','Tesla 历史交流感应电驱','早期 Model S：铜鼠笼转子、感应电机与独立逆变器。',SOURCE.teslaMotor,()=>driveVariant('induction'),['inverter','reducer']),
+  'huawei-driveone':entry('motor','Huawei 2020 DriveONE 七合一','电机、减速器与分层功率电子功能区集成，剖示连接关系。',SOURCE.huawei,()=>driveVariant('huawei'),['inverter','reducer','obc','dcdc','pdu']),
+  'byd-dmi-ehs':entry('dht','BYD DM-i EHS 架构','平行轴电机与发电机、单速传动和直接耦合机构。',SOURCE.dmi,()=>hybridVariant('dmi')),
   'toyota-ths':entry('dht','Toyota THS 功率分流原理','太阳轮、行星轮、齿圈与电机/发电机，表达功率分流原理。',SOURCE.ths,()=>hybridVariant('ths')),
-  'tesla-octovalve':entry('thermal','Tesla Octovalve 冷却液阀组参考','集中式八路冷却液阀组；不是完整制冷剂热泵回路。',SOURCE.octovalve,()=>thermalVariant('octovalve')),
-  'denso-heatpump':entry('thermal','DENSO 热泵回路架构参考','电动压缩机、换热器与带阀气液分离器组成分布式制冷剂回路。',SOURCE.denso,()=>thermalVariant('heatpump')),
-  'toyota-mirai':entry('fuelStack','Toyota 第二代 Mirai 电堆参考','参考2020/2021架构：抽样板片与前舱堆、升压器、PCU集成关系。',SOURCE.mirai,()=>stackVariant('mirai')),
-  'hyundai-nexo':entry('fuelStack','Hyundai 2018代 NEXO 电堆参考','参考2021公开规格的2018代架构：较长抽样板片阵列与独立空气辅助连接。',SOURCE.nexo,()=>stackVariant('nexo'))
+  'tesla-octovalve':entry('thermal','Tesla Octovalve 冷却液阀组','集中式八路冷却液阀组；不是完整制冷剂热泵回路。',SOURCE.octovalve,()=>thermalVariant('octovalve')),
+  'denso-heatpump':entry('thermal','DENSO 热泵回路架构','电动压缩机、换热器与带阀气液分离器组成分布式制冷剂回路。',SOURCE.denso,()=>thermalVariant('heatpump')),
+  'toyota-mirai':entry('fuelStack','Toyota 第二代 Mirai 电堆','2020/2021 架构：层叠板片与前舱电堆、升压器、PCU 集成关系。',SOURCE.mirai,()=>stackVariant('mirai')),
+  'hyundai-nexo':entry('fuelStack','Hyundai 2018代 NEXO 电堆','2018 代架构、2021 公开规格：层叠板片阵列与独立空气辅助连接。',SOURCE.nexo,()=>stackVariant('nexo'))
 });
 
 function mesh(parent,name,geometry,material,position=[0,0,0]) {

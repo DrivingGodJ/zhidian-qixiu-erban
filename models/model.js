@@ -31,7 +31,7 @@ const colors=['#82aca0','#c9ad7a','#7ca2c0','#ac9bc2','#bcaa8a','#8fa87c','#ad87
 const VIEW_PROFILE=PROFILE||getGenericVehicleProfile(KEY);
 const CFG = {...BASE_CFG,title:VIEW_PROFILE.name,tag:KEY.toUpperCase()+' · '+VIEW_PROFILE.year,
   parts:(PROFILE?PROFILE.parts:BASE_CFG.parts).map((p,i)=>({...p,color:p.color||colors[i%colors.length]}))};
-const shellName=VIEW_PROFILE.shellScope;
+const shellName=VIEW_PROFILE.name;
 document.body.dataset.vehicleProfile=VIEW_PROFILE.id;
 document.body.classList.toggle('embed', EMBED);
 document.body.classList.toggle('hero', HERO);
@@ -49,7 +49,7 @@ renderer.shadowMap.needsUpdate = true;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = .82;
 wrap.prepend(renderer.domElement);
-renderer.domElement.setAttribute('aria-label', '可旋转、缩放的 '+shellName+'教学模型');
+renderer.domElement.setAttribute('aria-label', HERO?'半透明动态展示 · '+shellName:'可旋转、缩放的 '+shellName+'教学模型');
 const scene = new THREE.Scene();
 scene.background = HERO ? null : new THREE.Color('#111512');
 scene.fog = new THREE.Fog('#111512', 16, 40);
@@ -58,8 +58,8 @@ const controls = new OrbitControls(camera, renderer.domElement);
 controls.target.set(0, .65, 0);
 controls.enableDamping = true;
 controls.dampingFactor = .07;
-controls.autoRotate = !HERO && Q.get('rotate') === '1' && !matchMedia('(prefers-reduced-motion: reduce)').matches;
-controls.autoRotateSpeed = .35;
+controls.autoRotate = Q.get('rotate') === '1' && !matchMedia('(prefers-reduced-motion: reduce)').matches;
+controls.autoRotateSpeed = HERO ? .5 : .35;
 controls.minDistance = 1.4;
 controls.maxDistance = 14;
 controls.maxPolarAngle = Math.PI / 2 - .02;
@@ -91,7 +91,7 @@ const grid = new THREE.GridHelper(30,60,0x354032,0x20291f);grid.position.y=.003;
 const car = new THREE.Group();scene.add(car);
 const parts = [], pickables = [];
 const partsRoot = new THREE.Group();partsRoot.position.y=-.095;car.add(partsRoot);
-for (const [idx, p] of (HERO ? [] : CFG.parts).entries()) {
+for (const [idx, p] of CFG.parts.entries()) {
   if(p.shellPart)continue;
   const builder = PROFILE ? VEHICLE_COMPONENT_BUILDERS[p.geometry] : BUILDERS[p.b];
   if (!builder || (PROFILE && !p.geometry)) {
@@ -112,13 +112,14 @@ for (const [idx, p] of (HERO ? [] : CFG.parts).entries()) {
   const original = group.position.clone();
   partsRoot.add(group);parts.push({idx,group,cfg:p,materials,original,localCenter,anchorLocal});
 }
-partsRoot.visible = !HERO;
+partsRoot.visible = true;
 
 // Do not invent vehicle-specific HV / coolant routing from generic connection lanes.
-let shell, shellMode = HERO?'solid':'xray';
+let shell, shellMode = HERO&&Q.get('shell')==='solid'?'solid':'xray';
 let under = Q.get('view') === 'under', exploded = false, selected = -1;
 const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
-let shellAlpha=shellMode==='solid'?1:shellMode==='hidden'?0:.08;
+const xrayOpacity=HERO?.26:.08;
+let shellAlpha=shellMode==='solid'?1:shellMode==='hidden'?0:xrayOpacity;
 let shellTarget=shellAlpha,cameraMotion=null;
 let labelsOn=Q.get('labels')==='1';
 const labelLayer=document.createElement('div');labelLayer.className='part-labels';wrap.append(labelLayer);
@@ -153,13 +154,14 @@ function select(idx) {
   if(BRIDGE){parent.postMessage({type:'studio:select',partId:p.id},location.origin);return;}
   document.getElementById('pcName').textContent=p.name;
   const specific=parts.find(pt=>pt.idx===idx)?.group.userData.vehicleComponent;
-  document.getElementById('pcDesc').textContent=p.desc+(specific?' 对应结构重建：'+specific.features+'。':'');
+  document.getElementById('pcDesc').textContent=p.desc+(specific?' 结构特点：'+specific.features+'。':'');
   const detail=document.getElementById('pcDiff');
-  detail.replaceChildren(document.createTextNode(PROFILE?(p.confidence==='confirmed'?'资料已确认该总成的区域与功能；尺寸、外壳及具体坐标为教学示意。':'功能与位置为教学示意，未核实该年款的原厂拆件坐标。'):(p.diff||'通用配件教学结构，位置与尺寸不对应具体量产车型。')));
+  detail.replaceChildren();
+  if(!PROFILE&&p.diff)detail.append(document.createTextNode(p.diff));
   for(const id of p.evidence||[]){
     const source=VIEW_PROFILE.sources.find(s=>s.id===id);if(!source)continue;
     const a=document.createElement('a');a.href=source.url;a.target='_blank';a.rel='noopener';a.textContent=source.title;
-    detail.append(document.createElement('br'),a);
+    if(detail.hasChildNodes())detail.append(document.createElement('br'));detail.append(a);
   }
   document.getElementById('pcCourse').hidden=true;
   card.classList.add('show');
@@ -205,9 +207,9 @@ function frame(animate=false) {
   if(animate)flyTo(position,target);else{camera.position.copy(position);controls.target.copy(target);controls.update();}
 }
 function applyMode(){
-  shellTarget=under?0:shellMode==='solid'?1:.08;
+  shellTarget=under?0:shellMode==='solid'?1:xrayOpacity;
   if(reducedMotion)shellAlpha=shellTarget;
-  partsRoot.visible=!HERO&&(under||shellMode!=='solid'||shellAlpha<.995);
+  partsRoot.visible=under||shellMode!=='solid'||shellAlpha<.995;
   renderer.shadowMap.needsUpdate=true;
   document.getElementById('vWhole').classList.toggle('on',!under);
   document.getElementById('vUnder').classList.toggle('on',under);
@@ -229,14 +231,16 @@ document.querySelector('.hint').textContent='选择部件查看说明 · 拖动�
 document.getElementById('typeTag').textContent=CFG.tag;
 document.getElementById('stageTitle').textContent=VIEW_PROFILE.name;
 document.querySelector('.stage-caption p').textContent=VIEW_PROFILE.year+' · '+shellName;
+if(EMBED&&EXPLORE)document.querySelector('.stage-caption').hidden=true;
 const disclaimer=document.querySelector('.stage-disclaimer');
 if(disclaimer){
-  disclaimer.replaceChildren(document.createTextNode(PROFILE?'按年款资料表达主总成区域；共用比例框架，非原厂 CAD 或毫米级装配。':'集中展示全部通用配件，非量产车型配置或原厂装配。'));
-  const a=document.createElement('a');a.href='assets/ATTRIBUTION.md';a.target='_blank';a.rel='noopener';a.textContent='外观模型来源与署名';disclaimer.append(document.createElement('br'),a);
+  disclaimer.replaceChildren();
+  const a=document.createElement('a');a.href='assets/ATTRIBUTION.md';a.target='_blank';a.rel='noopener';a.textContent='外观模型来源与署名';disclaimer.append(a);
 }
 controls.addEventListener('start',()=>{cameraMotion=null;stopRotation();});
 window.addEventListener('message',e=>{
   if(e.origin!==location.origin||e.source!==parent)return;
+  if(e.data?.type==='studio:rotation'&&HERO){controls.autoRotate=e.data.running===true;heroDirty=true;}
   if(e.data?.type==='studio:view')setView(e.data.view==='under'?'under':'whole');
   if(e.data?.type==='studio:drive'){
     const id=e.data.driving?'motor':'obc';
@@ -252,7 +256,7 @@ document.addEventListener('visibilitychange',()=>{active=!document.hidden;});
 let visible=true;new IntersectionObserver(entries=>{visible=entries[0].isIntersecting;}).observe(wrap);
 const clock=new THREE.Clock();
 renderer.setAnimationLoop(()=>{
-  const delta=Math.min(clock.getDelta(),.05);if(!active||!visible||(HERO&&!heroDirty))return;
+  const delta=Math.min(clock.getDelta(),.05);if(!active||!visible||(HERO&&!heroDirty&&!controls.autoRotate))return;
   for(const pt of parts){const offset=exploded?new THREE.Vector3(pt.original.x*.22,.45+Math.abs(pt.original.x)*.15,pt.original.z*.45):new THREE.Vector3();const target=pt.original.clone().add(offset);if(pt.group.position.distanceToSquared(target)>.000001)renderer.shadowMap.needsUpdate=true;pt.group.position.lerp(target,reducedMotion?1:1-Math.exp(-delta*7));}
   // Wheels stay grounded while the independent teaching assemblies separate.
   if(shell){
@@ -262,7 +266,7 @@ renderer.setAnimationLoop(()=>{
       shell.userData.setShellProgress(shellAlpha===1?'solid':shellAlpha===0?'hidden':'xray',shellAlpha);
       renderer.shadowMap.needsUpdate=true;
     }
-    partsRoot.visible=!HERO&&(under||shellMode!=='solid'||shellAlpha<.995);
+    partsRoot.visible=under||shellMode!=='solid'||shellAlpha<.995;
   }
   if(cameraMotion){
     const t=Math.min(1,(performance.now()-cameraMotion.start)/cameraMotion.duration),e=1-Math.pow(1-t,3);
@@ -311,3 +315,4 @@ catch(e){loader.classList.add('error');loader.replaceChildren(document.createTex
 frame();
 window.studio={scene,camera,renderer,controls,parts,profile:VIEW_PROFILE,generic,get shell(){return shell;},select,setView,get mode(){return shellMode;},get shellAlpha(){return shellAlpha;},get cameraAnimating(){return !!cameraMotion;}};
 window.vehicleStudio=window.studio;
+if(HERO&&parent!==window)parent.postMessage({type:'studio:ready'},location.origin);

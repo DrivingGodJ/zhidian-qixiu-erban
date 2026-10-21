@@ -64,7 +64,7 @@
     if((e.key==='Enter'||e.key===' ')&&target.matches('[role="button"]:not(button)')&&target===document.activeElement){e.preventDefault();target.click()}
   });
   if(!document.body.classList.contains('studio-app'))return;
-  var titles={models:'3D 拆解台',home:'学习总览',course:'体系课程',trainer:'故障带教',cases:'案例库',exam:'考证备考',dash:'学习看板',wrong:'我的错题',app:'安装到桌面'};
+  var titles={models:'3D 拆解台',home:'学习总览',course:'体系课程',trainer:'故障带教',cases:'案例库',exam:'考证备考',dash:'学习看板',wrong:'我的错题',app:'安装到桌面',membership:'会员与方案'};
   var menu=document.querySelector('.menu-toggle'),sidebar=document.getElementById('sidebar'),mobile=matchMedia('(max-width:760px)');
   function syncSidebar(){sidebar.inert=mobile.matches&&!document.body.classList.contains('menu-open')}
   function closeMenu(restoreFocus){var wasOpen=document.body.classList.contains('menu-open');document.body.classList.remove('menu-open');menu.setAttribute('aria-expanded','false');menu.setAttribute('aria-label','展开导航');syncSidebar();if(wasOpen&&restoreFocus)menu.focus()}
@@ -77,6 +77,7 @@
   document.addEventListener('click',function(e){if(document.body.classList.contains('menu-open')&&!e.target.closest('.studio-sidebar,.menu-toggle'))closeMenu()});
   var descriptions={models:'切换动力车型，旋转观察结构；点击标注查看部件说明。',home:'',course:'从结构与高压安全开始，再按车型学习部件；学习和实训进度会分别保存。',trainer:'从症状出发，通过读码、推断、排查与验证建立诊断思路。',cases:'从故障现象走到根因，先学对应部件，再进入实训。',exam:'选择证书，系统学习知识，再通过练习与模拟检验掌握情况。',dash:'查看课程、实训和考试进度，找到下一步学习重点。',wrong:'重练薄弱知识点；答对后自动移出，反复出错的题优先显示。',app:'在电脑、手机和平板上，把学习平台添加到常用位置。'};
   titles.app='安装应用';
+  descriptions.membership='选择适合个人学习或院校教学的方案，体验未来的付费流程。';
   window.studioViewToken=0;
   var originalCourseRenderer=window.renderLessons,originalGo=window.go,routing=false,current={path:'#home',parent:null,breadcrumbs:[{label:titles.home,href:'/#home'}]},resultViews={};
   function base(section){return {section:section,path:'#'+section,parent:section==='home'?null:'#home',title:titles[section],description:descriptions[section],crumbs:section==='home'?[]:[{label:titles[section],href:'/#'+section}]}}
@@ -110,6 +111,7 @@
     var target='#'+hash;if(!leaveMock(target))return false;if(current.path!==target&&current.path.indexOf('#course/lesson/')===0)stopStudyTimer(true);
     routing=true;window.studioViewToken++;
     try{
+      if(section==='exam'&&window.DemoAccess&&!DemoAccess.allowed('exam')){originalGo('exam');var lockedView=base('exam');lockedView.path='#'+hash;if(parts.length>1)lockedView.parent='#exam';applyView(lockedView,replace);closeMenu();window.scrollTo(0,0);return true}
       if(resultViews[target]){var saved=resultViews[target];document.querySelectorAll('.page').forEach(function(p){p.classList.toggle('active',p.id==='p-'+saved.view.section)});document.getElementById(saved.box).innerHTML=saved.html;applyView(saved.view,replace);closeMenu();window.scrollTo(0,0);return true}
       originalGo(section);var v=base(section),a=parts[1],id=parts[2];
       if(section==='course'){
@@ -147,7 +149,7 @@
   wrap('renderStudy',function(id){return bankView(id,'study','教材学习路线')});
   [['startMock','mock','全真模拟'],['startExam','quick','快速抽考'],['drill','drill','顺序刷题'],['drillWrong','wrong','错题重练'],['startGameQuiz','skills','维修实操考题'],['startPractical','practical','看图实操']].forEach(function(x){wrap(x[0],function(){return CURB?bankView(CURB.id,x[1],x[2]):null})});
   wrap('renderWrong',function(){return base('wrong')});wrap('startWrongPractice',function(){return view('wrong','wrong/practice','错题强化练习','#wrong')});
-  document.addEventListener('click',function(e){var a=e.target.closest('a[href]');if(!a||e.defaultPrevented||e.ctrlKey||e.metaKey||e.shiftKey||a.target==='_blank')return;var url=new URL(a.href,location.href);if(url.origin===location.origin&&(url.pathname==='/'||url.pathname==='/index.html')&&/^#(home|models|course|trainer|cases|exam|dash|wrong|app)(\/|$)/.test(url.hash)){e.preventDefault();window.studioNavigate(url.href)}});
+  document.addEventListener('click',function(e){var a=e.target.closest('a[href]');if(!a||e.defaultPrevented||e.ctrlKey||e.metaKey||e.shiftKey||a.target==='_blank')return;var url=new URL(a.href,location.href);if(url.origin===location.origin&&(url.pathname==='/'||url.pathname==='/index.html')&&/^#(home|models|course|trainer|cases|exam|dash|wrong|app|membership)(\/|$)/.test(url.hash)){e.preventDefault();window.studioNavigate(url.href)}});
   window.addEventListener('popstate',function(){var target=location.hash||'#home';if(target==='#mainContent')return;if(!route(target,true))history.pushState({studio:true,path:current.path},'',current.path)});
   function refreshCourseProgress(){
     if(current.path!=='#course'||routing)return;
@@ -165,6 +167,11 @@
   var modelLabels={'generic-bev':'通用纯电','generic-phev':'通用插混','generic-erev':'通用增程','generic-fcev':'通用氢燃料','su7-rwd-2024':'小米 SU7','atto3-fwd-2023':'BYD ATTO 3','model3-rwd-2023':'Tesla Model 3','xc60-t8-er-2022':'Volvo XC60 T8','li-l7-2023':'理想 L7','mirai-gen2-2021':'Toyota Mirai','nexo-2018':'Hyundai NEXO'};
   descriptions.models='选择通用模型或具体车型，直接查看对应的配件与内部结构。';
   function modelProfileNode(tag,text){var node=document.createElement(tag);if(text)node.textContent=text;return node}
+  var homeModel=document.getElementById('homeModel'),heroMotionControl=document.getElementById('heroMotionControl'),heroPaused=matchMedia('(prefers-reduced-motion:reduce)').matches;
+  function syncHeroMotion(){heroMotionControl.textContent=heroPaused?'开始旋转':'暂停旋转';heroMotionControl.setAttribute('aria-label',(heroPaused?'开始':'暂停')+'首页模型旋转');heroMotionControl.setAttribute('aria-pressed',String(heroPaused));homeModel.contentWindow.postMessage({type:'studio:rotation',running:!heroPaused},location.origin)}
+  heroMotionControl.addEventListener('click',function(){heroPaused=!heroPaused;syncHeroMotion()});homeModel.addEventListener('load',syncHeroMotion);
+  window.addEventListener('message',function(event){if(event.origin===location.origin&&event.source===homeModel.contentWindow&&event.data?.type==='studio:ready')syncHeroMotion()});
+  syncHeroMotion();
   function showModelProfile(id){
     var profile=modelProfiles[id];if(!profile)return;
     if(currentModelId===id&&modelProfileInfo.dataset.profile===id)return;
@@ -172,12 +179,12 @@
     modelSwitch.querySelectorAll('[data-profile]').forEach(function(button){var active=button.dataset.profile===id;button.classList.toggle('on',active);button.setAttribute('aria-pressed',String(active))});
     var src='/models/'+profile.powertrain+'.html?profile='+encodeURIComponent(id)+'&embed=1&explore=1&shell=xray';if(modelFrame.getAttribute('src')!==src)modelFrame.src=src;
     modelFrame.title=profile.name+' · '+(generic?'全配件教学拆解台':profile.year+' · 车型结构拆解台');modelProfileInfo.dataset.profile=id;
-    modelProfileInfo.replaceChildren(modelProfileNode('h3',generic?profile.name+' · 全配件模型':profile.year+' · '+profile.name),modelProfileNode('p',profile.shellScope));
-    var layout=modelProfileNode('ul');layout.className='model-profile-layout';profile.confirmedLayout.forEach(function(text){layout.append(modelProfileNode('li',text))});modelProfileInfo.append(layout);
-    var scope=modelProfileNode('p',profile.scope);scope.className='model-profile-scope';modelProfileInfo.append(scope);
+    var heading=modelProfileNode('header');heading.className='model-profile-heading';heading.append(modelProfileNode('span','车型特点'),modelProfileNode('h3',modelLabels[id]||profile.name),modelProfileNode('small',generic?profile.powertrain.toUpperCase()+' · 全配件':profile.year+' · '+profile.powertrain.toUpperCase()));modelProfileInfo.replaceChildren(heading);
+    var layout=modelProfileNode('ul');layout.className='model-profile-layout';layout.tabIndex=0;layout.setAttribute('aria-label','车型结构特点');profile.confirmedLayout.forEach(function(text){layout.append(modelProfileNode('li',text))});modelProfileInfo.append(layout);
     if(profile.sources.length){
-      var details=modelProfileNode('details'),list=modelProfileNode('ul');details.className='model-profile-sources';details.append(modelProfileNode('summary','车型资料与已确认位置'));
-      profile.sources.forEach(function(source){var item=modelProfileNode('li'),link=modelProfileNode('a',source.title);link.href=source.url;link.target='_blank';link.rel='noopener noreferrer';item.append(link);if(source.details)item.append(modelProfileNode('span',source.details));list.append(item)});details.append(list);modelProfileInfo.append(details);
+      var details=modelProfileNode('details'),list=modelProfileNode('ul');details.className='model-profile-sources';details.append(modelProfileNode('summary','车型资料'));
+      var sources=profile.sources.slice();if(['su7-rwd-2024','model3-rwd-2023','xc60-t8-er-2022'].includes(id))sources.push({title:'3D 模型来源与署名',url:'/models/assets/ATTRIBUTION.md'});
+      sources.forEach(function(source){var item=modelProfileNode('li'),link=modelProfileNode('a',source.title);link.href=source.url;link.target='_blank';link.rel='noopener noreferrer';item.append(link);list.append(item)});details.append(list);modelProfileInfo.append(details);
     }
   }
   modelSwitch.addEventListener('click',function(event){var button=event.target.closest('[data-profile]');if(button&&modelSwitch.contains(button))showModelProfile(button.dataset.profile)});
