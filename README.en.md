@@ -2,60 +2,37 @@
 
 # Zhidian Qixiu Erban
 
-A web learning platform for combustion-engine technicians transitioning to new-energy vehicles and for beginners, combining 3D disassembly, repair simulations and AI-assisted fault instruction.
+Understand a new-energy vehicle's structure, then practice repairs in virtual scenes. For transitioning combustion-engine technicians and beginners, the platform connects 3D disassembly, component lessons, simulations and AI fault instruction.
 
-[Live demo](http://47.101.135.218/) · [Detailed features, architecture and deployment](docs/readme-reference.zh-CN.md)
+[Open the learning platform](http://47.101.135.218/) · [Watch the 15-second introduction](videos/promo-15s.mp4)
 
-Created by the “智电汽修二班” teaching team for the university AI innovation/entrepreneurship and OPC AI Agent competition track.
+## Start with the vehicle, then explore a component
 
-## Features
+Choose battery-electric, plug-in hybrid, range-extended or hydrogen fuel-cell vehicles. Find batteries, motors, controllers and other components in a 3D model, then enter a lesson to connect their position with how they work.
 
-- **Four powertrains**: BEV, PHEV, EREV and FCEV models, component lessons and quizzes.
-- **Practice and assessment**: 3D repair games, beginner courses, an experienced-technician track and certification exercises.
-- **AI fault instruction** accepts text, images and videos and combines visual/text models with fault-code and case knowledge.
-- **Learning dashboard** tracks courses, game results, mistakes and exam preparation.
-- **Teacher portal** provides application review, class codes and class progress management.
+## Practice what you've learned
 
-## Quick start
+Lessons pair quizzes with repair simulations covering high-voltage shutdown, insulation checks, thermal management and related topics. Beginners can follow a structured course, while experienced technicians assess existing knowledge through an advanced track before filling the new-energy gaps.
 
-Requires **Node.js 18+**. The backend uses built-in modules only; no `npm install` is needed. From the repository root:
+## Ask about the symptoms in front of you
 
-```bash
-node server.js
-```
+Start with text, a fault-code photo or a symptom video. AI instruction combines visual recognition, fault-code knowledge and cases to explain diagnostic approaches. Representative questions can become cases for later learning.
 
-The default port is 80. Open `http://localhost/` for students or `http://localhost/teacher.html` for teachers. Set `PORT` to change it, for example in PowerShell:
+## Keep a record of practice
 
-```powershell
-$env:PORT = '8080'
-node server.js
-```
+The dashboard collects course progress, game results and mistakes, with theory and image-based certification exercises. Teachers can create classes and review progress to support lessons and follow-up discussions.
 
-Then open `http://localhost:8080/`. Startup works without keys; AI and teacher-review functionality remain unavailable.
+## Try it
 
-## Usage
+Enter the student interface through the [live demo](http://47.101.135.218/). See the user guide for teacher applications, classes and self-hosting configuration. The platform supports learning and simulation; it does not replace real-vehicle procedures or on-site safety requirements.
 
-Students enter component lessons, quizzes and simulations through the vehicle models. Approved teachers can create classes and review progress. Authenticated users can synchronize learning records to the server.
+## Explore further
 
-Use `keys.example.json` as the configuration reference. Prefer placing the real `keys.json` one directory above the website root, or use server environment variables. The service supports DashScope vision and DeepSeek text responses. Never commit real keys, `ADMIN_TOKEN` or `data/db.json`; administrator tokens must not be public frontend configuration.
+| Topic | Documentation |
+| --- | --- |
+| Local startup, teacher portal and model configuration | [User guide](docs/GUIDE.en.md) |
+| Courses, vehicles and complete features | [Feature reference (Chinese)](docs/readme-reference.zh-CN.md) |
+| Source layout, APIs and Windows deployment | [Technical reference (Chinese)](docs/readme-reference.zh-CN.md#五生产部署windows-服务器) |
+| Feedback | [Issues](https://github.com/DrivingGodJ/zhidian-qixiu-erban/issues) |
 
-AI answers and virtual practice are learning aids. Actual vehicle work must follow the relevant vehicle's repair procedures and on-site safety requirements. The demo URL uses HTTP; do not enter production secrets there.
-
-## Development and checks
-
-The frontend uses static pages and Three.js; `server.js` is the backend entry. `data.js` and `lessons.js` hold core learning/case data; `models/` and `videos/` contain models and games.
-
-```bash
-node --check server.js
-```
-
-A syntax check does not validate live accounts, model calls or instructional effectiveness. Verify login, teacher review, progress sync, uploads and model configuration before deployment. `videos/` is a historical compatibility path that also contains engine, game and PWA assets; do not rename it based only on its name.
-
-## Documentation and support
-
-- [Detailed courses, layout, APIs and Windows deployment (Chinese)](docs/readme-reference.zh-CN.md)
-- [Report an issue](https://github.com/DrivingGodJ/zhidian-qixiu-erban/issues)
-
-## License and credits
-
-Three.js is MIT-licensed; the original project describes teaching videos/images as team-created. No repository-wide software license is provided. Dependency terms do not automatically license the project code, courses or media; confirm applicable permissions before reuse.
+A competition project by the “智电汽修二班” teaching team. [Origins and licensing](docs/GUIDE.en.md#license-and-credits)
