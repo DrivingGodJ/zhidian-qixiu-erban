@@ -27,7 +27,7 @@ const wrong=fixture({vehicle:'bev',part:'battery'});wrong.complete('bev','motor'
 const partial=fixture({vehicle:'bev',part:null});partial.complete('bev','motor');assert.equal(partial.call('trainingAccess','motor').unlocked,false,'partial context must not fall back');
 const direct=fixture();direct.complete('phev','battery');assert.equal(direct.call('trainingAccess','battery').course.vehicle,'phev');assert.equal(direct.call('trainingAccess','battery').unlocked,true);
 for(const name of ['loadLevel','startGame','useTool','demo','selectTool','finish']){const start=html.indexOf('function '+name+'('),body=html.slice(start,html.indexOf('\n}',start));assert(body.includes('requireLearning('),'unguarded entry: '+name)}
-assert(html.includes("await runFx(s);\n  if(!requireLearning(cur.id))"),'progress must be checked again after animation');
+assert(/await runFx\(s\);\r?\n  if\(!requireLearning\(cur\.id\)\)/.test(html),'progress must be checked again after animation');
 assert(html.indexOf('src="/ui/course-progress.js?v=progress-2"')<html.indexOf('<script type="module">'),'progress API must load first');
 console.log('PASS: 50 games, '+Object.values(chapters).reduce((n,p)=>n+Object.keys(p).length,0)+' chapters, '+pairs+' native associations; locked/unlocked/revoked/mismatched/partial/direct context and all six engine entry guards; native read+quiz completion, exact BEV/PHEV isolation, partial reading/quiz, account isolation, old-star rejection and missing-API lock.');
 
